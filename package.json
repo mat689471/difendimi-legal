@@ -1,0 +1,21 @@
+{
+  "name": "difendimi-legal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:38871/git/mat689471/difendimi-legal"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@remotion/cli": "^4.0.479",
+    "@remotion/player": "^4.0.479",
+    "remotion": "^4.0.479"
+  }
+}
