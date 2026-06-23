@@ -53,7 +53,7 @@ def is_destructive(command: str) -> bool:
         r'\brd\b',                   # alias CMD di rmdir (remove directory)
         r'\brmdir\b',                # rimuove directory in CMD e PowerShell
         r'\brm\b',                   # alias Unix/PowerShell di Remove-Item
-        r'\bformat\b',               # formatta un volume o disco
+        r'\bformat\b(?!-)',           # formatta un volume o disco; (?!-) esclude Format-Table/List/ecc.
         r'\bClear-Content\b',        # svuota il contenuto di un file (senza cancellarlo)
         r'\bcc\b',                   # alias PowerShell di Clear-Content
         r'-Recurse\b',               # flag PS: rende un'operazione ricorsiva (amplifica impatto)
