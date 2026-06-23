@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>AGENTE AI ∞</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden;font-family:'Courier New',monospace;user-select:none}
+#bg{position:fixed;inset:0;z-index:0}
+
+/* ── HUD ───────────────────────────────────────────────────────────── */
+#hud{
+  position:fixed;inset:0;z-index:10;pointer-events:none;
+  display:grid;
+  grid-template-rows:48px 1fr 220px;
+  grid-template-columns:260px 1fr 260px;
+  gap:6px;padding:6px;
+}
+
+/* top bar */
+#topbar{
+  grid-column:1/-1;
+  display:flex;align-items:center;justify-content:space-between;
+  border:1px solid #00ffcc33;background:#00ffcc07;
+  backdrop-filter:blur(8px);padding:0 18px;
+  color:#00ffcc;font-size:12px;letter-spacing:2px;
+}
+#topbar .brand{font-size:14px;font-weight:bold;letter-spacing:4px}
+#topbar .model{color:#0088ff88;font-size:10px;letter-spacing:5px}
+#status-wrap{display:flex;align-items:center;gap:8px}
+#dot{width:8px;height:8px;border-radius:50%;background:#ff3333;box-shadow:0 0 6px #ff3333;transition:.4s}
+#dot.on{background:#00ffcc;box-shadow:0 0 12px #00ffcc}
+#status-txt{font-size:11px;letter-spacing:3px}
+
+/* panels */
+.panel{
+  border:1px solid #0088ff22;background:#00000a99;
+  backdrop-filter:blur(10px);padding:10px 12px;
+  overflow:hidden;
+}
+.panel h3{
+  color:#00ffcc;font-size:10px;letter-spacing:4px;
+  border-bottom:1px solid #00ffcc22;padding-bottom:5px;margin-bottom:8px;
+}
+.pitem{
+  padding:3px 0;border-bottom:1px solid #ffffff06;
+  color:#88ddcc;font-size:10px;word-break:break-all;line-height:1.4;
+}
+.pitem em{color:#00ffcc88;font-style:normal;margin-right:5px}
+.empty{color:#ffffff22;font-size:10px}
+
+#panel-l{grid-row:2;grid-column:1}
+#panel-r{grid-row:2;grid-column:3}
+
+/* terminal */
+#term{
+  grid-row:3;grid-column:1/-1;
+  display:flex;flex-direction:column;
+  border:1px solid #00ffcc33;background:#00000aee;
+  backdrop-filter:blur(12px);pointer-events:all;
+}
+#out{
+  flex:1;overflow-y:auto;padding:8px 14px;
+  font-size:11px;line-height:1.7;color:#aaffee;
+}
+#out::-webkit-scrollbar{width:3px}
+#out::-webkit-scrollbar-thumb{background:#00ffcc33}
+.lc{color:#00ffcc}.lo{color:#7bc8ff}.le{color:#ff5577}
+.li{color:#ffcc44}.ld{color:#00ff88;font-weight:bold}.lx{color:#ff5500}
+
+#irow{
+  display:flex;align-items:center;gap:10px;
+  border-top:1px solid #00ffcc22;padding:7px 14px;
+}
+#prompt{color:#00ffcc77;font-size:12px;white-space:nowrap;min-width:100px}
+#inp{
+  flex:1;background:transparent;border:none;outline:none;
+  color:#00ffcc;font-family:'Courier New',monospace;font-size:12px;
+  caret-color:#00ffcc;
+}
+#inp::placeholder{color:#00ffcc33}
+#sbtn{
+  background:#00ffcc11;border:1px solid #00ffcc44;color:#00ffcc;
+  padding:3px 16px;cursor:pointer;font-family:'Courier New',monospace;
+  font-size:11px;letter-spacing:2px;transition:.2s;pointer-events:all;
+}
+#sbtn:hover{background:#00ffcc33}
+
+/* confirm modal */
+#modal{
+  display:none;position:fixed;inset:0;z-index:50;
+  align-items:center;justify-content:center;
+  background:#000000cc;backdrop-filter:blur(4px);
+  pointer-events:all;
+}
+#modal.show{display:flex}
+#mbox{
+  border:1px solid #ff440066;background:#050010ee;
+  padding:28px 36px;text-align:center;min-width:420px;
+  backdrop-filter:blur(16px);
+}
+#mbox h4{color:#ff5500;letter-spacing:3px;font-size:13px;margin-bottom:8px}
+#mcmd{color:#ffcc44;font-size:11px;margin-bottom:20px;word-break:break-all;max-height:80px;overflow-y:auto}
+.mbts{display:flex;gap:14px;justify-content:center}
+.mbtn{
+  padding:5px 30px;border:1px solid;cursor:pointer;
+  font-family:'Courier New',monospace;font-size:12px;
+  background:transparent;letter-spacing:2px;transition:.2s;
+}
+.my{border-color:#00ffcc;color:#00ffcc}.my:hover{background:#00ffcc22}
+.mn{border-color:#ff4400;color:#ff4400}.mn:hover{background:#ff440022}
+
+/* scanlines */
+body::after{
+  content:'';position:fixed;inset:0;z-index:8;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,#00000018 2px,#00000018 4px);
+}
+/* vignette */
+body::before{
+  content:'';position:fixed;inset:0;z-index:9;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 55%,#000000cc 100%);
+}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<div id="hud">
+  <div id="topbar">
+    <div class="brand">◈ AGENTE AI ∞</div>
+    <div class="model">POWERSHELL · AUTONOMOUS · claude-opus-4-8</div>
+    <div id="status-wrap">
+      <div id="dot"></div>
+      <span id="status-txt">OFFLINE</span>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-l">
+    <h3>◈ MEMORIA</h3>
+    <div id="mem-list"><div class="empty">— vuota —</div></div>
+  </div>
+
+  <div class="panel" id="panel-r">
+    <h3>◈ SKILL</h3>
+    <div id="skl-list"><div class="empty">— nessuna —</div></div>
+  </div>
+
+  <div id="term">
+    <div id="out"></div>
+    <div id="irow">
+      <span id="prompt">OBIETTIVO ›</span>
+      <input id="inp" type="text" autocomplete="off" spellcheck="false" placeholder="digita il tuo obiettivo…"/>
+      <button id="sbtn">INVIA</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal">
+  <div id="mbox">
+    <h4>⚠ COMANDO DISTRUTTIVO</h4>
+    <div id="mcmd"></div>
+    <div class="mbts">
+      <button class="mbtn my" id="byes">✓ ESEGUI</button>
+      <button class="mbtn mn" id="bno">✗ SALTA</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CANVAS 2D SCENE — zero dipendenze esterne ─────────────────────────────────
+const canvas = document.getElementById('bg');
+const ctx    = canvas.getContext('2d');
+
+function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+// Icosaedro: 12 vertici, sezione aurea φ
+const PHI = (1 + Math.sqrt(5)) / 2;
+const RAW = [
+  [0,1,PHI],[0,-1,PHI],[0,1,-PHI],[0,-1,-PHI],
+  [1,PHI,0],[-1,PHI,0],[1,-PHI,0],[-1,-PHI,0],
+  [PHI,0,1],[-PHI,0,1],[PHI,0,-1],[-PHI,0,-1]
+];
+const SC = 130 / Math.sqrt(1 + PHI * PHI); // scala → raggio ~130px
+const VERTS = RAW.map(v => ({ x: v[0]*SC, y: v[1]*SC, z: v[2]*SC }));
+
+// Spigoli: vertici con distanza = 2*SC
+const EDGES = [];
+for (let i = 0; i < RAW.length; i++)
+  for (let j = i+1; j < RAW.length; j++) {
+    const dx=RAW[i][0]-RAW[j][0], dy=RAW[i][1]-RAW[j][1], dz=RAW[i][2]-RAW[j][2];
+    if (Math.abs(Math.sqrt(dx*dx+dy*dy+dz*dz) - 2) < 0.01) EDGES.push([i,j]);
+  }
+
+// Stelle
+const STARS = Array.from({length:320}, () => ({
+  x:(Math.random()-.5)*2, y:(Math.random()-.5)*2,
+  r:Math.random()*1.1+.2, a:Math.random()*.7+.15,
+  tw:Math.random()*Math.PI*2
+}));
+
+// Nodi orbitanti
+const NODES = Array.from({length:9}, (_,i) => ({
+  angle:(i/9)*Math.PI*2,
+  r:150+Math.random()*45,
+  speed:.25+Math.random()*.45,
+  yo:(Math.random()-.5)*55,
+  col:['#00ffcc','#0088ff','#cc00ff'][i%3]
+}));
+
+// Rotazione 3D
+function ry(p,a){ const c=Math.cos(a),s=Math.sin(a); return {x:p.x*c+p.z*s,y:p.y,z:-p.x*s+p.z*c}; }
+function rx(p,a){ const c=Math.cos(a),s=Math.sin(a); return {x:p.x,y:p.y*c-p.z*s,z:p.y*s+p.z*c}; }
+function proj(p,cx,cy){ const fov=620,z=p.z+fov; return {x:cx+p.x*fov/z, y:cy+p.y*fov/z, s:fov/z}; }
+
+let t=0, angY=0;
+
+function draw() {
+  requestAnimationFrame(draw);
+  t += .008; angY += .006;
+  const W=canvas.width, H=canvas.height, cx=W/2, cy=H/2-20;
+
+  // Sfondo
+  ctx.fillStyle='#000008'; ctx.fillRect(0,0,W,H);
+
+  // Stelle
+  STARS.forEach(s=>{
+    const bri=s.a*(0.65+Math.sin(t*1.3+s.tw)*.3);
+    ctx.beginPath();
+    ctx.arc(cx+s.x*W*.55, cy+s.y*H*.55, s.r, 0, Math.PI*2);
+    ctx.fillStyle=`rgba(255,255,255,${bri})`; ctx.fill();
+  });
+
+  // Griglia prospettica
+  ctx.save();
+  ctx.translate(cx, cy+200); ctx.scale(1,.28);
+  ctx.strokeStyle='rgba(0,40,80,.4)'; ctx.lineWidth=.6;
+  for(let i=-22;i<=22;i++){
+    ctx.beginPath(); ctx.moveTo(i*38,-600); ctx.lineTo(i*38,600); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-840,i*38); ctx.lineTo(840,i*38); ctx.stroke();
+  }
+  ctx.restore();
+
+  // Nebulosa
+  const nb=ctx.createRadialGradient(cx,cy,0,cx,cy,280);
+  nb.addColorStop(0,`rgba(0,60,160,${.18+Math.sin(t*.9)*.05})`);
+  nb.addColorStop(.6,`rgba(80,0,160,${.07+Math.sin(t*.7)*.03})`);
+  nb.addColorStop(1,'transparent');
+  ctx.fillStyle=nb; ctx.fillRect(0,0,W,H);
+
+  // Trasforma vertici
+  const angX = .28+Math.sin(t*.18)*.12;
+  const tv = VERTS.map(v=>proj(rx(ry(v,angY),angX),cx,cy));
+
+  // Spigoli interni (glow doppio)
+  [['rgba(0,255,204,.18)',4,20],['rgba(0,255,204,.55)',1.2,10]].forEach(([col,lw,blur])=>{
+    ctx.strokeStyle=col; ctx.lineWidth=lw; ctx.shadowColor='#00ffcc'; ctx.shadowBlur=blur;
+    EDGES.forEach(([a,b])=>{
+      ctx.beginPath(); ctx.moveTo(tv[a].x,tv[a].y); ctx.lineTo(tv[b].x,tv[b].y); ctx.stroke();
+    });
+  });
+
+  // Vertici
+  ctx.shadowColor='#00ffcc'; ctx.shadowBlur=18;
+  tv.forEach(p=>{
+    ctx.beginPath(); ctx.arc(p.x,p.y,Math.max(1.5,3.5*p.s),0,Math.PI*2);
+    ctx.fillStyle='#00ffcc'; ctx.fill();
+  });
+
+  // Nucleo interno (glow solido)
+  const pulse=.55+Math.sin(t*1.9)*.2;
+  const kg=ctx.createRadialGradient(cx,cy,0,cx,cy,90);
+  kg.addColorStop(0,`rgba(0,100,220,${pulse*.55})`);
+  kg.addColorStop(.45,`rgba(20,0,120,${pulse*.3})`);
+  kg.addColorStop(1,'transparent');
+  ctx.shadowBlur=0; ctx.fillStyle=kg; ctx.fillRect(0,0,W,H);
+
+  // Anelli orbitali
+  const rings=[
+    {rx:150,ry:52,rot:t*.6,col:'rgba(0,136,255,.35)',lw:.9},
+    {rx:185,ry:62,rot:-t*.45+1.2,col:'rgba(200,0,255,.25)',lw:.7},
+    {rx:120,ry:40,rot:t*.8+2.5,col:'rgba(0,255,204,.3)',lw:.8},
+  ];
+  rings.forEach(({rx:rr,ry:rry,rot,col,lw})=>{
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(rot);
+    ctx.beginPath(); ctx.ellipse(0,0,rr,rry,0,0,Math.PI*2);
+    ctx.strokeStyle=col; ctx.lineWidth=lw; ctx.shadowColor=col; ctx.shadowBlur=8; ctx.stroke();
+    ctx.restore();
+  });
+
+  // Nodi orbitanti
+  NODES.forEach(n=>{
+    n.angle += n.speed*.013;
+    const nx=cx+Math.cos(n.angle)*n.r;
+    const ny=cy+Math.sin(n.angle)*n.r*.33+n.yo+Math.sin(t+n.angle)*8;
+    ctx.beginPath(); ctx.arc(nx,ny,4.5,0,Math.PI*2);
+    ctx.shadowColor=n.col; ctx.shadowBlur=16; ctx.fillStyle=n.col; ctx.fill();
+  });
+
+  ctx.shadowBlur=0;
+}
+draw();
+
+// ── UI ────────────────────────────────────────────────────────────────────────
+const dot     = document.getElementById('dot');
+const stxt    = document.getElementById('status-txt');
+const out     = document.getElementById('out');
+const inp     = document.getElementById('inp');
+const prompt  = document.getElementById('prompt');
+const modal   = document.getElementById('modal');
+const mcmd    = document.getElementById('mcmd');
+const memList = document.getElementById('mem-list');
+const sklList = document.getElementById('skl-list');
+
+function online(on) {
+  dot.className = on ? 'on' : '';
+  stxt.textContent = on ? 'CONNESSO' : 'OFFLINE';
+}
+
+function line(txt, cls) {
+  const d = document.createElement('div');
+  d.className = cls;
+  d.textContent = txt;
+  out.appendChild(d);
+  out.scrollTop = out.scrollHeight;
+}
+
+function renderMem(mem) {
+  const keys = Object.keys(mem || {});
+  memList.innerHTML = keys.length
+    ? keys.map(k => `<div class="pitem"><em>${k}</em>${mem[k]}</div>`).join('')
+    : '<div class="empty">— vuota —</div>';
+}
+
+function renderSkills(list) {
+  sklList.innerHTML = list && list.length
+    ? list.map(s => `<div class="pitem"><em>▸</em>${s.name} — ${s.desc}</div>`).join('')
+    : '<div class="empty">— nessuna —</div>';
+}
+
+// ── WebSocket ─────────────────────────────────────────────────────────────────
+let ws, confirmId = null;
+
+function connect() {
+  ws = new WebSocket('ws://localhost:8765');
+
+  ws.onopen = () => {
+    online(true);
+    line('◈ Connessione stabilita con il server agente.', 'li');
+  };
+
+  ws.onmessage = ({ data }) => {
+    const m = JSON.parse(data);
+    switch (m.type) {
+      case 'init':
+        line('◈ Agente pronto — ' + m.model, 'li');
+        renderMem(m.memory);
+        renderSkills(m.skills);
+        break;
+      case 'command':
+        line((m.destructive ? '[DISTRUTTIVO] ' : '') + '› ' + m.cmd, m.destructive ? 'lx' : 'lc');
+        if (m.reason) line('  Motivo: ' + m.reason, 'lo');
+        break;
+      case 'destructive':
+        confirmId = m.id;
+        mcmd.textContent = m.cmd;
+        modal.classList.add('show');
+        break;
+      case 'result':
+        if (m.stdout && m.stdout.trim()) line(m.stdout.trim(), 'lo');
+        if (m.stderr && m.stderr.trim()) line(m.stderr.trim(), 'le');
+        line('  RC=' + m.rc, m.rc === 0 ? 'lo' : 'le');
+        break;
+      case 'message':
+        line('[AGENTE] ' + m.text, 'li');
+        prompt.textContent = 'RISPOSTA ›';
+        break;
+      case 'done':
+        line('✓ ' + m.summary, 'ld');
+        prompt.textContent = 'OBIETTIVO ›';
+        break;
+      case 'memory_update':
+        renderMem(m.data);
+        break;
+      case 'skill_saved':
+        line('◈ Skill salvata: ' + m.name, 'li');
+        renderSkills(m.skills);
+        break;
+      case 'skipped':
+        line('⊘ Comando saltato.', 'lx');
+        break;
+      case 'error':
+        line('✕ ' + m.text, 'le');
+        break;
+    }
+  };
+
+  ws.onclose = () => { online(false); setTimeout(connect, 3500); };
+  ws.onerror = () => { online(false); };
+}
+
+function send() {
+  const v = inp.value.trim();
+  if (!v) return;
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    line('✕ Server non raggiungibile — avvia ws_agente.py', 'le'); return;
+  }
+  line('» ' + v, 'lc');
+  ws.send(JSON.stringify({ type: 'objective', text: v }));
+  inp.value = '';
+  prompt.textContent = 'OBIETTIVO ›';
+}
+
+document.getElementById('sbtn').addEventListener('click', send);
+inp.addEventListener('keydown', e => e.key === 'Enter' && send());
+
+document.getElementById('byes').addEventListener('click', () => {
+  if (!confirmId) return;
+  ws.send(JSON.stringify({ type: 'confirm', id: confirmId, answer: 's' }));
+  line('✓ Comando confermato.', 'li');
+  modal.classList.remove('show'); confirmId = null;
+});
+
+document.getElementById('bno').addEventListener('click', () => {
+  if (!confirmId) return;
+  ws.send(JSON.stringify({ type: 'confirm', id: confirmId, answer: 'n' }));
+  line('⊘ Comando rifiutato.', 'lx');
+  modal.classList.remove('show'); confirmId = null;
+});
+
+connect();
+</script>
+</body>
+</html>
