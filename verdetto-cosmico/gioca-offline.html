@@ -1,0 +1,905 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#080a14">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23080a14'/%3E%3Ccircle cx='14' cy='13' r='6' fill='%233a7bd8'/%3E%3Cellipse cx='14' cy='13' rx='9' ry='2.8' fill='none' stroke='%234bd8ff' stroke-width='1.4'/%3E%3Ccircle cx='19' cy='20' r='5' fill='none' stroke='%234bd8ff' stroke-width='2'/%3E%3Cline x1='23' y1='24' x2='27' y2='28' stroke='%234bd8ff' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>Verdetto Cosmico</title>
+<style>
+  :root{
+    --bg:#080a14; --panel:#121627; --panel2:#0d1120; --ink:#eaf0ff; --muted:#9aa6c8;
+    --line:rgba(120,200,255,.22); --cyan:#4bd8ff;
+    --A:#3ddc84; --B:#4aa8ff; --C:#b98cff; --D:#ff5d6c;
+    --radius:16px; --fs:16px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:var(--fs); line-height:1.45; overflow:hidden;
+    -webkit-user-select:none; user-select:none;
+  }
+  body.big{--fs:18px}
+  #stars{position:fixed;inset:0;z-index:0;display:block}
+  #neb{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(60% 45% at 25% 20%, rgba(90,60,180,.28), transparent 70%),
+      radial-gradient(55% 40% at 80% 75%, rgba(30,120,180,.22), transparent 70%),
+      radial-gradient(120% 90% at 50% 120%, rgba(10,14,30,.9), transparent 60%);
+  }
+  #bgimg{position:fixed;inset:0;z-index:0;background-size:cover;background-position:center;opacity:.30;pointer-events:none}
+  #app{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;
+    max-width:560px;margin:0 auto;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
+  .screen{flex:1;display:none;flex-direction:column;min-height:0;padding:14px 0 18px}
+  .screen.on{display:flex;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0}
+
+  h1,h2,h3{margin:0;font-weight:800;letter-spacing:.5px}
+  .brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin-top:6vh}
+  .emblem{width:118px;height:118px;object-fit:contain;filter:drop-shadow(0 0 22px rgba(75,216,255,.35))}
+  .title{font-size:2.05rem;background:linear-gradient(90deg,#7fe9ff,#b98cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tagline{color:var(--muted);font-size:.98rem;max-width:22em}
+  .stampline{font:600 .72rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px;color:#6f7ba6;
+    border:1px solid var(--line);border-radius:999px;padding:6px 12px;margin-top:2px}
+
+  .btn{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+    font-size:1rem;font-weight:700;padding:15px 16px;border-radius:14px;cursor:pointer;width:100%;
+    display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .06s,border-color .15s,background .15s}
+  .btn:active{transform:scale(.98)}
+  .btn.primary{background:linear-gradient(180deg,#18325a,#122043);border-color:rgba(75,216,255,.55);
+    box-shadow:0 0 0 1px rgba(75,216,255,.15) inset,0 8px 26px rgba(20,40,90,.5)}
+  .btn.ghost{background:transparent}
+  .btn.sm{padding:11px 12px;font-size:.92rem}
+  .menu{display:flex;flex-direction:column;gap:11px;margin-top:26px}
+  .row{display:flex;gap:11px}
+  .row>*{flex:1}
+
+  .statbar{display:flex;gap:10px;margin-top:20px}
+  .stat{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:11px 8px;text-align:center}
+  .stat b{display:block;font-size:1.12rem}
+  .stat span{font-size:.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .iconbtn{width:40px;height:40px;flex:0 0 40px;border-radius:12px;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink);font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .hbadge{font:700 .8rem/1 ui-monospace,monospace;color:var(--muted)}
+  .hstat{display:flex;gap:14px;align-items:center}
+  .hstat .lives{letter-spacing:2px;font-size:1.05rem}
+  .hstat .sc{font-weight:800}
+
+  .prog{height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:12px}
+  .prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),#b98cff);width:0;transition:width .3s}
+
+  /* card */
+  .card{background:linear-gradient(180deg,rgba(22,27,46,.96),rgba(13,17,32,.96));
+    border:1px solid var(--line);border-radius:18px;padding:16px 15px;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;inset:0;background:
+    repeating-linear-gradient(180deg,transparent 0 22px,rgba(255,255,255,.012) 22px 23px);pointer-events:none}
+  .catrow{display:flex;align-items:center;gap:9px;color:var(--cyan);font-size:.82rem;font-weight:700;letter-spacing:.4px}
+  .catrow svg{width:22px;height:22px;flex:0 0 22px}
+  .casetag{margin-left:auto;font:600 .68rem/1 ui-monospace,monospace;letter-spacing:2px;color:#6f7ba6;
+    border:1px solid var(--line);border-radius:6px;padding:5px 7px}
+  .ctitle{font-size:1.18rem;font-weight:800;margin:12px 0 8px}
+  .claim{font-size:1.02rem;color:#dfe6ff}
+  .qlabel{margin:16px 2px 10px;color:var(--muted);font-size:.9rem;text-align:center}
+
+  .verdicts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .vbtn{border:1.5px solid var(--vc);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.14));
+    color:var(--ink);border-radius:14px;padding:13px 10px;cursor:pointer;text-align:left;transition:transform .06s,box-shadow .15s;position:relative}
+  .vbtn:active{transform:scale(.98)}
+  .vbtn .k{display:inline-flex;width:26px;height:26px;border-radius:8px;align-items:center;justify-content:center;
+    font-weight:800;color:#06111f;background:var(--vc);font-size:.95rem;margin-bottom:7px}
+  .vbtn .lb{display:block;font-weight:800;font-size:.98rem;color:var(--vc)}
+  .vbtn .sub{display:block;font-size:.76rem;color:var(--muted);margin-top:3px;line-height:1.3}
+  .vbtn[disabled]{opacity:.5;cursor:default}
+  .vbtn.pick{box-shadow:0 0 0 2px var(--vc) inset}
+  .vbtn.rightone{box-shadow:0 0 0 2px var(--A) inset;border-color:var(--A)}
+  .vbtn.wrongone{box-shadow:0 0 0 2px var(--D) inset;border-color:var(--D)}
+
+  /* feedback */
+  .fb{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:15px;margin-top:14px;animation:fade .2s}
+  .fbhead{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem}
+  .fbdot{width:12px;height:12px;border-radius:50%}
+  .fbpts{margin-left:auto;font-weight:800}
+  .fbverdict{margin:10px 0 6px;font-size:.92rem;color:var(--muted)}
+  .fbverdict b{color:var(--ink)}
+  .fbwhy{font-size:.96rem;color:#dfe6ff}
+  .fbsrc{margin-top:10px;font-size:.72rem;color:#6f7ba6}
+
+  .legend{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+  .leg{display:flex;gap:11px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px}
+  .leg .k{flex:0 0 28px;width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#06111f}
+  .leg b{font-size:.95rem}
+  .leg p{margin:2px 0 0;font-size:.85rem;color:var(--muted)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:6px}
+  .chip{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:12px 10px;cursor:pointer;
+    display:flex;align-items:center;gap:9px;flex:1 1 46%;font-size:.92rem;font-weight:600}
+  .chip svg{width:20px;height:20px}
+  .chip:active{transform:scale(.98)}
+
+  .big-emb{width:96px;height:96px;object-fit:contain;margin:2px auto 4px;display:block;filter:drop-shadow(0 0 18px rgba(75,216,255,.3))}
+  .result-score{font-size:3rem;font-weight:800;text-align:center;background:linear-gradient(90deg,#7fe9ff,#b98cff);
+    -webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.1}
+  .center{text-align:center}
+  .muted{color:var(--muted)}
+  .sec{margin-top:16px}
+  .sec h3{font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+  p.lead{color:#dfe6ff;margin:.4em 0}
+  .pack{opacity:.7;border-style:dashed}
+  .pack .lock{margin-left:auto;font-size:.7rem;border:1px solid var(--line);border-radius:99px;padding:3px 9px;color:var(--muted)}
+  .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);
+    background:#182142;border:1px solid var(--line);color:var(--ink);padding:11px 16px;border-radius:12px;
+    font-size:.9rem;z-index:50;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;max-width:88%}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(-4px)}
+  .switch{display:flex;align-items:center;justify-content:space-between;background:var(--panel2);
+    border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:10px}
+  .tg{width:48px;height:28px;border-radius:99px;background:#2a3153;position:relative;cursor:pointer;flex:0 0 48px;transition:background .15s}
+  .tg::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
+  .tg.on{background:var(--cyan)}
+  .tg.on::after{left:23px}
+  .space{flex:1}
+  .foot{display:flex;gap:11px;margin-top:14px}
+  .foot>*{flex:1}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div id="neb"></div>
+<div id="bgimg"></div>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+/* ===== strings.js ===== */
+// strings.js — tutti i testi visibili nell'interfaccia.
+// Cambiare lingua = tradurre questo file, senza toccare il codice.
+const STR = {
+  title: "VERDETTO COSMICO",
+  tagline: "Sei tu il revisore scientifico. Prova, indizio o bufala?",
+  loading: "Inizializzazione archivio…",
+
+  // menu
+  play: "Nuova indagine",
+  daily: "Sfida del giorno",
+  howto: "Come si gioca",
+  support: "Sostieni il gioco",
+  stats: "Statistiche",
+  settings: "Opzioni",
+  rankLabel: "Grado",
+  bestLabel: "Record",
+  accuracyLabel: "Precisione",
+
+  // selezione capitolo
+  chooseChapter: "Scegli il fascicolo",
+  allChapters: "Tutti i casi",
+  startRun: "Avvia",
+  back: "Indietro",
+
+  // gioco
+  livesLabel: "Vite",
+  scoreLabel: "Punti",
+  streakLabel: "Serie",
+  caseLabel: "CASO",
+  question: "Che livello di prova merita?",
+  next: "Prossimo caso",
+  correct: "Verdetto corretto!",
+  wrong: "Verdetto sbagliato",
+  correctAnswerWas: "La classificazione corretta è",
+  plus: "+",
+  streakBonus: "serie ×",
+  sourceNote: "Fonte: Dossier «Vita nell'universo» — chiusura 5 luglio 2026.",
+
+  // fine partita
+  gameOver: "Indagine conclusa",
+  finalScore: "Punteggio finale",
+  casesJudged: "Casi giudicati",
+  newBest: "Nuovo record!",
+  rankUp: "Promozione di grado!",
+  playAgain: "Jouer encore", // placeholder che NON deve apparire: sovrascritto sotto
+  retry: "Rigioca",
+  toMenu: "Menu",
+  share: "Condividi risultato",
+  shareCopied: "Risultato copiato negli appunti!",
+  shareText: (score, total, rank) =>
+    `Ho totalizzato ${score} punti in Verdetto Cosmico giudicando ${total} casi reali su vita, Marte, UFO ed esopianeti. Grado: ${rank}. Riesci a fare meglio?`,
+
+  // sfida quotidiana
+  dailyTitle: "Sfida del giorno",
+  dailyDesc: "10 casi, un solo tentativo al giorno. Stesse carte per tutti.",
+  dailyDone: "Hai già completato la sfida di oggi.",
+  dailyResult: "Risultato di oggi",
+  dailyComeBack: "Torna domani per una nuova sfida.",
+  startDaily: "Comincia",
+
+  // come si gioca
+  howtoTitle: "Come si gioca",
+  howtoBody: [
+    "Ti mostriamo un caso reale tratto da un dossier scientifico: una missione, un reperto, un segnale, un avvistamento.",
+    "Il tuo compito: assegnargli il giusto livello di prova, come farebbe un revisore scientifico.",
+    "Ogni risposta corretta vale punti; una serie di risposte giuste moltiplica il punteggio. Hai 3 vite.",
+    "Dopo ogni verdetto scopri la spiegazione: è così che si impara a distinguere una prova da una suggestione.",
+  ],
+  legendTitle: "I quattro livelli di prova",
+
+  // opzioni
+  soundOn: "Suoni",
+  bigText: "Testo grande",
+  reset: "Azzera progressi",
+  resetConfirm: "Cancellare punteggi e statistiche? Non si può annullare.",
+
+  // sostieni / monetizzazione
+  supportTitle: "Sostieni Verdetto Cosmico",
+  supportBody: "Questo gioco è gratuito. Se ti diverte e vuoi vederlo crescere con nuovi fascicoli, puoi dare una mano:",
+  supportDonate: "☕ Offri un caffè allo sviluppatore",
+  supportShare: "📣 Condividi con un amico curioso",
+  supportRate: "⭐ Lascia una recensione",
+  packsTitle: "Fascicoli extra (in arrivo)",
+  packsBody: "Nuove raccolte di casi: «Grandi bufale», «Missioni spaziali», «Misteri archeologici». Presto disponibili.",
+  packLocked: "In arrivo",
+
+  // gradi (rank) — dal più basso al più alto
+  ranks: [
+    "Curioso",
+    "Appassionato",
+    "Osservatore",
+    "Analista junior",
+    "Ricercatore",
+    "Revisore scientifico",
+    "Astrobiologo",
+    "Direttore di ricerca",
+  ],
+};
+
+// correzione del placeholder lasciato apposta
+STR.playAgain = "Rigioca";
+
+/* ===== data.js ===== */
+// data.js — tutti i casi del gioco, estratti dal dossier "Vita nell'universo".
+// Contenuto esterno al codice: aggiungere un caso = aggiungere una riga qui.
+//
+// Livelli di prova (regola d'oro del dossier):
+//   A = PROVATO        (osservazione ripetuta, strumenti calibrati, consenso)
+//   B = INDIZIO        (dato reale e interessante, ma non conclusivo)
+//   C = IPOTESI        (proposta testabile che guida esperimenti, non una scoperta)
+//   D = NON VERIFICATO (mancano dati controllabili o replicabili)
+const LEVELS = {
+  A: { key: "A", label: "PROVATO",        short: "Provato",        color: "#3ddc84", desc: "Osservato e ripetuto, con consenso scientifico." },
+  B: { key: "B", label: "INDIZIO",        short: "Indizio",        color: "#4aa8ff", desc: "Dato reale ma non conclusivo: restano spiegazioni alternative." },
+  C: { key: "C", label: "IPOTESI",        short: "Ipotesi",        color: "#b98cff", desc: "Idea testabile che guida la ricerca, non ancora una scoperta." },
+  D: { key: "D", label: "NON VERIFICATO", short: "Non verif.",     color: "#ff5d6c", desc: "Mancano dati controllabili: affermazione non dimostrata." },
+};
+const CATEGORIES = {
+  origine:    { name: "Origine della vita", glyph: "origine" },
+  marte:      { name: "Marte",              glyph: "marte" },
+  lune:       { name: "Lune oceaniche",     glyph: "lune" },
+  esopianeti: { name: "Esopianeti",         glyph: "esopianeti" },
+  seti:       { name: "SETI e segnali",     glyph: "seti" },
+  uap:        { name: "UAP / UFO",          glyph: "uap" },
+  archivi:    { name: "Archivi antichi",    glyph: "archivi" },
+  cosmo:      { name: "Cosmo",              glyph: "cosmo" },
+};
+
+// answer = livello corretto secondo il dossier.
+const CASES = [
+  // ————— ORIGINE DELLA VITA —————
+  { id: 1, cat: "origine", title: "Esperimento di Miller-Urey (1953)",
+    claim: "Facendo passare scariche elettriche in una miscela di acqua, metano, ammoniaca e idrogeno si formano amminoacidi, i mattoni delle proteine.",
+    answer: "A",
+    why: "Chimica reale e ripetibile: alcune molecole biologiche nascono senza organismi, in condizioni energetiche plausibili. Ma NON crea una cellula, un genoma o la vita: dimostra la plausibilità di alcuni passaggi, non l'origine della vita." },
+  { id: 2, cat: "origine", title: "Il mondo a RNA",
+    claim: "Prima del DNA e delle proteine, molecole simili all'RNA portavano l'informazione e catalizzavano le reazioni della prima vita.",
+    answer: "C",
+    why: "Filone di ricerca serio e influente, ma la sintesi credibile dei nucleotidi, la loro polimerizzazione e il passaggio a DNA/proteine restano problemi aperti. È un'ipotesi di lavoro che guida gli esperimenti." },
+  { id: 3, cat: "origine", title: "Esperimento di Redi (1668)",
+    claim: "In condizioni controllate gli insetti non compaiono spontaneamente dalla carne: servono uova deposte da altri insetti.",
+    answer: "A",
+    why: "Esperimento controllato e ripetibile, pietra miliare del metodo scientifico. Ha smontato la 'generazione spontanea' come spiegazione della vita." },
+  { id: 4, cat: "origine", title: "Pasteur, i palloni a collo di cigno (1861)",
+    claim: "L'aria non genera automaticamente vita: i microrganismi in un brodo sterile arrivano da contaminanti esterni.",
+    answer: "A",
+    why: "Risultato osservato e ripetuto. Attenzione: la biogenesi non esclude un'abiogenesi antica in condizioni diversissime; cambia il problema, non lo chiude." },
+  { id: 5, cat: "origine", title: "Panspermia",
+    claim: "La vita, o i suoi precursori, è arrivata sulla Terra viaggiando nello spazio su rocce o granelli di polvere.",
+    answer: "C",
+    why: "Ipotesi in parte testabile ma non confermata. Anche se fosse vera, sposterebbe solo il luogo di origine: non spiega come la vita sia nata la prima volta." },
+  { id: 6, cat: "origine", title: "Stromatoliti di Dresser (3,48 miliardi di anni)",
+    claim: "Le strutture sedimentarie della Dresser Formation (Australia) sono resti di antiche comunità microbiche.",
+    answer: "B",
+    why: "Più linee di evidenza sono compatibili con attività microbica: è un indizio forte. Ma le rocce antichissime possono produrre strutture simili senza vita, quindi va sempre valutato contro imitazioni abiologiche." },
+  { id: 7, cat: "origine", title: "Microstrutture dell'Apex chert",
+    claim: "Le microstrutture dell'Apex chert (3,5 miliardi di anni) sono i più antichi microfossili conosciuti della Terra.",
+    answer: "D",
+    why: "Pubblicate come microfossili, ma analisi successive con tecniche migliori hanno contestato l'interpretazione biologica. È il caso-scuola su come cambiano le conclusioni: la lettura come vita non regge." },
+  { id: 8, cat: "origine", title: "Carbonio negli zirconi (4,1 miliardi di anni)",
+    claim: "Il carbonio intrappolato in cristalli di zircone di 4,1 miliardi di anni è la firma della vita più antica mai trovata.",
+    answer: "D",
+    why: "Alcuni studi hanno proposto segnali potenzialmente biogenici, ma il significato è molto controverso e non conclusivo: mancano prove controllabili che escludano origini non biologiche." },
+  { id: 44, cat: "origine", title: "Origine nelle sorgenti idrotermali",
+    claim: "La vita è iniziata nelle sorgenti idrotermali oceaniche, dove minerali e gradienti chimici hanno alimentato le prime reazioni.",
+    answer: "C",
+    why: "È uno dei principali scenari di ricerca ('metabolism-first'), con esperimenti in corso. Manca però il passaggio dimostrato da cicli chimici a ereditarietà e membrane: resta un'ipotesi di lavoro." },
+
+  // ————— MARTE —————
+  { id: 9, cat: "marte", title: "Viking, esperimento Labeled Release (1976)",
+    claim: "Il Labeled Release del Viking rilevò gas dopo l'aggiunta di nutrienti al suolo marziano: è la firma di un metabolismo microbico.",
+    answer: "B",
+    why: "Il segnale è reale e si ripeté ai due siti, ma anche reazioni chimiche del suolo possono produrne di simili, e il GC/MS non trovò organici attesi. Risultato corretto: ambiguità persistente, non vita provata né esclusa." },
+  { id: 10, cat: "marte", title: "Meteorite ALH84001 (1996)",
+    claim: "Il meteorite marziano ALH84001 contiene microstrutture, carbonati e magnetite che sono fossili di antica vita su Marte.",
+    answer: "B",
+    why: "Meteorite reale, studiato per decenni. Ma ogni singola linea di prova ha ricevuto spiegazioni abiologiche o problemi di contaminazione: nessun consenso di vita marziana. Caso non conclusivo." },
+  { id: 11, cat: "marte", title: "Perseverance, campione 'Sapphire Canyon' (2024-25)",
+    claim: "Il campione Sapphire Canyon, raccolto da Perseverance a Cheyava Falls, contiene biosignature potenziali di vita marziana.",
+    answer: "B",
+    why: "La NASA parla esplicitamente di biosignature POTENZIALI: indica che serve altro studio, non un annuncio di vita. Restano possibili spiegazioni geochimiche. Indizio da confermare." },
+  { id: 12, cat: "marte", title: "I 'canali' di Marte",
+    claim: "I canali osservati da Schiaparelli e interpretati da Lowell sono opere di ingegneria di una civiltà marziana.",
+    answer: "D",
+    why: "Immagini migliori e analisi successive hanno mostrato il ruolo di illusioni ottiche e aspettative. L'idea è stata abbandonata: nessun dato la sostiene." },
+  { id: 13, cat: "marte", title: "Molecole organiche su Marte",
+    claim: "Curiosity ha rilevato molecole organiche e variazioni di metano nelle rocce di Marte.",
+    answer: "A",
+    why: "La RILEVAZIONE è solida e ripetuta. Ma attenzione al tranello: 'organico' significa 'a base di carbonio', non 'biologico'. Le molecole possono avere origini non viventi. Il dato è provato, la vita no." },
+  { id: 14, cat: "marte", title: "Marte antico abitabile",
+    claim: "Miliardi di anni fa Marte ebbe acqua liquida in superficie e ambienti potenzialmente abitabili.",
+    answer: "A",
+    why: "Prove geologiche solide e indipendenti: delta fluviali, minerali formatisi in acqua, letti di antichi laghi. 'Abitabile' però non vuol dire 'abitato'." },
+
+  // ————— LUNE OCEANICHE —————
+  { id: 15, cat: "lune", title: "L'oceano di Europa",
+    claim: "Sotto la crosta ghiacciata di Europa, luna di Giove, si nasconde un oceano globale di acqua liquida: un mondo potenzialmente abitabile.",
+    answer: "B",
+    why: "Le evidenze di un oceano interno e di scambi con la superficie sono forti; Europa Clipper (lanciata nel 2024) ne studierà l'abitabilità. Ma nessun organismo è stato rilevato: è un ambiente promettente, non vita." },
+  { id: 16, cat: "lune", title: "I pennacchi di Encelado",
+    claim: "I geyser di Encelado (luna di Saturno) sprigionano acqua, sali, molecole organiche e idrogeno: possibile energia chimica per microbi.",
+    answer: "B",
+    why: "Cassini ha misurato davvero questi composti: indizi ambientali forti di abitabilità. Ma nessuna cellula è stata osservata; la fonte d'energia potenziale non è un organismo." },
+  { id: 17, cat: "lune", title: "I laghi di Titano",
+    claim: "Titano ha laghi di idrocarburi e una chimica organica ricca: un laboratorio prebiotico naturale.",
+    answer: "C",
+    why: "Ambiente affascinante con chimica molto diversa dalla Terra e possibile interesse prebiotico. Ma è un'idea da esplorare: nessuna vita è confermata e la sua chimica potrebbe non portare a biologia." },
+  { id: 18, cat: "lune", title: "La fosfina di Venere",
+    claim: "La fosfina rilevata nelle nubi di Venere è prodotta da microrganismi che vivono nell'atmosfera.",
+    answer: "D",
+    why: "L'intensità del segnale, la sua identificazione e la chimica sono state contestate da rianalisi indipendenti. Nessuna vita è dedotta: affermazione non verificata." },
+
+  // ————— ESOPIANETI —————
+  { id: 19, cat: "esopianeti", title: "Esistono gli esopianeti",
+    claim: "Attorno ad altre stelle esistono pianeti: gli esopianeti confermati sono oltre 6.000.",
+    answer: "A",
+    why: "Categoria fisica pienamente stabilita, con migliaia di conferme indipendenti dal 1995 (51 Pegasi b). Che ESISTANO è provato; che siano abitati è tutt'altra domanda." },
+  { id: 20, cat: "esopianeti", title: "K2-18 b e il DMS",
+    claim: "Su K2-18 b il telescopio JWST ha trovato metano, CO2 e forse DMS: è un mondo oceanico che ospita vita.",
+    answer: "B",
+    why: "Gli spettri mostrano molecole di carbonio reali, ma il DMS è un candidato discusso, esistono vie di formazione non biologiche e nessun oceano è stato osservato direttamente. Indizio interessante, niente biosignature confermata." },
+  { id: 21, cat: "esopianeti", title: "Pianeti nella zona abitabile",
+    claim: "I molti esopianeti che orbitano nella 'zona abitabile' delle loro stelle ospitano vita.",
+    answer: "C",
+    why: "Che esistano pianeti nella zona abitabile è confermato; che siano davvero abitabili dipende da atmosfera, superficie e stella, caso per caso. La presenza di vita resta un'ipotesi da testare." },
+  { id: 22, cat: "esopianeti", title: "Ossigeno = vita?",
+    claim: "Se in un'atmosfera esoplanetaria troviamo ossigeno, allora su quel pianeta c'è vita.",
+    answer: "C",
+    why: "Sulla Terra l'ossigeno è legato alla fotosintesi, ma può formarsi anche per processi fotochimici o perdita d'acqua. Un solo gas non basta: serve un contesto coerente. È un criterio da verificare, non una prova." },
+
+  // ————— SETI E SEGNALI —————
+  { id: 23, cat: "seti", title: "Il Wow! signal (1977)",
+    claim: "Il Wow! signal, un forte impulso radio captato una volta nel 1977, è un messaggio di una civiltà aliena.",
+    answer: "D",
+    why: "Evento reale e intenso, ma registrato UNA sola volta, mai ripetuto, con origine tuttora irrisolta. 'Non spiegato' non significa 'alieno': manca qualunque verifica indipendente." },
+  { id: 24, cat: "seti", title: "L'equazione di Drake",
+    claim: "L'equazione di Drake calcola quante civiltà tecnologiche esistono nella nostra galassia.",
+    answer: "C",
+    why: "È uno strumento per organizzare le incognite e ragionare, non una misura: molti dei suoi termini sono sconosciuti. Serve a porre bene la domanda, non a dare un numero dimostrato." },
+  { id: 25, cat: "seti", title: "Decenni di ricerca SETI",
+    claim: "Dopo oltre 60 anni di ricerche (da Project Ozma a Breakthrough Listen), nessuna tecnosignatura extraterrestre è stata confermata.",
+    answer: "A",
+    why: "Fatto documentato sull'esito delle ricerche: molti candidati controllati, nessuno ha superato la verifica di ripetizione e origine non terrestre. È un risultato reale, non una prova che gli alieni non esistano." },
+  { id: 26, cat: "seti", title: "Il paradosso di Fermi",
+    claim: "Il paradosso di Fermi ('se ci sono, dove sono tutti?') dimostra che le civiltà aliene non esistono.",
+    answer: "C",
+    why: "Non è una dimostrazione: è un modo per elencare possibilità (vita rara, distanze enormi, durata breve, strumenti limitati...). Resta un ragionamento aperto, non una prova." },
+
+  // ————— UAP / UFO —————
+  { id: 27, cat: "uap", title: "Roswell (1947)",
+    claim: "Nel 1947 a Roswell l'esercito statunitense recuperò un veicolo alieno precipitato.",
+    answer: "D",
+    why: "Gli archivi e le indagini ufficiali disponibili non hanno fornito alcuna prova verificabile di tecnologia extraterrestre. Il caso resta culturalmente famoso, ma non dimostrato." },
+  { id: 28, cat: "uap", title: "Rapporto storico AARO (2024)",
+    claim: "Dopo aver esaminato archivi classificati e non, l'ufficio AARO del Pentagono non ha trovato prove verificabili di tecnologia extraterrestre o recuperi non umani.",
+    answer: "A",
+    why: "È la conclusione documentata di un'indagine ufficiale su decenni di materiale (1945-2023). Un esito verificabile — che, ovviamente, potrebbe cambiare solo con prove materiali future." },
+  { id: 29, cat: "uap", title: "Gli archivi del Project Blue Book",
+    claim: "I documenti del Project Blue Book sull'attività UFO (1947-1969) sono declassificati e consultabili al National Archives.",
+    answer: "A",
+    why: "Fatto verificabile: gli archivi esistono e si possono consultare. Attenzione: che un ente abbia indagato un fenomeno prova che l'indagine c'è stata, non che il contenuto confermi origini aliene." },
+  { id: 30, cat: "uap", title: "'Non identificato' = alieno?",
+    claim: "Un fenomeno aereo classificato come 'non identificato' (UAP) è, per definizione, una tecnologia aliena.",
+    answer: "D",
+    why: "'Non identificato' descrive lo stato del DATO (scarso, non calibrato, ambiguo), non la natura dell'oggetto. Può essere un pallone, un drone, un artefatto dei sensori. Non è una prova di origine non umana." },
+  { id: 31, cat: "uap", title: "Oltre 1.600 casi in revisione",
+    claim: "Il Dipartimento della Difesa ha comunicato oltre 1.600 casi UAP in revisione, dei quali una parte resta non risolta.",
+    answer: "A",
+    why: "Il numero è reale e comunicato ufficialmente (2024). Ma 'non risolto' indica qualità insufficiente dei dati, non un'origine extraterrestre: il fatto amministrativo è provato, la spiegazione aliena no." },
+
+  // ————— ARCHIVI ANTICHI —————
+  { id: 32, cat: "archivi", title: "Il meccanismo di Anticitera",
+    claim: "Il meccanismo di Anticitera è un calcolatore astronomico costruito dai greci con decine di ingranaggi di bronzo.",
+    answer: "A",
+    why: "Tomografie, iscrizioni e ricostruzioni lo confermano come tecnologia ellenistica eccezionale ma pienamente umana. Complessità sorprendente non significa origine impossibile o aliena." },
+  { id: 33, cat: "archivi", title: "La mappa di Piri Reis (1513)",
+    claim: "La mappa di Piri Reis mostra l'Antartide libera dai ghiacci, impossibile da disegnare senza una veduta aerea.",
+    answer: "D",
+    why: "La lettura cartografica non sostiene questa tesi: proiezioni, fonti parziali e deformazioni spiegano le corrispondenze apparenti. La mappa raffigura soprattutto coste atlantiche note e deformate." },
+  { id: 34, cat: "archivi", title: "Le linee di Nazca",
+    claim: "I giganteschi geoglifi di Nazca sono piste di atterraggio costruite per le astronavi.",
+    answer: "D",
+    why: "L'archeologia li interpreta come opere culturali, rituali e territoriali della civiltà andina. Forma e scala imponenti non sono prove di infrastrutture aerospaziali." },
+  { id: 35, cat: "archivi", title: "Le tavolette astronomiche babilonesi",
+    claim: "Le tavolette tardo-babilonesi registrano osservazioni sistematiche di stelle, mesi e segni zodiacali.",
+    answer: "A",
+    why: "Documenti reali e datati (ne conserva il British Museum): testimoniano l'inizio di un'astronomia osservativa sistematica. Sono l'alba della scienza del cielo, non un messaggio alieno." },
+  { id: 36, cat: "archivi", title: "I geroglifici come 'codice tecnologico'",
+    claim: "I geroglifici egizi nascondono un codice tecnologico lasciato da visitatori extraterrestri.",
+    answer: "D",
+    why: "I geroglifici sono una lingua complessa e decifrata, con grammatica e usi documentati. Non c'è alcun codice nascosto: è un'affermazione priva di prove controllabili." },
+
+  // ————— COSMO —————
+  { id: 37, cat: "cosmo", title: "L'età dell'universo",
+    claim: "L'universo ha circa 13,8 miliardi di anni.",
+    answer: "A",
+    why: "Sostenuto da più linee indipendenti: espansione cosmica, fondo cosmico a microonde e abbondanze degli elementi leggeri. Uno dei risultati più solidi della cosmologia." },
+  { id: 38, cat: "cosmo", title: "Gli elementi nascono nelle stelle",
+    claim: "Il carbonio, l'ossigeno e l'azoto della nostra biochimica sono stati fabbricati dentro le stelle e dispersi da venti stellari e supernove.",
+    answer: "A",
+    why: "La nucleosintesi stellare è stabilita: senza generazioni di stelle precedenti non esisterebbero né i pianeti rocciosi né i mattoni della vita. È il ponte tra cosmo e biologia." },
+  { id: 39, cat: "cosmo", title: "L'evoluzione della vita terrestre",
+    claim: "La vita sulla Terra si è evoluta e diversificata nel corso di miliardi di anni.",
+    answer: "A",
+    why: "Sostenuta dal record fossile, dalla biologia molecolare e da innumerevoli linee indipendenti. È un caposaldo stabilito della scienza." },
+  { id: 40, cat: "cosmo", title: "I mattoni chimici nello spazio",
+    claim: "Comete e meteoriti contengono acqua e molecole organiche, i mattoni della chimica prebiotica.",
+    answer: "A",
+    why: "Provato per la CHIMICA: questi corpi contengono davvero acqua e composti organici. Ma non sono di per sé organismi: 'mattoni della vita' non è 'vita'." },
+  { id: 41, cat: "cosmo", title: "La Grande Ossidazione",
+    claim: "Circa 2,4 miliardi di anni fa la fotosintesi riempì di ossigeno l'atmosfera terrestre, trasformando il pianeta.",
+    answer: "A",
+    why: "Evento stabilito dalla geochimica: fu insieme un'opportunità e una catastrofe, letale per molti organismi anaerobi. Un esempio di come la vita cambia il proprio pianeta." },
+  { id: 42, cat: "cosmo", title: "L'impatto di Chicxulub",
+    claim: "Un impatto di asteroide circa 66 milioni di anni fa contribuì all'estinzione dei dinosauri non aviari.",
+    answer: "A",
+    why: "Sostenuto da più prove convergenti (cratere, strato geologico, anomalie chimiche). Dimostra anche che una biosfera può essere sconvolta senza scomparire del tutto." },
+  { id: 43, cat: "cosmo", title: "Il Golden Record del Voyager",
+    claim: "Il Voyager Golden Record (1977) è un disco con suoni e immagini della Terra lanciato nello spazio.",
+    answer: "A",
+    why: "Artefatto reale e documentato. Nota bene: è un messaggio culturale spedito da noi verso l'esterno, non un 'contatto' ricevuto da una civiltà aliena." },
+];
+
+/* ─────────────────────────────────────────────────────────────
+   CONFIGURAZIONE MONETIZZAZIONE  (modifica qui — vedi note per l'utente)
+   Inserisci il tuo link donazioni (Ko-fi, BuyMeACoffee, PayPal.me…).
+   Se lasci "" il pulsante mostrerà un promemoria invece di aprire un link.
+   ───────────────────────────────────────────────────────────── */
+const DONATE_URL = "";              // es: "https://ko-fi.com/tuonome"
+const SHARE_URL  = location.origin + location.pathname; // link condiviso del gioco
+
+/* ───────── util ───────── */
+const $ = (h)=>{const t=document.createElement("template");t.innerHTML=h.trim();return t.content.firstChild;};
+const app = document.getElementById("app");
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("on");
+  clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("on"),2200);}
+
+/* seeded RNG per sfida quotidiana (mulberry32) */
+function rng(seed){let a=seed>>>0;return ()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+function shuffle(arr,rand=Math.random){const a=arr.slice();for(let i=a.length-1;i>0;i--){
+  const j=Math.floor(rand()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function todaySeed(){const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
+
+/* ───────── persistenza ───────── */
+const DEF_STATS={best:0,games:0,correct:0,answered:0,xp:0};
+const DEF_SET={sound:true,big:false};
+function load(k,def){try{return {...def,...JSON.parse(localStorage.getItem(k)||"{}")};}catch{return {...def};}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+let stats=load("vc_stats",DEF_STATS);
+let settings=load("vc_set",DEF_SET);
+let daily=load("vc_daily",{date:0,done:false,score:0,total:0});
+applySettings();
+
+function rankIndex(correct){const th=[0,20,50,100,180,300,500,800];let i=0;
+  for(let k=0;k<th.length;k++) if(correct>=th[k]) i=k; return i;}
+const rankName=()=>STR.ranks[rankIndex(stats.correct)];
+
+/* ───────── audio (WebAudio, opzionale) ───────── */
+let actx=null;
+function beep(freq,dur=.09,type="sine",gain=.05){
+  if(!settings.sound) return;
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(),g=actx.createGain();
+    o.type=type;o.frequency.value=freq;o.connect(g);g.connect(actx.destination);
+    g.gain.setValueAtTime(gain,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+dur);
+    o.start();o.stop(actx.currentTime+dur);}catch{}
+}
+const sfx={click:()=>beep(520,.05,"triangle",.04),
+  ok:()=>{beep(660,.09,"sine",.05);setTimeout(()=>beep(990,.11,"sine",.05),90);},
+  bad:()=>{beep(200,.16,"sawtooth",.05);},
+  win:()=>{[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.14,"sine",.05),i*110));}};
+
+/* ───────── glifi categorie (SVG, contorni sottili luminosi) ───────── */
+const G={
+  origine:'<path d="M12 3a9 9 0 1 0 .001 18.001A9 9 0 0 0 12 3Z"/><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="M12 12h.01"/>',
+  marte:'<circle cx="12" cy="12" r="8"/><path d="M8 10c1.5 1 3 1 4 0M14 14c1 .8 2 .8 2.5.2"/>',
+  lune:'<circle cx="12" cy="12" r="8"/><path d="M4.5 12c2.5 2.5 12.5 2.5 15 0M6 8c1.5 1.5 10.5 1.5 12 0M6 16c1.5-1.5 10.5-1.5 12 0"/>',
+  esopianeti:'<circle cx="12" cy="12" r="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-20 12 12)"/>',
+  seti:'<path d="M4 20l7-7"/><path d="M9 15a6 6 0 0 1 8-8"/><path d="M11 13a3 3 0 0 1 4-4"/><circle cx="5" cy="19" r="1.6"/>',
+  uap:'<ellipse cx="12" cy="12" rx="9" ry="3.4"/><path d="M8 11c1-2.4 7-2.4 8 0"/><path d="M12 15.4V19M9 18l-1.5 2M15 18l1.5 2"/>',
+  archivi:'<path d="M5 3h11l3 3v15H5z"/><path d="M9 8h6M9 12h6M9 16h4"/>',
+  cosmo:'<path d="M12 3v18M3 12h18" opacity=".25"/><path d="M6 6l12 12M18 6 6 18" opacity=".25"/><path d="M12 4l1.6 5.4L19 11l-5.4 1.6L12 18l-1.6-5.4L5 11l5.4-1.6z"/>',
+};
+const glyph=(cat)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${G[cat]||G.cosmo}</svg>`;
+
+/* ───────── emblema (SVG procedurale: lente su pianeta con anello) ───────── */
+function EMBLEM(cls){return `<svg class="${cls}" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <radialGradient id="pl" cx="42%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="#6fd7ff"/><stop offset="55%" stop-color="#3a7bd8"/><stop offset="100%" stop-color="#1a2a63"/>
+    </radialGradient>
+    <linearGradient id="rg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#b98cff"/><stop offset="100%" stop-color="#4bd8ff"/>
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="55" stroke="rgba(75,216,255,.28)" stroke-width="1.5"/>
+  <circle cx="60" cy="60" r="47" stroke="rgba(120,140,220,.18)" stroke-width="1" stroke-dasharray="2 5"/>
+  <g transform="rotate(-18 54 52)">
+    <circle cx="54" cy="52" r="19" fill="url(#pl)"/>
+    <path d="M54 52 m-19 0 a19 19 0 0 0 38 0" fill="rgba(0,0,10,.22)"/>
+    <ellipse cx="54" cy="52" rx="30" ry="9" stroke="url(#rg)" stroke-width="2.4" fill="none" opacity=".95"/>
+    <ellipse cx="54" cy="52" rx="30" ry="9" stroke="#0b1024" stroke-width="2.4" fill="none" stroke-dasharray="14 60" stroke-dashoffset="7"/>
+  </g>
+  <circle cx="74" cy="74" r="17" stroke="#4bd8ff" stroke-width="4" fill="rgba(10,20,40,.15)"/>
+  <line x1="86" y1="86" x2="99" y2="99" stroke="#4bd8ff" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="30" cy="30" r="1.6" fill="#bfe6ff"/><circle cx="92" cy="34" r="1.3" fill="#bfe6ff"/>
+  <circle cx="28" cy="82" r="1.2" fill="#9fb6ff"/><circle cx="86" cy="22" r="1" fill="#bfe6ff"/>
+</svg>`;}
+
+/* ───────── stato di gioco ───────── */
+let G_=null;
+function newRun({daily=false}={}){
+  let deck;
+  if(daily){deck=shuffle(CASES,rng(todaySeed())).slice(0,10);}
+  else{deck=shuffle(CASES);}
+  G_={deck,i:0,score:0,lives:3,streak:0,answered:0,correct:0,daily,answeredThis:false};
+  screenGame();
+}
+function multiplier(streak){return streak>=6?3:streak>=4?2:streak>=2?1.5:1;}
+
+/* ───────── SCHERMATE ───────── */
+function setScreen(node){app.innerHTML="";app.appendChild(node);}
+
+function screenMenu(){
+  const acc = stats.answered? Math.round(stats.correct/stats.answered*100):0;
+  const n=$(`<div class="screen on">
+    <div class="scroll">
+      <div class="brand">
+        ${EMBLEM("emblem")}
+        <h1 class="title">${STR.title}</h1>
+        <div class="tagline">${STR.tagline}</div>
+        <div class="stampline">DOSSIER · VITA NELL'UNIVERSO</div>
+      </div>
+      <div class="statbar">
+        <div class="stat"><b>${rankName()}</b><span>${STR.rankLabel}</span></div>
+        <div class="stat"><b>${stats.best}</b><span>${STR.bestLabel}</span></div>
+        <div class="stat"><b>${acc}%</b><span>${STR.accuracyLabel}</span></div>
+      </div>
+      <div class="menu">
+        <button class="btn primary" id="mPlay">🛰️ ${STR.play}</button>
+        <button class="btn" id="mDaily">📅 ${STR.daily}</button>
+        <div class="row">
+          <button class="btn sm" id="mHow">❓ ${STR.howto}</button>
+          <button class="btn sm" id="mSet">⚙️ ${STR.settings}</button>
+        </div>
+        <button class="btn ghost sm" id="mSup">💜 ${STR.support}</button>
+      </div>
+    </div>
+  </div>`);
+  n.querySelector("#mPlay").onclick=()=>{sfx.click();screenChapters();};
+  n.querySelector("#mDaily").onclick=()=>{sfx.click();screenDaily();};
+  n.querySelector("#mHow").onclick=()=>{sfx.click();screenHow();};
+  n.querySelector("#mSet").onclick=()=>{sfx.click();screenSettings();};
+  n.querySelector("#mSup").onclick=()=>{sfx.click();screenSupport();};
+  setScreen(n);
+}
+
+function header(title){
+  const h=$(`<div class="top">
+    <button class="iconbtn" id="bk">←</button>
+    <div class="hbadge">${title}</div><div class="space"></div>
+  </div>`);
+  h.querySelector("#bk").onclick=()=>{sfx.click();screenMenu();};
+  return h;
+}
+
+function screenChapters(){
+  const n=$(`<div class="screen on"><div class="scroll"></div></div>`);
+  const s=n.querySelector(".scroll");
+  s.appendChild(header(STR.chooseChapter));
+  s.appendChild($(`<button class="btn primary" id="all">🌌 ${STR.allChapters}</button>`));
+  const chips=$(`<div class="chips"></div>`);
+  Object.entries(CATEGORIES).forEach(([k,c])=>{
+    const cnt=CASES.filter(x=>x.cat===k).length;
+    const chip=$(`<div class="chip">${glyph(k)}<span>${c.name}</span><span class="muted" style="margin-left:auto;font-size:.78rem">${cnt}</span></div>`);
+    chip.style.color="var(--cyan)";
+    chip.querySelector("span").style.color="var(--ink)";
+    chip.onclick=()=>{sfx.click();startFiltered(k);};
+    chips.appendChild(chip);
+  });
+  s.appendChild($(`<div class="sec"><h3>${STR.allChapters==""?"":"Fascicoli"}</h3></div>`));
+  s.appendChild(chips);
+  n.querySelector("#all").onclick=()=>{sfx.click();newRun();};
+  setScreen(n);
+}
+function startFiltered(cat){
+  G_={deck:shuffle(CASES.filter(x=>x.cat===cat)),i:0,score:0,lives:3,streak:0,answered:0,correct:0,daily:false,answeredThis:false};
+  screenGame();
+}
+
+function screenDaily(){
+  const isToday=daily.date===todaySeed()&&daily.done;
+  const n=$(`<div class="screen on"><div class="scroll"></div></div>`);
+  const s=n.querySelector(".scroll");
+  s.appendChild(header(STR.dailyTitle));
+  s.appendChild($(`<div class="card"><div class="ctitle">📅 ${STR.dailyTitle}</div>
+    <p class="claim">${STR.dailyDesc}</p></div>`));
+  if(isToday){
+    s.appendChild($(`<div class="fb"><div class="fbhead">${STR.dailyResult}
+      <span class="fbpts">${daily.score} pt</span></div>
+      <div class="fbwhy">${STR.dailyComeBack}</div></div>`));
+  }else{
+    const b=$(`<button class="btn primary sec" id="go">▶️ ${STR.startDaily}</button>`);
+    b.onclick=()=>{sfx.click();newRun({daily:true});};
+    s.appendChild(b);
+  }
+  setScreen(n);
+}
+
+function screenGame(){
+  const g=G_;
+  const c=g.deck[g.i];
+  const pct=Math.round(g.i/g.deck.length*100);
+  const hearts="●".repeat(g.lives)+"○".repeat(3-g.lives);
+  const n=$(`<div class="screen on">
+    <div class="top">
+      <button class="iconbtn" id="quit">✕</button>
+      <div class="hstat">
+        <span class="lives" style="color:var(--D)" title="${STR.livesLabel}">${hearts}</span>
+        ${g.streak>=2?`<span class="hbadge" style="color:var(--cyan)">🔥×${multiplier(g.streak)}</span>`:``}
+        <span class="sc">${g.score}</span>
+      </div>
+    </div>
+    <div class="prog"><i style="width:${pct}%"></i></div>
+    <div class="scroll">
+      <div class="card">
+        <div class="catrow">${glyph(c.cat)}<span>${CATEGORIES[c.cat].name}</span>
+          <span class="casetag">${STR.caseLabel} ${String(g.i+1).padStart(2,"0")}/${String(g.deck.length).padStart(2,"0")}</span></div>
+        <div class="ctitle">${c.title}</div>
+        <div class="claim">«${c.claim}»</div>
+      </div>
+      <div class="qlabel">${STR.question}</div>
+      <div class="verdicts" id="vd"></div>
+      <div id="fbslot"></div>
+    </div>
+  </div>`);
+  const vd=n.querySelector("#vd");
+  ["A","B","C","D"].forEach(k=>{
+    const L=LEVELS[k];
+    const b=$(`<button class="vbtn" data-k="${k}" style="--vc:${L.color}">
+      <span class="k">${k}</span><span class="lb">${L.label}</span>
+      <span class="sub">${L.desc}</span></button>`);
+    b.onclick=()=>answer(k,n);
+    vd.appendChild(b);
+  });
+  n.querySelector("#quit").onclick=()=>{sfx.click();screenMenu();};
+  setScreen(n);
+  G_._node=n;
+}
+
+function answer(k,n){
+  const g=G_; if(g.answeredThis) return; g.answeredThis=true;
+  const c=g.deck[g.i];
+  const ok=k===c.answer;
+  g.answered++; stats.answered++;
+  const btns=n.querySelectorAll(".vbtn");
+  btns.forEach(b=>{b.disabled=true;
+    const bk=b.dataset.k;
+    if(bk===c.answer) b.classList.add("rightone");
+    if(bk===k && !ok) b.classList.add("wrongone");
+    if(bk===k) b.classList.add("pick");
+  });
+  let gained=0;
+  if(ok){
+    g.streak++; g.correct++; stats.correct++;
+    const m=multiplier(g.streak); gained=Math.round(100*m);
+    g.score+=gained; stats.xp+=gained;
+    sfx.ok();
+  }else{
+    g.streak=0; g.lives--; sfx.bad();
+    if(navigator.vibrate) try{navigator.vibrate(60);}catch{}
+  }
+  const L=LEVELS[c.answer];
+  const fb=$(`<div class="fb">
+    <div class="fbhead"><span class="fbdot" style="background:${ok?'var(--A)':'var(--D)'}"></span>
+      ${ok?STR.correct:STR.wrong}
+      ${ok?`<span class="fbpts" style="color:var(--A)">${STR.plus}${gained}${g.streak>=2?` · ${STR.streakBonus}${multiplier(g.streak)}`:''}</span>`:''}</div>
+    <div class="fbverdict">${STR.correctAnswerWas}: <b style="color:${L.color}">${L.label}</b></div>
+    <div class="fbwhy">${c.why}</div>
+    <div class="fbsrc">${STR.sourceNote}</div>
+    <button class="btn primary" style="margin-top:13px" id="nx">${g.i+1>=g.deck.length||g.lives<=0?'🏁 '+STR.finalScore:'▶️ '+STR.next}</button>
+  </div>`);
+  fb.querySelector("#nx").onclick=()=>{sfx.click();advance();};
+  n.querySelector("#fbslot").appendChild(fb);
+  fb.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function advance(){
+  const g=G_;
+  g.i++; g.answeredThis=false;
+  if(g.lives<=0 || g.i>=g.deck.length){ endRun(); return; }
+  screenGame();
+}
+
+function endRun(){
+  const g=G_;
+  stats.games++;
+  const isBest=g.score>stats.best;
+  const prevRank=rankName();
+  if(isBest) stats.best=g.score;
+  const nowRank=rankName();
+  const promoted=nowRank!==prevRank;
+  save("vc_stats",stats);
+  if(g.daily){daily={date:todaySeed(),done:true,score:g.score,total:g.answered};save("vc_daily",daily);}
+  sfx.win();
+  const acc=g.answered?Math.round(g.correct/g.answered*100):0;
+  const n=$(`<div class="screen on"><div class="scroll">
+    <div class="center" style="margin-top:4vh">
+      ${EMBLEM("big-emb")}
+      <h2>${STR.gameOver}</h2>
+      <div class="muted" style="margin:6px 0 12px">${g.daily?STR.dailyTitle:''}</div>
+      <div class="result-score">${g.score}</div>
+      ${isBest?`<div style="color:var(--A);font-weight:700;margin-top:6px">✨ ${STR.newBest}</div>`:''}
+      ${promoted?`<div style="color:var(--cyan);font-weight:700;margin-top:4px">⬆️ ${STR.rankUp} ${nowRank}</div>`:''}
+    </div>
+    <div class="statbar">
+      <div class="stat"><b>${g.correct}/${g.answered}</b><span>${STR.casesJudged}</span></div>
+      <div class="stat"><b>${acc}%</b><span>${STR.accuracyLabel}</span></div>
+      <div class="stat"><b>${nowRank}</b><span>${STR.rankLabel}</span></div>
+    </div>
+    <div class="foot">
+      ${g.daily?'':`<button class="btn primary" id="again">🔄 ${STR.retry}</button>`}
+      <button class="btn" id="menu">🏠 ${STR.toMenu}</button>
+    </div>
+    <button class="btn ghost sec" id="share">📣 ${STR.share}</button>
+    <button class="btn ghost sm" id="sup" style="margin-top:10px">💜 ${STR.support}</button>
+  </div></div>`);
+  const ag=n.querySelector("#again"); if(ag) ag.onclick=()=>{sfx.click();g.daily?screenMenu():newRun();};
+  n.querySelector("#menu").onclick=()=>{sfx.click();screenMenu();};
+  n.querySelector("#sup").onclick=()=>{sfx.click();screenSupport();};
+  n.querySelector("#share").onclick=()=>doShare(g.score,g.answered);
+  setScreen(n);
+}
+
+async function doShare(score,total){
+  sfx.click();
+  const text=STR.shareText(score,total,rankName());
+  const data={title:STR.title,text,url:SHARE_URL};
+  try{
+    if(navigator.share){await navigator.share(data);return;}
+  }catch{return;}
+  try{await navigator.clipboard.writeText(text+" "+SHARE_URL);toast(STR.shareCopied);}
+  catch{toast(text);}
+}
+
+function screenHow(){
+  const n=$(`<div class="screen on"><div class="scroll"></div></div>`);
+  const s=n.querySelector(".scroll");
+  s.appendChild(header(STR.howtoTitle));
+  s.appendChild($(`<div class="card"><div class="ctitle">${STR.howtoTitle}</div>
+    ${STR.howtoBody.map(p=>`<p class="lead">${p}</p>`).join("")}</div>`));
+  s.appendChild($(`<div class="sec"><h3>${STR.legendTitle}</h3></div>`));
+  const leg=$(`<div class="legend"></div>`);
+  Object.values(LEVELS).forEach(L=>{
+    leg.appendChild($(`<div class="leg"><span class="k" style="background:${L.color}">${L.key}</span>
+      <div><b style="color:${L.color}">${L.label}</b><p>${L.desc}</p></div></div>`));
+  });
+  s.appendChild(leg);
+  const b=$(`<button class="btn primary sec" id="go">🛰️ ${STR.play}</button>`);
+  b.onclick=()=>{sfx.click();screenChapters();};
+  s.appendChild(b);
+  setScreen(n);
+}
+
+function screenSettings(){
+  const n=$(`<div class="screen on"><div class="scroll"></div></div>`);
+  const s=n.querySelector(".scroll");
+  s.appendChild(header(STR.settings));
+  const mk=(label,on,cb)=>{const r=$(`<div class="switch"><span>${label}</span><div class="tg ${on?'on':''}"></div></div>`);
+    r.querySelector(".tg").onclick=()=>{const t=r.querySelector(".tg");const v=!t.classList.contains("on");
+      t.classList.toggle("on",v);cb(v);};return r;};
+  s.appendChild(mk(STR.soundOn,settings.sound,v=>{settings.sound=v;save("vc_set",settings);if(v)sfx.click();}));
+  s.appendChild(mk(STR.bigText,settings.big,v=>{settings.big=v;save("vc_set",settings);applySettings();}));
+  const rs=$(`<button class="btn ghost sec" id="rs">🗑️ ${STR.reset}</button>`);
+  rs.onclick=()=>{if(confirm(STR.resetConfirm)){stats={...DEF_STATS};daily={date:0,done:false,score:0,total:0};
+    save("vc_stats",stats);save("vc_daily",daily);toast("OK");screenMenu();}};
+  s.appendChild(rs);
+  s.appendChild($(`<div class="sec center muted" style="font-size:.78rem">${STR.sourceNote}</div>`));
+  setScreen(n);
+}
+
+function screenSupport(){
+  const n=$(`<div class="screen on"><div class="scroll"></div></div>`);
+  const s=n.querySelector(".scroll");
+  s.appendChild(header(STR.support));
+  s.appendChild($(`<div class="card"><div class="ctitle">💜 ${STR.supportTitle}</div>
+    <p class="lead">${STR.supportBody}</p></div>`));
+  const don=$(`<button class="btn primary sec" id="don">${STR.supportDonate}</button>`);
+  don.onclick=()=>{sfx.click();
+    if(DONATE_URL){window.open(DONATE_URL,"_blank","noopener");}
+    else{toast("Imposta DONATE_URL nel codice per attivare le donazioni.");}};
+  s.appendChild(don);
+  const sh=$(`<button class="btn" id="sh">${STR.supportShare}</button>`);
+  sh.style.marginTop="10px";
+  sh.onclick=()=>doShare(stats.best,stats.answered);
+  s.appendChild(sh);
+  s.appendChild($(`<div class="sec"><h3>${STR.packsTitle}</h3></div>`));
+  const packs=["Grandi bufale","Missioni spaziali","Misteri archeologici"];
+  packs.forEach(p=>s.appendChild($(`<div class="chip pack" style="flex-basis:100%">📦 <span style="color:var(--ink)">${p}</span><span class="lock">${STR.packLocked}</span></div>`)));
+  s.appendChild($(`<div class="sec muted" style="font-size:.82rem">${STR.packsBody}</div>`));
+  setScreen(n);
+}
+
+/* ───────── impostazioni globali ───────── */
+function applySettings(){document.body.classList.toggle("big",!!settings.big);}
+
+/* ───────── sfondo stellato animato (canvas, DPR cap, pausa su blur) ───────── */
+const cv=document.getElementById("stars"),cx=cv.getContext("2d");
+const DPR=Math.min(devicePixelRatio||1,1.5);
+let stars=[],W=0,H=0,paused=false;
+function resizeStars(){W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;
+  cv.style.width=W+"px";cv.style.height=H+"px";cx.setTransform(DPR,0,0,DPR,0,0);
+  const count=Math.min(140,Math.floor(W*H/9000));
+  stars=Array.from({length:count},()=>({x:Math.random()*W,y:Math.random()*H,
+    z:Math.random()*.8+.2,ph:Math.random()*6.28}));}
+addEventListener("resize",resizeStars);addEventListener("orientationchange",resizeStars);resizeStars();
+addEventListener("blur",()=>paused=true);addEventListener("focus",()=>{paused=false;last=performance.now();});
+let last=performance.now();
+function loop(now){requestAnimationFrame(loop);if(paused)return;
+  const dt=Math.min(50,now-last);last=now;
+  cx.clearRect(0,0,W,H);
+  for(const s of stars){
+    s.y+=s.z*0.012*dt; if(s.y>H){s.y=0;s.x=Math.random()*W;}
+    s.ph+=0.002*dt;
+    const tw=0.55+0.45*Math.sin(s.ph);
+    const r=s.z*1.4;
+    cx.globalAlpha=tw*(0.35+s.z*0.5);
+    cx.fillStyle=s.z>0.75?"#bfe6ff":"#8fb0ff";
+    cx.beginPath();cx.arc(s.x,s.y,r,0,6.283);cx.fill();
+  }
+  cx.globalAlpha=1;
+}
+requestAnimationFrame(loop);
+
+/* ───────── tastiera: 1-4 = verdetti (physical key codes) ───────── */
+const KEYMAP={Digit1:"A",Digit2:"B",Digit3:"C",Digit4:"D",Numpad1:"A",Numpad2:"B",Numpad3:"C",Numpad4:"D"};
+addEventListener("keydown",e=>{const k=KEYMAP[e.code];if(!k)return;
+  const n=G_&&G_._node;if(!n||!document.body.contains(n))return;
+  const btn=n.querySelector(`.vbtn[data-k="${k}"]`);if(btn&&!btn.disabled){e.preventDefault();btn.click();}});
+
+/* ───────── avvio ───────── */
+screenMenu();
+</script>
+</body>
+</html>

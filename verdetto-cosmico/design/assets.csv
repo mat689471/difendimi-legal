@@ -1,0 +1,9 @@
+id,role,type,description,size/ratio,style line ref,source
+thumbnail,marketplace/deploy cover card (passed as URL to deploy),background,bold VERDETTO COSMICO cover with planet UFO and four verdict stamps,16:9,STYLE FORMULA,generate
+favicon,marketplace/deploy square icon (passed as URL to deploy),ui,magnifying glass over ringed planet app icon,1:1,STYLE FORMULA,generate
+starfield,animated twinkling parallax stars drawn in canvas behind all screens,background,procedural moving starfield with faint drifting nebula haze,fullscreen,STYLE FORMULA,procedural
+nebula,layered radial-gradient nebula behind starfield (CSS),background,deep space navy with faint violet and teal nebula glows,fullscreen,STYLE FORMULA,procedural
+emblem,title/menu logo mark and end-screen seal (inline SVG),ui,magnifying glass over ringed planet with orbit rings and stars,1:1,STYLE FORMULA,procedural
+verdict_buttons,four verdict buttons and result stamps drawn with CSS,ui,green/blue/violet/red rounded verdict badges with monospace labels,square,STYLE FORMULA,procedural
+card_panel,dossier case card panel drawn with CSS,ui,dark slate rounded panel with cyan hairline border and file stamp,card,STYLE FORMULA,procedural
+category_glyphs,eight category glyphs drawn as inline SVG,ui,minimal cyan line glyphs for origine marte lune esopianeti seti uap archivi cosmo,icon,STYLE FORMULA,procedural
