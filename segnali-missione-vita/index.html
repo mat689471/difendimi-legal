@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#05060d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2305060d'/%3E%3Ccircle cx='16' cy='13' r='6' fill='%2342e0c8'/%3E%3Crect x='11' y='17' width='10' height='9' rx='2' fill='%234aa8ff'/%3E%3C/svg%3E">
+<title>Segnali · Missione Vita</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+  html,body{margin:0;height:100%;overflow:hidden;background:#05060d;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#eaf0ff;touch-action:none}
+  #game{position:fixed;inset:0;display:block;background:#05060d;image-rendering:pixelated;image-rendering:crisp-edges}
+  .layer{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column}
+  .hidden{display:none!important}
+
+  /* HUD */
+  #hud{position:fixed;top:0;left:0;right:0;z-index:6;padding:calc(env(safe-area-inset-top) + 8px) 12px 8px;
+    display:flex;gap:10px;align-items:center;pointer-events:none;
+    background:linear-gradient(180deg,rgba(5,6,13,.85),transparent)}
+  #obj{flex:1;font-size:13px;font-weight:600;color:#cfe0ff;text-shadow:0 1px 3px #000;line-height:1.25}
+  #obj b{color:#42e0c8}
+  .pill{pointer-events:none;background:rgba(12,18,36,.8);border:1px solid rgba(120,200,255,.28);border-radius:999px;
+    padding:6px 11px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;white-space:nowrap}
+  #pause{pointer-events:auto;width:38px;height:38px;border-radius:11px;border:1px solid rgba(120,200,255,.28);
+    background:rgba(12,18,36,.8);color:#eaf0ff;font-size:15px;display:flex;align-items:center;justify-content:center}
+
+  /* controlli touch */
+  #touch{position:fixed;inset:0;z-index:6;pointer-events:none}
+  #stick{position:absolute;left:0;bottom:0;width:52%;height:46%;pointer-events:auto}
+  #knobBase{position:absolute;width:120px;height:120px;border-radius:50%;border:2px solid rgba(120,200,255,.25);
+    background:radial-gradient(circle,rgba(30,50,90,.35),rgba(10,16,30,.15));display:none}
+  #knob{position:absolute;width:56px;height:56px;border-radius:50%;background:rgba(90,180,255,.5);
+    border:2px solid rgba(180,230,255,.7);box-shadow:0 0 18px rgba(70,160,255,.5);display:none}
+  #btnA{position:absolute;right:22px;bottom:calc(28px + env(safe-area-inset-bottom));width:96px;height:96px;border-radius:50%;
+    pointer-events:auto;background:radial-gradient(circle at 40% 35%,#2fe0c0,#149b86);border:3px solid rgba(190,255,245,.6);
+    color:#04231e;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 24px rgba(20,155,134,.5)}
+  #btnA:active{transform:scale(.94)}
+  @media(hover:hover) and (pointer:fine){ #touch{display:none} }
+
+  /* dialogo */
+  #dlg{position:fixed;left:0;right:0;bottom:0;z-index:8;padding:0 12px calc(14px + env(safe-area-inset-bottom));
+    display:flex;justify-content:center;pointer-events:none}
+  #dlgBox{pointer-events:auto;width:100%;max-width:560px;background:linear-gradient(180deg,rgba(16,22,44,.97),rgba(9,12,26,.98));
+    border:1px solid rgba(120,200,255,.35);border-radius:16px;padding:12px 14px 14px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+  #dlgHead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  #portrait{width:46px;height:46px;border-radius:10px;background:#0b1024;border:1px solid rgba(120,200,255,.3);flex:0 0 46px}
+  #dlgName{font-weight:800;color:#7fe9ff;font-size:15px}
+  #dlgRole{font-size:11px;color:#8ea3cf;letter-spacing:.3px}
+  #dlgText{font-size:15px;line-height:1.5;color:#e7edff;min-height:3em}
+  #dlgText .lvl{display:inline-block;font-weight:800;font-size:11px;padding:2px 7px;border-radius:6px;color:#04121f;margin-left:4px;vertical-align:middle}
+  #dlgFoot{display:flex;justify-content:flex-end;align-items:center;margin-top:8px}
+  #dlgNext{background:#18325a;border:1px solid rgba(120,200,255,.4);color:#eaf0ff;font-weight:700;font-size:13px;
+    padding:8px 16px;border-radius:10px}
+
+  /* schermate */
+  .panel{margin:auto;width:100%;max-width:520px;padding:24px;text-align:center}
+  .big{font-size:2rem;font-weight:800;letter-spacing:.5px;background:linear-gradient(90deg,#42e0c8,#7fb0ff);
+    -webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.1}
+  .sub{color:#9fb0d6;margin:10px 0 4px;font-size:1rem}
+  .crew{margin:18px auto;display:block}
+  .btn{appearance:none;border:1px solid rgba(120,200,255,.4);background:linear-gradient(180deg,#18325a,#122043);
+    color:#eaf0ff;font-size:1.05rem;font-weight:800;padding:15px;border-radius:14px;width:100%;margin-top:12px;cursor:pointer}
+  .btn:active{transform:scale(.98)}
+  .btn.g{background:transparent;font-weight:600;font-size:.95rem}
+  .layer.veil{background:rgba(5,6,13,.78);backdrop-filter:blur(3px);z-index:9}
+  .card{background:rgba(14,20,40,.9);border:1px solid rgba(120,200,255,.28);border-radius:14px;padding:14px;margin-top:14px;text-align:left}
+  .card h3{margin:0 0 6px;font-size:.8rem;letter-spacing:1.5px;text-transform:uppercase;color:#8ea3cf}
+  .logitem{display:flex;gap:9px;align-items:flex-start;font-size:.9rem;color:#dfe6ff;margin:7px 0}
+  .logitem .lvl{font-weight:800;font-size:10px;padding:2px 6px;border-radius:5px;color:#04121f;flex:0 0 auto}
+  .hintline{font-size:.82rem;color:#8ea3cf;margin-top:10px;line-height:1.5}
+  #toast{position:fixed;left:50%;top:64px;transform:translateX(-50%);z-index:10;background:rgba(20,40,70,.95);
+    border:1px solid rgba(120,200,255,.4);border-radius:12px;padding:10px 16px;font-size:.9rem;font-weight:600;
+    opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;max-width:88%;text-align:center}
+  #toast.on{opacity:1;transform:translateX(-50%) translateY(4px)}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="pause">⏸</div>
+  <div id="obj"></div>
+  <div class="pill">🔬 <span id="evc">0</span>/6</div>
+</div>
+
+<div id="touch" class="hidden">
+  <div id="stick"><div id="knobBase"></div><div id="knob"></div></div>
+  <div id="btnA">AZIONE</div>
+</div>
+
+<div id="dlg" class="hidden"><div id="dlgBox">
+  <div id="dlgHead"><canvas id="portrait" width="46" height="46"></canvas>
+    <div><div id="dlgName"></div><div id="dlgRole"></div></div></div>
+  <div id="dlgText"></div>
+  <div id="dlgFoot"><button id="dlgNext">Avanti ▶</button></div>
+</div></div>
+
+<div id="toast"></div>
+
+<!-- MENU -->
+<div id="menu" class="layer"><div class="panel">
+  <div class="big">SEGNALI</div>
+  <div class="sub">Missione Vita — Base di ricerca «Kepler»</div>
+  <canvas id="crewC" class="crew" width="320" height="70"></canvas>
+  <p style="color:#c7d4f0;font-size:.95rem;line-height:1.5;margin:4px 0 2px">
+    Sei la <b style="color:#42e0c8">Dott.ssa Nova</b>, xenobiologa. Esplora la base,
+    parla con l'equipaggio e raccogli le <b>6 prove</b> per il briefing finale del Comandante.</p>
+  <button class="btn" id="playBtn">▶ Inizia la missione</button>
+  <button class="btn g" id="howBtn">Come si gioca</button>
+</div></div>
+
+<!-- PAUSA / LOG -->
+<div id="pauseScr" class="layer veil hidden"><div class="panel">
+  <div class="big" style="font-size:1.5rem">Diario di missione</div>
+  <div class="card"><h3>Prove raccolte</h3><div id="logList"></div></div>
+  <div class="hintline" id="pauseHint"></div>
+  <button class="btn" id="resumeBtn">▶ Riprendi</button>
+  <button class="btn g" id="menuBtn">Torna al menu</button>
+</div></div>
+
+<!-- HOWTO -->
+<div id="howScr" class="layer veil hidden"><div class="panel">
+  <div class="big" style="font-size:1.4rem">Come si gioca</div>
+  <div class="card">
+    <p style="margin:.2em 0">🕹️ <b>Muoviti</b>: joystick a sinistra (touch) o tasti <b>WASD</b> / frecce.</p>
+    <p style="margin:.6em 0">✨ <b>Interagisci</b>: avvicinati a una persona o a un reperto (appare «!») e premi <b>AZIONE</b> (o <b>Spazio</b>).</p>
+    <p style="margin:.6em 0">🔬 <b>Obiettivo</b>: esamina i 6 reperti nei laboratori, poi torna dal Comandante nel corridoio.</p>
+    <p style="margin:.6em 0">📖 Ogni reperto entra nel tuo diario con il suo <b>livello di prova</b> reale.</p>
+  </div>
+  <button class="btn" id="howBack">Indietro</button>
+</div></div>
+
+<!-- VITTORIA -->
+<div id="winScr" class="layer veil hidden"><div class="panel">
+  <div class="big">Missione compiuta</div>
+  <div class="sub" id="winSub"></div>
+  <div class="card"><h3>Dossier completato</h3><div id="winList"></div></div>
+  <p class="hintline">Verità della missione: l'universo ha gli ingredienti per la vita, ma finora
+    nessuna prova pubblica e verificata la conferma. Distinguere prova, indizio e ipotesi è il vero lavoro.</p>
+  <button class="btn" id="winAgain">Rigioca</button>
+  <button class="btn g" id="winMenu">Menu</button>
+</div></div>
+
+<script>
+"use strict";
+/* ════════════════════════════════════════════════════════════════
+   SEGNALI · MISSIONE VITA — avventura top-down, personaggi in pixel-art.
+   Tutto in un file, offline, mobile+desktop. Contenuti dal dossier
+   «Vita nell'universo». (Modifica i dialoghi/prove più in basso.)
+   ════════════════════════════════════════════════════════════════ */
+
+const TILE=16;
+const cv=document.getElementById("game"), ctx=cv.getContext("2d");
+ctx.imageSmoothingEnabled=false;
+const $=id=>document.getElementById(id);
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast._);toast._=setTimeout(()=>e.classList.remove("on"),2000);}
+
+/* ---------- palette personaggi ---------- */
+// C: {skin,hair,suit,dark,acc,visor}
+const HERO={skin:"#f2c9a0",hair:"#3a2a44",suit:"#28d6b6",dark:"#149b86",acc:"#eafff9",visor:"#0a3b34"};
+const CREW={
+  adler:{name:"Cap. Adler",role:"Comandante",C:{skin:"#e8b892",hair:"#c9c9d6",suit:"#e0663c",dark:"#a5401f",acc:"#ffd9b0",visor:"#2a0f08"}},
+  vega:{name:"Dott.ssa Vega",role:"Geologa · Marte",C:{skin:"#c98a63",hair:"#1c1a22",suit:"#d97b2e",dark:"#9c5115",acc:"#ffe0a8",visor:"#2a1405"}},
+  mila:{name:"Dott.ssa Mila",role:"Oceanografa",C:{skin:"#f0cbb0",hair:"#243b6b",suit:"#2e78d9",dark:"#1a4c9c",acc:"#bfe0ff",visor:"#08213f"}},
+  orin:{name:"Dott. Orin",role:"Astronomo · SETI",C:{skin:"#d8a884",hair:"#2a2030",suit:"#8b5cff",dark:"#5b34b8",acc:"#e6d9ff",visor:"#1a0f38"}},
+  sela:{name:"Archiv. Sela",role:"Archivista",C:{skin:"#e5b48c",hair:"#4a2f1a",suit:"#b08948",dark:"#7c5a25",acc:"#f2e2c0",visor:"#241608"}},
+  rho:{name:"Tecn. Rho",role:"Analista · UAP",C:{skin:"#caa07a",hair:"#20241c",suit:"#3fae5a",dark:"#237a38",acc:"#c8f2d0",visor:"#0a2410"}},
+  iris:{name:"Dott.ssa Iris",role:"Biochimica",C:{skin:"#f0c6a4",hair:"#6b2a44",suit:"#d94f8a",dark:"#9c2c5e",acc:"#ffd6ea",visor:"#2a0a1a"}},
+};
+const LV={A:{t:"PROVATO",c:"#3ddc84"},B:{t:"INDIZIO",c:"#4aa8ff"},C:{t:"IPOTESI",c:"#b98cff"},D:{t:"NON VERIF.",c:"#ff5d6c"}};
+
+/* ---------- disegno personaggio (pixel-art procedurale) ---------- */
+// disegna centrato sui piedi (fx,fy) a scala s. walk = fase animazione, face=-1/1
+function drawChar(g,fx,fy,s,C,walk,face){
+  const P=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(Math.round(fx+x*s),Math.round(fy+y*s),Math.ceil(w*s),Math.ceil(h*s));};
+  const bob=walk?(Math.sin(walk)>0?-1:0):0;
+  const legL=walk?Math.round(Math.sin(walk)* .0)+ (Math.sin(walk)>0?1:0):0;
+  const legR=walk?(Math.sin(walk)<0?1:0):0;
+  const y0=bob;
+  // ombra
+  g.fillStyle="rgba(0,0,0,.28)";g.beginPath();g.ellipse(fx,fy+1,5.5*s,2.2*s,0,0,7);g.fill();
+  // gambe
+  P(-3.5,-6+y0+legL,3,6,C.dark); P(0.5,-6+y0+legR,3,6,C.dark);
+  // stivali
+  P(-3.5,-2+y0+legL,3,2,"#11151f"); P(0.5,-2+y0+legR,3,2,"#11151f");
+  // braccia
+  P(-6,-11+y0,2,5,C.suit); P(4,-11+y0,2,5,C.suit);
+  P(-6,-7+y0,2,1.5,C.skin); P(4,-7+y0,2,1.5,C.skin); // mani
+  // torso
+  P(-4,-12+y0,8,6,C.suit);
+  P(-4,-11+y0,8,1.3,C.acc); // striscia accento
+  P(-1,-9.5+y0,2,3,C.dark); // pettorina
+  // collo
+  P(-1.5,-13+y0,3,1.2,C.skin);
+  // testa
+  P(-3,-16.5+y0,6,4,C.skin);
+  // capelli
+  P(-3.3,-17+y0,6.6,1.8,C.hair); P(-3.3,-16+y0,1,2,C.hair); P(2.3,-16+y0,1,2,C.hair);
+  // visiera/occhi (verso la direzione)
+  P(-2.4,-15+y0,4.8,1.4,C.visor);
+  g.fillStyle=C.acc;g.fillRect(Math.round(fx+(face>0?0.6:-1.6)*s),Math.round(fy+(-15+y0)*s),Math.ceil(1*s),Math.ceil(1.2*s));
+}
+
+/* ---------- MONDO: base con corridoio e 6 laboratori ---------- */
+const MW=58, MH=40;
+let grid; // 0 floor, 1 wall, 2 corridor floor, 3 room accent floor
+const ROOMS=[]; // {name,theme,x,y,w,h,floor,accent}
+function build(){
+  grid=Array.from({length:MH},()=>Array(MW).fill(1));
+  // corridoio orizzontale centrale
+  const cyA=17, cyB=22;
+  for(let y=cyA;y<=cyB;y++) for(let x=3;x<MW-3;x++) grid[y][x]=2;
+  // stanze: 3 sopra, 3 sotto
+  const bands=[[4,18],[21,35],[38,52]];
+  const defsTop=[
+    {name:"Laboratorio Marte",floor:"#3a2417",accent:"#d97b2e",crew:"vega"},
+    {name:"Osservatorio SETI",floor:"#221a33",accent:"#8b5cff",crew:"orin"},
+    {name:"Archivio Storico",floor:"#2b2416",accent:"#b08948",crew:"sela"},
+  ];
+  const defsBot=[
+    {name:"Laboratorio Oceani",floor:"#12233d",accent:"#2e78d9",crew:"mila"},
+    {name:"Hangar UAP",floor:"#16261a",accent:"#3fae5a",crew:"rho"},
+    {name:"Serra · Origini",floor:"#3a1428",accent:"#d94f8a",crew:"iris"},
+  ];
+  const mk=(d,x0,x1,y0,y1,dsideTop)=>{
+    for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++) grid[y][x]=0;
+    // porta verso corridoio
+    const dx=Math.floor((x0+x1)/2);
+    if(dsideTop){ for(let y=y1;y<cyA;y++){grid[y][dx]=2;grid[y][dx+1]=2;} }
+    else { for(let y=cyB+1;y<=y0;y++){grid[y][dx]=2;grid[y][dx+1]=2;} }
+    ROOMS.push({...d,x:x0,y:y0,w:x1-x0+1,h:y1-y0+1,dx});
+  };
+  bands.forEach((b,i)=>mk(defsTop[i],b[0],b[1],3,15,true));
+  bands.forEach((b,i)=>mk(defsBot[i],b[0],b[1],24,36,false));
+}
+
+/* ---------- ENTITÀ ---------- */
+let hero, npcs, exhibits, cam, evidence, talkedAll;
+function spawnEntities(){
+  npcs=[]; exhibits=[]; evidence=[];
+  const cx=Math.floor(MW/2), cy=19;
+  hero={x:cx*TILE, y:cy*TILE+8, vx:0,vy:0, face:1, walk:0, spd:1.35};
+  // Comandante nel corridoio
+  npcs.push(mkNPC("adler", 8*TILE, 19.5*TILE, DLG.adler_intro));
+  // per ogni stanza: scienziato + reperto
+  const roomDlg={vega:DLG.vega,orin:DLG.orin,sela:DLG.sela,mila:DLG.mila,rho:DLG.rho,iris:DLG.iris};
+  const roomEx={
+    "Laboratorio Marte":{icon:"rock",name:"Campione «Sapphire Canyon»",lvl:"B",text:DLG.ex_marte},
+    "Osservatorio SETI":{icon:"radio",name:"Registrazione «Wow! signal»",lvl:"D",text:DLG.ex_seti},
+    "Archivio Storico":{icon:"gear",name:"Ingranaggio di Anticitera",lvl:"A",text:DLG.ex_arch},
+    "Laboratorio Oceani":{icon:"drop",name:"Pennacchio di Encelado",lvl:"B",text:DLG.ex_ocean},
+    "Hangar UAP":{icon:"screen",name:"Video sensore UAP",lvl:"D",text:DLG.ex_uap},
+    "Serra · Origini":{icon:"flask",name:"Apparato di Miller-Urey",lvl:"A",text:DLG.ex_orig},
+  };
+  ROOMS.forEach(r=>{
+    const midx=(r.x+r.w/2), midy=(r.y+r.h/2);
+    npcs.push(mkNPC(r.crew,(r.x+2)*TILE+8,(midy)*TILE, roomDlg[r.crew]));
+    const ex=roomEx[r.name];
+    exhibits.push({x:(r.x+r.w-3)*TILE, y:(r.y+2)*TILE+8, icon:ex.icon, name:ex.name, lvl:ex.lvl, text:ex.text, done:false, room:r.name});
+  });
+  cam={x:hero.x,y:hero.y};
+  talkedAll=false;
+}
+function mkNPC(key,x,y,dlg){return {key,x,y,face:-1,walk:0,dlg,C:CREW[key].C,name:CREW[key].name,role:CREW[key].role};}
+
+/* solidità */
+function solidTileAt(px,py){
+  const tx=Math.floor(px/TILE), ty=Math.floor(py/TILE);
+  if(tx<0||ty<0||tx>=MW||ty>=MH) return true;
+  return grid[ty][tx]===1;
+}
+function blockedAt(px,py,self){
+  if(solidTileAt(px,py)) return true;
+  for(const n of npcs){ if(Math.abs(px-n.x)<11 && Math.abs(py-(n.y-6))<12) return true; }
+  for(const e of exhibits){ if(Math.abs(px-e.x)<11 && Math.abs(py-(e.y-6))<12) return true; }
+  return false;
+}
+
+/* ---------- INPUT ---------- */
+const keys=new Set();
+const CODE={KeyW:"up",ArrowUp:"up",KeyS:"down",ArrowDown:"down",KeyA:"left",ArrowLeft:"left",KeyD:"right",ArrowRight:"right"};
+addEventListener("keydown",e=>{ if(e.code==="Space"||e.code==="Enter"){e.preventDefault();action();return;}
+  if(e.code==="Escape"){togglePause();return;}
+  const c=CODE[e.code]; if(c){keys.add(c);e.preventDefault();}});
+addEventListener("keyup",e=>{const c=CODE[e.code];if(c)keys.delete(c);});
+
+// joystick touch
+let stickId=null, stickVec={x:0,y:0};
+const stick=$("stick"),knob=$("knob"),knobBase=$("knobBase");
+function stickStart(e){const t=e.changedTouches?e.changedTouches[0]:e; stickId=t.identifier??"m";
+  const r=stick.getBoundingClientRect(); stick._ox=t.clientX; stick._oy=t.clientY;
+  knobBase.style.display=knob.style.display="block";
+  knobBase.style.left=(t.clientX-r.left-60)+"px"; knobBase.style.top=(t.clientY-r.top-60)+"px";
+  knob.style.left=(t.clientX-r.left-28)+"px"; knob.style.top=(t.clientY-r.top-28)+"px"; }
+function stickMove(e){ if(stickId===null)return;
+  const ts=e.changedTouches||[e]; let t=null; for(const x of ts){ if((x.identifier??"m")===stickId)t=x;} if(!t)return;
+  let dx=t.clientX-stick._ox, dy=t.clientY-stick._oy; const len=Math.hypot(dx,dy)||1; const max=48;
+  const cl=Math.min(len,max); dx=dx/len*cl; dy=dy/len*cl;
+  stickVec.x=dx/max; stickVec.y=dy/max;
+  const r=stick.getBoundingClientRect();
+  knob.style.left=(stick._ox-r.left-28+dx)+"px"; knob.style.top=(stick._oy-r.top-28+dy)+"px"; }
+function stickEnd(){ stickId=null; stickVec.x=stickVec.y=0; knobBase.style.display=knob.style.display="none"; }
+stick.addEventListener("touchstart",e=>{e.preventDefault();stickStart(e);},{passive:false});
+stick.addEventListener("touchmove",e=>{e.preventDefault();stickMove(e);},{passive:false});
+stick.addEventListener("touchend",e=>{e.preventDefault();stickEnd(e);},{passive:false});
+stick.addEventListener("touchcancel",stickEnd);
+$("btnA").addEventListener("touchstart",e=>{e.preventDefault();action();},{passive:false});
+
+/* ---------- DIALOGO ---------- */
+let dlgQueue=null, dlgIdx=0, dlgAfter=null, dlgSpeaker=null;
+function openDialogue(speaker, lines, after){
+  state="dialogue"; dlgSpeaker=speaker; dlgQueue=lines; dlgIdx=0; dlgAfter=after||null;
+  $("dlgName").textContent=speaker?speaker.name:"";
+  $("dlgRole").textContent=speaker?speaker.role:"";
+  drawPortrait(speaker);
+  $("dlg").classList.remove("hidden"); renderLine();
+}
+function renderLine(){
+  const line=dlgQueue[dlgIdx];
+  let html=typeof line==="string"?line:line.t;
+  if(typeof line==="object"&&line.lvl){const L=LV[line.lvl];html+=`<span class="lvl" style="background:${L.c}">${L.t}</span>`;}
+  $("dlgText").innerHTML=html;
+  $("dlgNext").textContent = dlgIdx>=dlgQueue.length-1 ? "Chiudi ✓" : "Avanti ▶";
+}
+function advanceDialogue(){
+  dlgIdx++;
+  if(dlgIdx>=dlgQueue.length){ $("dlg").classList.add("hidden"); state="play"; const a=dlgAfter; dlgAfter=null; if(a)a(); }
+  else renderLine();
+}
+$("dlgNext").addEventListener("click",advanceDialogue);
+$("dlgBox").addEventListener("click",e=>{ if(e.target.id!=="dlgNext") advanceDialogue(); });
+function drawPortrait(sp){ const p=$("portrait"),g=p.getContext("2d"); g.imageSmoothingEnabled=false;
+  g.clearRect(0,0,46,46); g.fillStyle="#0b1024"; g.fillRect(0,0,46,46);
+  const C=sp?sp.C:HERO; drawChar(g,23,42,2.0,C,0,1); }
+
+/* ---------- AZIONE / INTERAZIONE ---------- */
+function nearestInteractable(){
+  let best=null,bd=1e9;
+  const cand=[...npcs.map(n=>({t:"npc",e:n,x:n.x,y:n.y-6})), ...exhibits.map(e=>({t:"ex",e,x:e.x,y:e.y-6}))];
+  for(const c of cand){ const d=Math.hypot(c.x-hero.x,c.y-hero.y); if(d<26 && d<bd){bd=d;best=c;} }
+  return best;
+}
+function action(){
+  if(state==="menu"||state==="how"){ return; }
+  if(state==="dialogue"){ advanceDialogue(); return; }
+  if(state==="win"){ return; }
+  if(state!=="play") return;
+  const it=nearestInteractable();
+  if(!it){ return; }
+  sfx.click();
+  if(it.t==="npc"){
+    const n=it.e; n.face = hero.x<n.x?-1:1;
+    if(n.key==="adler"){
+      if(evidence.length>=6){ openDialogue(n, DLG.adler_win, ()=>winGame()); }
+      else openDialogue(n, DLG.adler_need(evidence.length));
+    } else openDialogue(n, n.dlg);
+  } else {
+    const e=it.e;
+    if(e.done){ openDialogue(null,[{t:`Hai già analizzato: <b>${e.name}</b>.`}]); return; }
+    openDialogue(exSpeakerFor(e), e.text.concat([{t:`Reperto aggiunto al dossier: <b>${e.name}</b>.`,lvl:e.lvl}]), ()=>{
+      e.done=true; evidence.push({name:e.name,lvl:e.lvl,room:e.room}); $("evc").textContent=evidence.length;
+      sfx.ok(); toast(`Prova ${evidence.length}/6 — ${LV[e.lvl].t}`); updateObjective();
+      if(evidence.length>=6) toast("Tutte le prove raccolte! Torna dal Comandante.");
+    });
+  }
+}
+function exSpeakerFor(e){ // il reperto "parla" con la voce dello scienziato della stanza
+  const r=ROOMS.find(r=>r.name===e.room); return r?{name:e.name,role:"Reperto",C:CREW[r.crew].C}:null;
+}
+
+/* ---------- OBIETTIVO ---------- */
+function updateObjective(){
+  const o=$("obj");
+  if(evidence.length>=6){ o.innerHTML="Obiettivo: <b>parla col Comandante</b> nel corridoio per il briefing finale."; }
+  else{ const left=6-evidence.length; o.innerHTML=`Obiettivo: esamina i <b>reperti</b> nei laboratori — ne mancano <b>${left}</b>.`; }
+}
+
+/* ---------- LOOP ---------- */
+let state="menu", last=performance.now(), acc=0;
+const STEP=1000/60;
+function update(){
+  if(state!=="play") return;
+  let ix=0,iy=0;
+  if(keys.has("left"))ix-=1; if(keys.has("right"))ix+=1; if(keys.has("up"))iy-=1; if(keys.has("down"))iy+=1;
+  ix+=stickVec.x; iy+=stickVec.y;
+  // gamepad
+  const gp=(navigator.getGamepads?.()||[])[0];
+  if(gp){ const ax=gp.axes[0]||0, ay=gp.axes[1]||0; if(Math.abs(ax)>.2)ix+=ax; if(Math.abs(ay)>.2)iy+=ay;
+    if(gp.buttons[0]?.pressed && !update._gpA){update._gpA=true;action();} if(!gp.buttons[0]?.pressed)update._gpA=false; }
+  const len=Math.hypot(ix,iy);
+  if(len>1){ix/=len;iy/=len;}
+  const sp=hero.spd;
+  const nx=hero.x+ix*sp, ny=hero.y+iy*sp;
+  // collisione separata su assi, hitbox piedi
+  if(!blockedAt(nx-4,hero.y)&&!blockedAt(nx+4,hero.y)&&!blockedAt(nx,hero.y+2)) hero.x=nx;
+  if(!blockedAt(hero.x-4,ny+2)&&!blockedAt(hero.x+4,ny+2)&&!blockedAt(hero.x,ny)) hero.y=ny;
+  if(ix<-.1)hero.face=-1; else if(ix>.1)hero.face=1;
+  hero.walk = len>.1 ? hero.walk+0.25 : 0;
+  // camera
+  cam.x += (hero.x-cam.x)*0.12; cam.y += (hero.y-cam.y)*0.12;
+}
+
+function render(){
+  const w=cv.width/DPR, h=cv.height/DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.fillStyle="#05060d"; ctx.fillRect(0,0,w,h);
+  const Z=zoom();
+  const camx=cam.x - w/(2*Z), camy=cam.y - h/(2*Z);
+  ctx.setTransform(DPR*Z,0,0,DPR*Z,-camx*DPR*Z,-camy*DPR*Z);
+  // tiles visibili
+  const x0=Math.max(0,Math.floor(camx/TILE)-1), x1=Math.min(MW-1,Math.ceil((camx+w/Z)/TILE)+1);
+  const y0=Math.max(0,Math.floor(camy/TILE)-1), y1=Math.min(MH-1,Math.ceil((camy+h/Z)/TILE)+1);
+  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){ drawTile(x,y); }
+  // reperti
+  for(const e of exhibits){ drawExhibit(e); }
+  // ordina per y (npc + hero)
+  const ents=[...npcs.map(n=>({y:n.y,d:()=>drawNPC(n)})), {y:hero.y,d:()=>drawChar(ctx,hero.x,hero.y,1.7,HERO,hero.walk,hero.face)}];
+  ents.sort((a,b)=>a.y-b.y).forEach(e=>e.d());
+  // prompt "!"
+  if(state==="play"){ const it=nearestInteractable(); if(it){ const bx=it.x, by=it.e.y? (it.t==="ex"?it.e.y-22:it.e.y-24):it.y-24;
+    ctx.fillStyle="#ffe14a"; ctx.font="bold 11px sans-serif"; ctx.textAlign="center";
+    const t=performance.now()/300; ctx.fillText("!", bx, by + Math.sin(t)*2); } }
+}
+function drawTile(x,y){
+  const t=grid[y][x];
+  const sx=x*TILE, sy=y*TILE;
+  if(t===1){ // muro
+    ctx.fillStyle="#141a2e"; ctx.fillRect(sx,sy,TILE,TILE);
+    ctx.fillStyle="#1e2942"; ctx.fillRect(sx,sy,TILE,3);
+    ctx.fillStyle="#0d1120"; ctx.fillRect(sx,sy+TILE-2,TILE,2);
+    return;
+  }
+  // pavimento: corridoio o stanza (colore per regione)
+  let floor="#10182c", grout="#0b1020";
+  if(t===2){ floor="#122038"; grout="#0d1728"; }
+  else{ const r=ROOMS.find(r=>x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h); if(r){ floor=r.floor; } }
+  ctx.fillStyle=floor; ctx.fillRect(sx,sy,TILE,TILE);
+  ctx.fillStyle="rgba(0,0,0,.18)"; ctx.fillRect(sx,sy,TILE,1); ctx.fillRect(sx,sy,1,TILE);
+  // accento tenue negli angoli stanza
+  if(t===0){ const r=ROOMS.find(r=>x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h);
+    if(r && ((x+y)%7===0)){ ctx.fillStyle=r.accent+"22"; ctx.fillRect(sx+6,sy+6,4,4);} }
+}
+function drawNPC(n){ drawChar(ctx,n.x,n.y,1.7,n.C, n._w||0, n.face); }
+function drawExhibit(e){
+  const x=e.x,y=e.y; ctx.save();
+  // base console
+  ctx.fillStyle="#0c1122"; ctx.fillRect(x-11,y-14,22,15);
+  ctx.fillStyle="#182642"; ctx.fillRect(x-11,y-14,22,3);
+  const L=LV[e.lvl];
+  const glow=e.done?"#2a3550":L.c;
+  ctx.fillStyle=e.done?"#223":"#0a1a2a"; ctx.fillRect(x-8,y-11,16,9);
+  // icona
+  ctx.fillStyle=glow; ctx.strokeStyle=glow; ctx.lineWidth=1;
+  const cx=x, cy=y-6;
+  if(e.icon==="rock"){ ctx.fillRect(cx-4,cy-1,8,4); ctx.fillRect(cx-2,cy-4,5,3); }
+  else if(e.icon==="radio"){ ctx.fillRect(cx-1,cy-4,2,7); for(let i=1;i<=3;i++){ctx.globalAlpha=1-i*.25;ctx.beginPath();ctx.arc(cx,cy-2,i*3,-1.2,-0.2);ctx.stroke();} ctx.globalAlpha=1; }
+  else if(e.icon==="gear"){ ctx.beginPath();ctx.arc(cx,cy,4,0,7);ctx.fill(); ctx.fillStyle="#0a1a2a";ctx.beginPath();ctx.arc(cx,cy,1.6,0,7);ctx.fill(); }
+  else if(e.icon==="drop"){ ctx.beginPath();ctx.arc(cx,cy,3.4,0,7);ctx.fill(); ctx.fillRect(cx-1,cy-6,2,3); }
+  else if(e.icon==="screen"){ ctx.fillRect(cx-5,cy-4,10,7); ctx.fillStyle="#0a1a2a";ctx.fillRect(cx-3,cy-2,6,3); }
+  else if(e.icon==="flask"){ ctx.fillRect(cx-1,cy-5,2,3); ctx.beginPath();ctx.moveTo(cx-4,cy+3);ctx.lineTo(cx-1,cy-2);ctx.lineTo(cx+1,cy-2);ctx.lineTo(cx+4,cy+3);ctx.fill(); }
+  // stamp livello
+  if(e.done){ ctx.fillStyle="#3ddc84"; ctx.font="bold 7px sans-serif"; ctx.textAlign="center"; ctx.fillText("✓",x,y-13.5); }
+  ctx.restore();
+}
+
+/* ---------- audio ---------- */
+let actx=null;
+function beep(f,d=.08,ty="sine",g=.05){ try{actx=actx||new(window.AudioContext||webkitAudioContext)();
+  const o=actx.createOscillator(),ga=actx.createGain();o.type=ty;o.frequency.value=f;o.connect(ga);ga.connect(actx.destination);
+  ga.gain.setValueAtTime(g,actx.currentTime);ga.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d);
+  o.start();o.stop(actx.currentTime+d);}catch{} }
+const sfx={click:()=>beep(480,.05,"triangle",.035),ok:()=>{beep(660,.09);setTimeout(()=>beep(990,.11),80);},
+  win:()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.14),i*120))};
+
+/* ---------- rendering setup ---------- */
+let DPR=Math.min(devicePixelRatio||1,2);
+function resize(){ DPR=Math.min(devicePixelRatio||1,2); cv.width=innerWidth*DPR; cv.height=innerHeight*DPR;
+  cv.style.width=innerWidth+"px"; cv.style.height=innerHeight+"px"; ctx.imageSmoothingEnabled=false; }
+addEventListener("resize",resize); addEventListener("orientationchange",resize); resize();
+function zoom(){ const base=Math.min(innerWidth,innerHeight); return base<520? 3 : base<900? 3.4 : 4; }
+
+let paused=false;
+addEventListener("blur",()=>{ if(state==="play"){paused=true;} });
+addEventListener("focus",()=>{ paused=false; last=performance.now(); });
+function frame(now){ requestAnimationFrame(frame);
+  if(paused){ return; }
+  acc+=Math.min(60,now-last); last=now;
+  // anima npc idle
+  if(npcs) npcs.forEach(n=>n._w=(n._w||0)+0.03);
+  while(acc>=STEP){ update(); acc-=STEP; }
+  if(state==="play"||state==="dialogue"||state==="pause") render();
+}
+requestAnimationFrame(frame);
+
+/* ---------- flusso schermate ---------- */
+function startGame(){ ROOMS.length=0; build(); spawnEntities();
+  $("menu").classList.add("hidden"); $("howScr").classList.add("hidden");
+  $("hud").classList.remove("hidden"); $("touch").classList.remove("hidden");
+  $("evc").textContent="0"; updateObjective(); state="play"; last=performance.now();
+  // battuta d'ingresso
+  openDialogue(npcs[0], DLG.adler_intro);
+}
+function togglePause(){ if(state==="play"){ state="pause"; buildLog(); $("pauseScr").classList.remove("hidden"); }
+  else if(state==="pause"){ state="play"; $("pauseScr").classList.add("hidden"); last=performance.now(); } }
+function buildLog(){ const L=$("logList");
+  if(!evidence.length){ L.innerHTML='<div style="color:#8ea3cf;font-size:.9rem">Nessuna prova ancora. Esamina i reperti nei laboratori.</div>'; }
+  else L.innerHTML=evidence.map(e=>`<div class="logitem"><span class="lvl" style="background:${LV[e.lvl].c}">${LV[e.lvl].t}</span><span>${e.name}</span></div>`).join("");
+  $("pauseHint").innerHTML = evidence.length>=6 ? "Torna dal <b>Comandante</b> nel corridoio per il briefing finale."
+    : `Mancano <b>${6-evidence.length}</b> reperti. Cerca le console luminose nei laboratori.`;
+}
+function winGame(){ state="win"; sfx.win(); $("hud").classList.add("hidden"); $("touch").classList.add("hidden");
+  $("winSub").textContent="Dossier «Vita nell'universo» completato · Dott.ssa Nova";
+  $("winList").innerHTML=evidence.map(e=>`<div class="logitem"><span class="lvl" style="background:${LV[e.lvl].c}">${LV[e.lvl].t}</span><span>${e.name}</span></div>`).join("");
+  $("winScr").classList.remove("hidden"); }
+
+$("playBtn").onclick=()=>{sfx.click();startGame();};
+$("howBtn").onclick=()=>{$("menu").classList.add("hidden");$("howScr").classList.remove("hidden");state="how";};
+$("howBack").onclick=()=>{$("howScr").classList.add("hidden");$("menu").classList.remove("hidden");state="menu";};
+$("pause").onclick=togglePause;
+$("resumeBtn").onclick=()=>{state="play";$("pauseScr").classList.add("hidden");last=performance.now();};
+$("menuBtn").onclick=()=>location.reload();
+$("winAgain").onclick=()=>{$("winScr").classList.add("hidden");startGame();};
+$("winMenu").onclick=()=>location.reload();
+
+/* crew lineup nel menu */
+(function(){ const c=$("crewC"),g=c.getContext("2d"); g.imageSmoothingEnabled=false;
+  const order=[HERO,CREW.adler.C,CREW.vega.C,CREW.mila.C,CREW.orin.C,CREW.sela.C,CREW.rho.C,CREW.iris.C];
+  order.forEach((C,i)=>drawChar(g, 22+i*38, 64, 1.7, C, i? (i*1.3):0, i%2?1:-1)); })();
+
+/* ---------- DIALOGHI E CONTENUTI (dal dossier) ---------- */
+</script>
+<script>
+/* Definiti in coda per tenerli separati e facili da tradurre/estendere. */
+window.DLG = {
+  adler_intro:[
+    {t:"Benvenuta a bordo della Kepler, Dott.ssa Nova. Sono il Capitano Adler."},
+    {t:"La nostra missione: raccogliere e <b>classificare</b> le prove sulla vita nell'universo. Niente titoli sensazionali, solo dati."},
+    {t:"Sei laboratori, sei reperti. Esaminali tutti, poi torna qui per il briefing finale. In bocca al lupo."},
+  ],
+  adler_need:(n)=>[
+    {t:`Hai raccolto <b>${n}</b> reperti su 6. Continua: parla con l'equipaggio e analizza le console nei laboratori.`},
+    {t:"Ricorda la regola d'oro: una scoperta straordinaria richiede prove straordinarie."},
+  ],
+  adler_win:[
+    {t:"Ottimo lavoro, Nova. Hai il dossier completo."},
+    {t:"Il verdetto della missione: l'universo è pieno di <b>ingredienti</b> e di <b>mondi</b>, ma nessuna prova pubblica conferma ancora vita oltre la Terra."},
+    {t:"Abbiamo indizi seri — Marte antico, le lune oceaniche, gli esopianeti — e affermazioni da respingere. Saperle distinguere è la vera scienza. Missione compiuta."},
+  ],
+  vega:[
+    {t:"Vega, geologa. Marte oggi è freddo e secco, ma un tempo aveva fiumi e laghi."},
+    {t:"Perseverance ha raccolto un campione promettente a Cheyava Falls. La NASA lo chiama «biosignatura potenziale»."},
+    {t:"«Potenziale» è la parola chiave: serve altro studio. Analizza tu stessa il reperto qui accanto.",lvl:"B"},
+  ],
+  orin:[
+    {t:"Orin, astronomo. Da oltre 60 anni ascoltiamo il cielo con Ozma, poi Breakthrough Listen."},
+    {t:"Nessuna tecnosignatura confermata. Il famoso «Wow! signal» del 1977? Fortissimo, ma captato una sola volta e mai più."},
+    {t:"Non ripetuto significa non verificabile. Dai un'occhiata alla registrazione.",lvl:"D"},
+  ],
+  sela:[
+    {t:"Sela, archivista. Gli antichi osservavano il cielo con straordinaria abilità… umana."},
+    {t:"Il meccanismo di Anticitera è un calcolatore astronomico greco a ingranaggi. Complesso, non alieno."},
+    {t:"La mappa di Piri Reis «con l'Antartide»? Solo deformazioni cartografiche. Esamina l'ingranaggio.",lvl:"A"},
+  ],
+  mila:[
+    {t:"Mila, oceanografa. I mondi più promettenti non sono pianeti, ma lune ghiacciate."},
+    {t:"Europa nasconde un oceano; Encelado spruzza acqua, sali e idrogeno: possibile energia per microbi."},
+    {t:"Ambienti abitabili, sì. Organismi osservati, no. Analizza il pennacchio di Encelado.",lvl:"B"},
+  ],
+  rho:[
+    {t:"Rho, analista UAP. «Non identificato» non vuol dire «alieno»."},
+    {t:"Descrive la qualità del dato: scarso, non calibrato. L'AARO nel 2024 non ha trovato prove di tecnologia extraterrestre."},
+    {t:"Guarda tu stessa questo video sensore: interessante, ma inconcludente.",lvl:"D"},
+  ],
+  iris:[
+    {t:"Iris, biochimica. L'origine della vita è una catena di reazioni, non un fulmine su una pozza."},
+    {t:"Nel 1953 Miller e Urey produssero amminoacidi dai gas primordiali: chimica reale e ripetibile."},
+    {t:"Ha mostrato che i mattoni si formano da soli — non che nasca una cellula. Osserva l'apparato.",lvl:"A"},
+  ],
+  ex_marte:[{t:"<b>Campione «Sapphire Canyon»</b> — roccia del cratere Jezero. Contiene tracce che <i>potrebbero</i> essere biosignature."},{t:"Restano possibili spiegazioni geochimiche non biologiche. Un indizio da confermare, non una prova."}],
+  ex_seti:[{t:"<b>«Wow! signal»</b> — impulso radio del 1977, intenso e a banda stretta."},{t:"Mai più rilevato. Origine ignota. Senza ripetizione indipendente non è verificabile."}],
+  ex_arch:[{t:"<b>Ingranaggio di Anticitera</b> — bronzo, II sec. a.C."},{t:"Tomografie e iscrizioni lo confermano tecnologia ellenistica: eccezionale, ma pienamente umana."}],
+  ex_ocean:[{t:"<b>Pennacchio di Encelado</b> — acqua, sali, molecole organiche e idrogeno molecolare."},{t:"Misurato da Cassini: indizio ambientale forte di abitabilità. Nessuna cellula osservata."}],
+  ex_uap:[{t:"<b>Video sensore UAP</b> — bersaglio non identificato."},{t:"Dati insufficienti per una determinazione. «Non identificato» è lo stato del dato, non l'oggetto."}],
+  ex_orig:[{t:"<b>Apparato di Miller-Urey</b> — scariche elettriche in gas primordiali."},{t:"Produce amminoacidi: prova solida che i mattoni della vita nascono per chimica abiotica."}],
+};
+</script>
+</body>
+</html>
