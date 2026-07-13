@@ -188,4 +188,6 @@ async function aggiornaLog() {
 aggiornaStato();
 aggiornaLog();
 setInterval(aggiornaStato, 4000);
-window.addEventListener("load", () => { setTimeout(() => parlaPersona(null, Persona.saluto()), 400); });
+// All'avvio: se c'e' il clip premium voice/avvio.mp3 lo riproduce, altrimenti
+// sintetizza il saluto in base all'ora.
+window.addEventListener("load", () => { setTimeout(() => parlaPersona("avvio", Persona.saluto()), 400); });

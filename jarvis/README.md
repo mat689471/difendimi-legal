@@ -74,10 +74,12 @@ composto e deferente, con saluto in base all'ora e frasi variate per non
 suonare robotico. Il timbro della sintesi è tunato più grave e lento.
 
 - Come ti chiama: `localStorage.setItem('jarvis_appellativo', 'dottore')` (default `signore`).
-- **Voice pack premium (opzionale)**: se metti un file `ui/voice/<chiave>.mp3`
-  (es. `successo.mp3`, `catastrofico.mp3`), la UI riproduce quel clip al posto
-  della sintesi di sistema. Timbro cinematografico come upgrade drop-in, senza
-  toccare il codice.
+- **Voice pack premium (incluso)**: in `ui/voice/` ci sono 10 clip generati
+  con una voce maschile italiana (avvio, successo, errore, catastrofico,
+  fermato, ripresa, in pausa, offline, non eseguito, prova). La UI li riproduce
+  al posto della sintesi di sistema; i contenuti dinamici (output dei comandi)
+  restano in sintesi. Per rigenerarli con un'altra voce basta sostituire i file
+  `ui/voice/<chiave>.mp3` — nessuna modifica al codice.
 
 Sicurezza del ponte web — **Jarvis risponde solo a te**:
 - il server ascolta **solo su `127.0.0.1`** (non è esposto in rete);
@@ -109,7 +111,25 @@ La **pubblicazione** su YouTube/social non è automatica: richiede le tue
 credenziali e la tua approvazione (l'automazione del posting viola le ToS di
 molte piattaforme). La pipeline prepara tutto; l'ultimo clic è tuo.
 
-## Prossimi moduli
+## Trading (demo-first)
 
-Trading MetaTrader/Fusion Market **in demo** con limiti hard, sulla stessa
-infrastruttura di sicurezza (audit + kill switch + auth).
+Modulo `jarvis/trading`: opera con **limiti hard** e sotto lo stesso audit log
+e kill switch del resto di Jarvis. Regola d'oro sulla progressione:
+
+`paper` (simulato) → `demo` (conto demo reale Fusion Market) → `live` (soldi veri).
+
+```bash
+python -m jarvis.trading   # demo: strategia SMA su prezzi sintetici, 0 euro reali
+```
+
+Sicurezza:
+- **Limiti hard** (in `trading/config.yaml`): volume per ordine, posizioni
+  aperte, volume totale, **perdita giornaliera** oltre cui Jarvis smette di
+  aprire. Nessun ordine passa senza l'ok del risk manager.
+- **`live` = doppio interruttore**: serve `mode: live` **e** `allow_live: true`,
+  **e** la conferma manuale di *ogni* ordine. Di default entrambi off.
+- **MT5/Fusion Market**: l'adattatore (`mt5_adapter.py`) è disattivo finché non
+  lo colleghi tu, richiede il pacchetto `MetaTrader5` (solo Windows) e rifiuta i
+  server non-demo salvo attivazione live esplicita.
+- Una **strategia non esegue**: propone segnali; l'esecuzione (con i limiti)
+  resta al motore. Una strategia sbagliata non può sforare i limiti hard.

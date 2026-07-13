@@ -1,0 +1,22 @@
+# Configurazione trading di Jarvis — i limiti sono la tua rete di sicurezza.
+#
+# Regola d'oro: si parte in 'paper' (simulato), si passa a 'demo' (conto demo
+# reale di Fusion Market) solo dopo aver visto la strategia comportarsi bene,
+# e 'live' (soldi veri) richiede DUE cose: mode=live E allow_live=true, PIU'
+# la conferma manuale di ogni singolo ordine.
+
+mode: paper              # paper | demo | live
+allow_live: false        # doppio interruttore per i soldi veri
+
+starting_balance: 10000  # solo per il paper broker
+
+# Limiti hard (valgono in tutte le modalita'):
+max_volume_per_order: 0.10
+max_open_positions: 3
+max_total_volume: 0.30
+max_daily_loss: 200      # perdita giornaliera oltre cui Jarvis smette di aprire
+
+allowed_symbols:         # whitelist; vuota/omessa = qualsiasi simbolo
+  - EURUSD
+  - GBPUSD
+  - XAUUSD
