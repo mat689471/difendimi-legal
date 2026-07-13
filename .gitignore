@@ -6,3 +6,4 @@ __pycache__/
 
 # Jarvis runtime
 jarvis/logs/
+remotion/props/

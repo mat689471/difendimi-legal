@@ -79,13 +79,37 @@ suonare robotico. Il timbro della sintesi è tunato più grave e lento.
   della sintesi di sistema. Timbro cinematografico come upgrade drop-in, senza
   toccare il codice.
 
-Sicurezza del ponte web:
+Sicurezza del ponte web — **Jarvis risponde solo a te**:
 - il server ascolta **solo su `127.0.0.1`** (non è esposto in rete);
+- ogni chiamata richiede il **tuo token segreto**, generato alla prima
+  esecuzione e stampato nel terminale come parte dell'URL. Solo chi ha quel
+  token (tu) può aprire l'interfaccia e dare comandi;
+- controllo dell'header `Host` contro il **DNS-rebinding** (un sito malevolo
+  che prova a comandare Jarvis dal tuo browser);
 - via HTTP le operazioni **catastrofiche sono negate**: un pulsante web non
   deve poter formattare un disco. Per quelle serve la conferma da terminale.
 
+## Pipeline contenuti
+
+Genera video social a partire da un **brief** (JSON). Il contenuto del video
+Remotion è ora guidato dai dati: cambi il brief, cambia il video.
+
+```bash
+python -m jarvis.content jarvis/content/brief.example.json            # prepara e renderizza
+python -m jarvis.content jarvis/content/brief.example.json --no-render # solo props + social
+```
+
+La pipeline:
+1. converte il brief nei props del video (`remotion/props/<slug>.json`);
+2. renderizza **tramite Jarvis** (quindi con audit log e kill switch);
+3. genera il **pacchetto social** (descrizione + hashtag) in
+   `remotion/out/<slug>.social.txt`.
+
+La **pubblicazione** su YouTube/social non è automatica: richiede le tue
+credenziali e la tua approvazione (l'automazione del posting viola le ToS di
+molte piattaforme). La pipeline prepara tutto; l'ultimo clic è tuo.
+
 ## Prossimi moduli
 
-Si agganceranno tutti a questa infrastruttura (audit + kill switch + livelli):
-pipeline contenuti (base Remotion già nel repo) e trading
-MetaTrader/Fusion Market **in demo** con limiti hard.
+Trading MetaTrader/Fusion Market **in demo** con limiti hard, sulla stessa
+infrastruttura di sicurezza (audit + kill switch + auth).

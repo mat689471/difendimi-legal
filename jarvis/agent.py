@@ -51,6 +51,13 @@ class Jarvis:
             loaded = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
             cfg.update({k: v for k, v in loaded.items() if v is not None})
 
+        # Validazione: un typo nella config non deve passare in silenzio.
+        if cfg["autonomy"] not in ("auto", "confirm"):
+            raise ValueError(
+                f"config non valida: autonomy='{cfg['autonomy']}' "
+                "(valori ammessi: 'auto', 'confirm')"
+            )
+
         audit = AuditLog(cfg["audit_path"])
         killswitch = KillSwitch(cfg["stop_sentinel"])
         executor = Executor(

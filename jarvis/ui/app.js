@@ -91,7 +91,13 @@ function setState(s) {
 }
 
 /* ---------------- Ponte verso il backend ---------------- */
-async function api(path, opts) {
+/* Il token che rende Jarvis tuo: arriva nell'URL (?k=...), lo teniamo in
+ * memoria e lo togliamo subito dalla barra degli indirizzi. */
+const TOKEN = new URLSearchParams(location.search).get("k") || "";
+if (TOKEN) history.replaceState(null, "", location.pathname);
+
+async function api(path, opts = {}) {
+  opts.headers = Object.assign({}, opts.headers, { "X-Jarvis-Token": TOKEN });
   const r = await fetch(path, opts);
   return r.json();
 }

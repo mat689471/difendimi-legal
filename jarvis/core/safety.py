@@ -7,6 +7,13 @@ o se deve fermarsi e chiedere conferma umana.
 Filosofia: privilegi minimi. Jarvis puo' fare quasi tutto in autonomia
 (incluso sudo), ma le operazioni catastrofiche e IRREVERSIBILI restano
 dietro una conferma, perche' per quelle un "log + stop" arriva troppo tardi.
+
+ONESTA' — questo e' un GUARDRAIL, non un sandbox. Un classificatore a regex
+riconosce le forme note di comandi pericolosi, ma si puo' aggirare (es.
+`echo cm0gLXJmIC8=|base64 -d|sh`, variabili, alias). Serve come difesa in
+profondita' insieme a: kill switch, audit log, e -- per un isolamento vero --
+l'esecuzione in un container/VM o un utente con permessi limitati. Non
+affidarti solo a questo per contenere comandi ostili.
 """
 
 from __future__ import annotations
