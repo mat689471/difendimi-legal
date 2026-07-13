@@ -67,6 +67,18 @@ python jarvis/server.py        # avvia il ponte locale su http://127.0.0.1:8787
 - ⌨️ campo di testo: stesso effetto, scritto.
 - ⏹ **Ferma/Riavvia**: il kill switch, dall'interfaccia.
 
+### Personalità vocale (`ui/persona.js`)
+
+Jarvis non legge l'output: risponde **in carattere** — tono da maggiordomo-AI,
+composto e deferente, con saluto in base all'ora e frasi variate per non
+suonare robotico. Il timbro della sintesi è tunato più grave e lento.
+
+- Come ti chiama: `localStorage.setItem('jarvis_appellativo', 'dottore')` (default `signore`).
+- **Voice pack premium (opzionale)**: se metti un file `ui/voice/<chiave>.mp3`
+  (es. `successo.mp3`, `catastrofico.mp3`), la UI riproduce quel clip al posto
+  della sintesi di sistema. Timbro cinematografico come upgrade drop-in, senza
+  toccare il codice.
+
 Sicurezza del ponte web:
 - il server ascolta **solo su `127.0.0.1`** (non è esposto in rete);
 - via HTTP le operazioni **catastrofiche sono negate**: un pulsante web non

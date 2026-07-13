@@ -17,24 +17,43 @@ const statusText = document.getElementById("statusText");
 /* ---------------- Voce: sintesi (Jarvis parla) ---------------- */
 let itVoice = null;
 function pickItalianVoice() {
-  const voices = speechSynthesis.getVoices();
-  itVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith("it")) || null;
+  itVoice = Persona.scegliVoce(speechSynthesis.getVoices());
 }
 pickItalianVoice();
 if (typeof speechSynthesis !== "undefined") {
   speechSynthesis.onvoiceschanged = pickItalianVoice;
 }
 
-function parla(testo) {
+// Sintesi del sistema, tunata per il timbro Jarvis (più lento e grave).
+function sintetizza(testo) {
   if (!("speechSynthesis" in window)) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(testo);
   u.lang = "it-IT";
   if (itVoice) u.voice = itVoice;
-  u.rate = 1.0; u.pitch = 1.0;
+  u.rate = Persona.TUNING.rate;
+  u.pitch = Persona.TUNING.pitch;
   u.onstart = () => setState("speaking");
   u.onend = () => setState("idle");
   speechSynthesis.speak(u);
+}
+
+/* Parla in carattere. Se `chiave` ha un clip pre-renderizzato in voice/,
+ * riproduce quello (timbro premium); altrimenti usa la sintesi del sistema.
+ * `testoLibero` è per contenuti dinamici senza clip (es. output di comando). */
+function parla(testo) { sintetizza(testo); }
+
+function parlaPersona(chiave, testoLibero) {
+  const testo = testoLibero || Persona.frase(chiave);
+  if (!chiave) { sintetizza(testo); return; }
+  // Prova il clip pre-renderizzato; se manca, ripiega sulla sintesi UNA volta sola.
+  let ripiegato = false;
+  const ripiega = () => { if (!ripiegato) { ripiegato = true; sintetizza(testo); } };
+  const audio = new Audio(`voice/${chiave}.mp3`);
+  audio.onplay = () => setState("speaking");
+  audio.onended = () => setState("idle");
+  audio.onerror = ripiega;              // nessun clip: sintesi di sistema
+  audio.play().catch(ripiega);
 }
 
 /* ---------------- Voce: riconoscimento (Jarvis ascolta) ---------------- */
@@ -61,7 +80,7 @@ micBtn.addEventListener("click", () => {
   if (!recognition) return;
   if (listening) { recognition.stop(); return; }
   listening = true; micBtn.classList.add("on"); setState("listening");
-  subtitle.textContent = "Ti ascolto…";
+  subtitle.textContent = Persona.frase("ascolto");
   recognition.start();
 });
 
@@ -90,7 +109,7 @@ async function eseguiComando(comando) {
     interpretaRisultato(res);
   } catch (err) {
     subtitle.textContent = "Errore di connessione al backend.";
-    parla("Non riesco a raggiungere il backend.");
+    parlaPersona("offline");
     setState("idle");
   }
   aggiornaLog();
@@ -98,22 +117,22 @@ async function eseguiComando(comando) {
 }
 
 function interpretaRisultato(res) {
-  if (res.error) { subtitle.textContent = res.error; parla(res.error); setState("idle"); return; }
+  if (res.error) { subtitle.textContent = res.error; parlaPersona("errore"); setState("idle"); return; }
   if (!res.executed) {
     if (res.risk === "CATASTROPHIC") {
-      const msg = "Operazione irreversibile bloccata. Per sicurezza va confermata dal terminale.";
-      subtitle.textContent = "⛔ " + msg; parla(msg);
+      subtitle.textContent = "⛔ Operazione irreversibile: va confermata dal terminale.";
+      parlaPersona("catastrofico");
     } else if (res.note && res.note.toLowerCase().includes("kill switch")) {
-      subtitle.textContent = "⏹ Sono fermato. Riavviami per operare."; parla("Sono fermato.");
+      subtitle.textContent = "⏹ Sono fermato. Riattivami per operare."; parlaPersona("fermato");
     } else {
-      subtitle.textContent = "Non eseguito: " + (res.note || ""); parla("Non eseguito.");
+      subtitle.textContent = "Non eseguito: " + (res.note || ""); parlaPersona("non_eseguito");
     }
     setState("idle"); return;
   }
   const ok = res.exit_code === 0;
   const out = (res.stdout || res.stderr || "").trim();
   subtitle.textContent = (ok ? "✓ " : "✗ ") + res.command + (out ? "\n" + out : "");
-  parla(ok ? "Fatto." : "Il comando ha restituito un errore.");
+  parlaPersona(ok ? "successo" : "errore");
   setState("idle");
 }
 
@@ -122,7 +141,7 @@ stopBtn.addEventListener("click", async () => {
   const armed = stopBtn.classList.contains("armed");
   await api(armed ? "/api/start" : "/api/stop", { method: "POST" });
   aggiornaStato();
-  parla(armed ? "Sono di nuovo operativo." : "Mi fermo.");
+  parlaPersona(armed ? "ripresa" : "in_pausa");
 });
 
 /* ---------------- Input testuale ---------------- */
@@ -130,7 +149,7 @@ function inviaTesto() { const v = cmdInput.value.trim(); if (v) { cmdInput.value
 sendBtn.addEventListener("click", inviaTesto);
 cmdInput.addEventListener("keydown", (e) => { if (e.key === "Enter") inviaTesto(); });
 
-testBtn.addEventListener("click", () => parla("Ciao, sono Jarvis. Sono pronto ad assisterti."));
+testBtn.addEventListener("click", () => parlaPersona("prova"));
 
 /* ---------------- Aggiornamento pannello ---------------- */
 async function aggiornaStato() {
@@ -163,4 +182,4 @@ async function aggiornaLog() {
 aggiornaStato();
 aggiornaLog();
 setInterval(aggiornaStato, 4000);
-window.addEventListener("load", () => { setTimeout(() => parla("Sistemi online. Sono Jarvis, pronto ad assisterti."), 400); });
+window.addEventListener("load", () => { setTimeout(() => parlaPersona(null, Persona.saluto()), 400); });
