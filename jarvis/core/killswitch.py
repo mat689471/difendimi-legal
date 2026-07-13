@@ -1,10 +1,14 @@
 """Kill switch: il freno d'emergenza di Jarvis.
 
-Due meccanismi:
-  1. Un file sentinella. Se il file esiste, Jarvis e' "fermato" e non
-     esegue nessuna nuova azione finche' non viene riarmato.
-  2. La gestione di SIGINT/SIGTERM, che arma il kill switch in modo che
-     un'azione in corso non venga seguita da altre.
+Meccanismo principale: un file sentinella. Se il file esiste, Jarvis e'
+"fermato" e non esegue nessuna nuova azione finche' non viene riarmato.
+Puo' essere armato dalla CLI (`jarvis stop`), dall'interfaccia, o da un
+altro terminale mentre Jarvis lavora.
+
+Opzionale: la gestione di SIGINT/SIGTERM che arma il kill switch. E'
+disattivata per default perche' altrimenti "cattura" il Ctrl+C anche a un
+processo che vuole solo terminare (es. il server). Attivala con
+`install_signals=True` solo dove vuoi che un segnale fermi l'agente.
 
 Jarvis controlla `is_engaged()` PRIMA di ogni azione. Cosi' un "stop"
 impedisce almeno tutte le azioni successive a quella gia' partita.
@@ -17,9 +21,10 @@ from pathlib import Path
 
 
 class KillSwitch:
-    def __init__(self, sentinel_path: str = "jarvis/logs/STOP"):
+    def __init__(self, sentinel_path: str = "jarvis/logs/STOP", install_signals: bool = False):
         self.sentinel = Path(sentinel_path)
-        self._install_signal_handlers()
+        if install_signals:
+            self._install_signal_handlers()
 
     def _install_signal_handlers(self) -> None:
         def _handler(signum, _frame):

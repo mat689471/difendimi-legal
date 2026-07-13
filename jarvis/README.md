@@ -51,14 +51,29 @@ python -m jarvis.cli log -n 30
 - `allow_sudo`: consenti/blocca i privilegi elevati
 - `dry_run`: simula senza eseguire
 
-## Test
+## Interfaccia + voce italiana
+
+Il "volto" di Jarvis: un'interfaccia web con orbe animato, **voce italiana**
+(sintesi + riconoscimento vocali nativi del browser, `it-IT`) e un pannello
+che mostra in tempo reale la scatola nera. Comanda lo stesso motore di
+automazione, quindi vale lo stesso modello di sicurezza.
 
 ```bash
-python -m pytest jarvis/tests/ -v
+python jarvis/server.py        # avvia il ponte locale su http://127.0.0.1:8787
+# apri quell'indirizzo in Chrome/Edge (per la voce serve un browser con Web Speech API)
 ```
+
+- 🎙️ **Parla**: detta un comando a voce, Jarvis lo esegue e risponde a voce.
+- ⌨️ campo di testo: stesso effetto, scritto.
+- ⏹ **Ferma/Riavvia**: il kill switch, dall'interfaccia.
+
+Sicurezza del ponte web:
+- il server ascolta **solo su `127.0.0.1`** (non è esposto in rete);
+- via HTTP le operazioni **catastrofiche sono negate**: un pulsante web non
+  deve poter formattare un disco. Per quelle serve la conferma da terminale.
 
 ## Prossimi moduli
 
 Si agganceranno tutti a questa infrastruttura (audit + kill switch + livelli):
-interfaccia + voce italiana, pipeline contenuti (base Remotion già nel repo),
-trading MetaTrader/Fusion Market **in demo** con limiti hard.
+pipeline contenuti (base Remotion già nel repo) e trading
+MetaTrader/Fusion Market **in demo** con limiti hard.

@@ -1,0 +1,166 @@
+/* Interfaccia vocale di Jarvis.
+ * Voce IT nativa del browser: SpeechSynthesis (parla) + SpeechRecognition (ascolta).
+ * Comanda il modulo di automazione tramite il ponte HTTP locale (server.py).
+ */
+
+const orb = document.getElementById("orb");
+const subtitle = document.getElementById("subtitle");
+const micBtn = document.getElementById("micBtn");
+const testBtn = document.getElementById("testBtn");
+const stopBtn = document.getElementById("stopBtn");
+const sendBtn = document.getElementById("sendBtn");
+const cmdInput = document.getElementById("cmdInput");
+const logEl = document.getElementById("log");
+const dot = document.getElementById("dot");
+const statusText = document.getElementById("statusText");
+
+/* ---------------- Voce: sintesi (Jarvis parla) ---------------- */
+let itVoice = null;
+function pickItalianVoice() {
+  const voices = speechSynthesis.getVoices();
+  itVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith("it")) || null;
+}
+pickItalianVoice();
+if (typeof speechSynthesis !== "undefined") {
+  speechSynthesis.onvoiceschanged = pickItalianVoice;
+}
+
+function parla(testo) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(testo);
+  u.lang = "it-IT";
+  if (itVoice) u.voice = itVoice;
+  u.rate = 1.0; u.pitch = 1.0;
+  u.onstart = () => setState("speaking");
+  u.onend = () => setState("idle");
+  speechSynthesis.speak(u);
+}
+
+/* ---------------- Voce: riconoscimento (Jarvis ascolta) ---------------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null, listening = false;
+if (SR) {
+  recognition = new SR();
+  recognition.lang = "it-IT";
+  recognition.interimResults = true;
+  recognition.continuous = false;
+  recognition.onresult = (e) => {
+    const testo = Array.from(e.results).map(r => r[0].transcript).join("");
+    subtitle.textContent = "“" + testo + "”";
+    if (e.results[e.results.length - 1].isFinal) eseguiComando(testo.trim());
+  };
+  recognition.onend = () => { listening = false; micBtn.classList.remove("on"); if (orb.classList.contains("listening")) setState("idle"); };
+  recognition.onerror = (e) => { subtitle.textContent = "Riconoscimento non disponibile (" + e.error + ")."; setState("idle"); };
+} else {
+  micBtn.disabled = true;
+  micBtn.textContent = "🎙️ Voce non supportata";
+}
+
+micBtn.addEventListener("click", () => {
+  if (!recognition) return;
+  if (listening) { recognition.stop(); return; }
+  listening = true; micBtn.classList.add("on"); setState("listening");
+  subtitle.textContent = "Ti ascolto…";
+  recognition.start();
+});
+
+/* ---------------- Stato visivo dell'orbe ---------------- */
+function setState(s) {
+  orb.classList.remove("listening", "speaking", "busy");
+  if (s !== "idle") orb.classList.add(s);
+}
+
+/* ---------------- Ponte verso il backend ---------------- */
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  return r.json();
+}
+
+async function eseguiComando(comando) {
+  if (!comando) return;
+  setState("busy");
+  subtitle.textContent = "Eseguo: " + comando;
+  try {
+    const res = await api("/api/run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ command: comando }),
+    });
+    interpretaRisultato(res);
+  } catch (err) {
+    subtitle.textContent = "Errore di connessione al backend.";
+    parla("Non riesco a raggiungere il backend.");
+    setState("idle");
+  }
+  aggiornaLog();
+  aggiornaStato();
+}
+
+function interpretaRisultato(res) {
+  if (res.error) { subtitle.textContent = res.error; parla(res.error); setState("idle"); return; }
+  if (!res.executed) {
+    if (res.risk === "CATASTROPHIC") {
+      const msg = "Operazione irreversibile bloccata. Per sicurezza va confermata dal terminale.";
+      subtitle.textContent = "⛔ " + msg; parla(msg);
+    } else if (res.note && res.note.toLowerCase().includes("kill switch")) {
+      subtitle.textContent = "⏹ Sono fermato. Riavviami per operare."; parla("Sono fermato.");
+    } else {
+      subtitle.textContent = "Non eseguito: " + (res.note || ""); parla("Non eseguito.");
+    }
+    setState("idle"); return;
+  }
+  const ok = res.exit_code === 0;
+  const out = (res.stdout || res.stderr || "").trim();
+  subtitle.textContent = (ok ? "✓ " : "✗ ") + res.command + (out ? "\n" + out : "");
+  parla(ok ? "Fatto." : "Il comando ha restituito un errore.");
+  setState("idle");
+}
+
+/* ---------------- Stop / start ---------------- */
+stopBtn.addEventListener("click", async () => {
+  const armed = stopBtn.classList.contains("armed");
+  await api(armed ? "/api/start" : "/api/stop", { method: "POST" });
+  aggiornaStato();
+  parla(armed ? "Sono di nuovo operativo." : "Mi fermo.");
+});
+
+/* ---------------- Input testuale ---------------- */
+function inviaTesto() { const v = cmdInput.value.trim(); if (v) { cmdInput.value = ""; eseguiComando(v); } }
+sendBtn.addEventListener("click", inviaTesto);
+cmdInput.addEventListener("keydown", (e) => { if (e.key === "Enter") inviaTesto(); });
+
+testBtn.addEventListener("click", () => parla("Ciao, sono Jarvis. Sono pronto ad assisterti."));
+
+/* ---------------- Aggiornamento pannello ---------------- */
+async function aggiornaStato() {
+  try {
+    const s = await api("/api/status");
+    const armed = s.stopped;
+    dot.classList.toggle("armed", armed);
+    stopBtn.classList.toggle("armed", armed);
+    stopBtn.textContent = armed ? "▶ Riavvia Jarvis" : "⏹ Ferma Jarvis";
+    statusText.textContent = armed ? ("fermato — " + (s.reason || "")) : ("operativo — autonomia: " + s.autonomy);
+  } catch (_) { statusText.textContent = "backend non raggiungibile"; }
+}
+
+async function aggiornaLog() {
+  try {
+    const { entries } = await api("/api/log");
+    logEl.innerHTML = "";
+    entries.slice().reverse().forEach(e => {
+      const line = document.createElement("div");
+      line.className = "line";
+      const t = (e.iso || "").split("T")[1] || "";
+      const risk = e.risk && e.risk !== "-" ? `<span class="badge ${e.risk}">${e.risk}</span>` : "";
+      line.innerHTML = `<span class="t">${t}</span>${risk}<span class="cmd">${e.event}: ${e.command || e.note || ""}</span>`;
+      logEl.appendChild(line);
+    });
+  } catch (_) {}
+}
+
+/* avvio */
+aggiornaStato();
+aggiornaLog();
+setInterval(aggiornaStato, 4000);
+window.addEventListener("load", () => { setTimeout(() => parla("Sistemi online. Sono Jarvis, pronto ad assisterti."), 400); });
