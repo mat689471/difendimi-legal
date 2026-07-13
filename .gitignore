@@ -3,3 +3,6 @@ remotion/node_modules/
 remotion/out/
 *.pyc
 __pycache__/
+
+# Jarvis runtime
+jarvis/logs/

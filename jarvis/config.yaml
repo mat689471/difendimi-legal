@@ -1,0 +1,21 @@
+# Configurazione di Jarvis - modulo automazione di sistema
+#
+# Questi valori sono il pannello di controllo della sicurezza. Sono TUOI:
+# nulla e' nascosto nel codice. Se vuoi piu' autonomia, alzi i limiti qui.
+
+autonomy: auto          # "auto" = agisce da solo, log + kill switch (come da te scelto)
+                        # "confirm" = chiede conferma anche per le operazioni elevate
+
+guard_catastrophic: true  # freno d'emergenza: le operazioni IRREVERSIBILI
+                          # (wipe disco, fork bomb, esfiltrazione credenziali)
+                          # chiedono conferma anche in modalita' "auto".
+                          # Metti false SOLO se sai esattamente cosa comporta.
+
+allow_sudo: true        # Jarvis puo' usare sudo/privilegi elevati.
+
+dry_run: false          # true = simula i comandi senza eseguirli (utile per provare).
+
+timeout: 600            # secondi massimi per singolo comando.
+
+audit_path: jarvis/logs/audit.jsonl   # la "scatola nera" append-only.
+stop_sentinel: jarvis/logs/STOP       # file del kill switch.
