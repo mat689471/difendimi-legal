@@ -41,8 +41,6 @@ function sintetizza(testo) {
 /* Parla in carattere. Se `chiave` ha un clip pre-renderizzato in voice/,
  * riproduce quello (timbro premium); altrimenti usa la sintesi del sistema.
  * `testoLibero` è per contenuti dinamici senza clip (es. output di comando). */
-function parla(testo) { sintetizza(testo); }
-
 function parlaPersona(chiave, testoLibero) {
   const testo = testoLibero || Persona.frase(chiave);
   if (!chiave) { sintetizza(testo); return; }

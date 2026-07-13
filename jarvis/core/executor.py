@@ -9,6 +9,7 @@ E' il cuore del modulo "automazione di sistema". Ogni comando passa da qui:
 
 from __future__ import annotations
 
+import re
 import subprocess
 from dataclasses import dataclass
 from typing import Callable
@@ -65,8 +66,10 @@ class Executor:
             self.audit.record("blocked", command=command, risk=verdict.risk.name, note=note)
             return Result(command, False, None, "", "", verdict.risk.name, note)
 
-        # 2. sudo disabilitato da config.
-        if not self.allow_sudo and verdict.risk == Risk.ELEVATED and "sudo" in command:
+        # 2. sudo disabilitato da config: blocca a QUALSIASI livello di rischio
+        #    (anche prima del freno catastrofico), con match su parola intera
+        #    per non colpire "pseudo" e simili.
+        if not self.allow_sudo and re.search(r"\bsudo\b", command):
             note = "sudo disabilitato nella configurazione"
             self.audit.record("denied", command=command, risk=verdict.risk.name, note=note)
             return Result(command, False, None, "", "", verdict.risk.name, note)

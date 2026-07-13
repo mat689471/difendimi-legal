@@ -17,10 +17,10 @@ from pathlib import Path
 # consente sia `python -m jarvis.cli` sia `python jarvis/cli.py`
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-    from jarvis.agent import Jarvis
+    from jarvis.agent import Jarvis, load_config
     from jarvis.core import AuditLog, KillSwitch
 else:
-    from .agent import Jarvis
+    from .agent import Jarvis, load_config
     from .core import AuditLog, KillSwitch
 
 
@@ -45,8 +45,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     # comandi che non richiedono l'inizializzazione completa dell'agente
+    # (ma usano gli STESSI percorsi del config, cosi' stop/log agiscono sui
+    #  file davvero usati dall'agente)
     if args.cmd in ("stop", "start", "status", "log"):
-        ks = KillSwitch()
+        cfg = load_config(args.config)
+        ks = KillSwitch(cfg["stop_sentinel"])
         if args.cmd == "stop":
             ks.engage("stop manuale via CLI")
             print("⏹ Kill switch ARMATO. Jarvis non eseguira' nuove azioni.")
@@ -56,7 +59,7 @@ def main(argv: list[str] | None = None) -> int:
         elif args.cmd == "status":
             print(f"Kill switch armato: {ks.is_engaged()} ({ks.reason() or 'operativo'})")
         elif args.cmd == "log":
-            for entry in AuditLog("jarvis/logs/audit.jsonl").tail(args.n):
+            for entry in AuditLog(cfg["audit_path"]).tail(args.n):
                 print(f"{entry.get('iso')}  {entry.get('event'):16}  "
                       f"[{entry.get('risk', '-')}]  {entry.get('command', entry.get('note', ''))}")
         return 0

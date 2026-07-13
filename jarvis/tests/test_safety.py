@@ -89,6 +89,21 @@ def test_sudo_negato_se_disabilitato(tmp_path):
     assert "sudo disabilitato" in res.note
 
 
+def test_sudo_negato_anche_su_comando_catastrofico(tmp_path):
+    # con allow_sudo=False il blocco scatta prima del freno catastrofico
+    ex, _ = _executor(tmp_path, allow_sudo=False, confirmer=lambda c, r: True)
+    res = ex.run("sudo rm -rf /etc")
+    assert res.executed is False
+    assert "sudo disabilitato" in res.note
+
+
+def test_parola_pseudo_non_confusa_con_sudo(tmp_path):
+    ex, _ = _executor(tmp_path, allow_sudo=False, confirmer=lambda c, r: True)
+    res = ex.run("echo pseudocodice")
+    assert res.executed is True
+    assert "pseudocodice" in res.stdout
+
+
 if __name__ == "__main__":
     import subprocess
     raise SystemExit(subprocess.call(["python", "-m", "pytest", __file__, "-v"]))

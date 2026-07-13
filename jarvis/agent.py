@@ -37,6 +37,24 @@ def _cli_confirmer(command: str, reason: str) -> bool:
     return answer in ("s", "si", "sì", "y", "yes")
 
 
+def load_config(config_path: str = "jarvis/config.yaml") -> dict:
+    """Carica e valida la config, riempiendo i default. Fonte unica di verita'
+    per i percorsi (audit, kill switch): la usano sia l'agente sia la CLI."""
+    cfg = dict(DEFAULTS)
+    p = Path(config_path)
+    if p.exists():
+        loaded = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+        cfg.update({k: v for k, v in loaded.items() if v is not None})
+
+    # Validazione: un typo nella config non deve passare in silenzio.
+    if cfg["autonomy"] not in ("auto", "confirm"):
+        raise ValueError(
+            f"config non valida: autonomy='{cfg['autonomy']}' "
+            "(valori ammessi: 'auto', 'confirm')"
+        )
+    return cfg
+
+
 @dataclass
 class Jarvis:
     executor: Executor
@@ -45,18 +63,7 @@ class Jarvis:
 
     @classmethod
     def from_config(cls, config_path: str = "jarvis/config.yaml", confirmer=_cli_confirmer) -> "Jarvis":
-        cfg = dict(DEFAULTS)
-        p = Path(config_path)
-        if p.exists():
-            loaded = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
-            cfg.update({k: v for k, v in loaded.items() if v is not None})
-
-        # Validazione: un typo nella config non deve passare in silenzio.
-        if cfg["autonomy"] not in ("auto", "confirm"):
-            raise ValueError(
-                f"config non valida: autonomy='{cfg['autonomy']}' "
-                "(valori ammessi: 'auto', 'confirm')"
-            )
+        cfg = load_config(config_path)
 
         audit = AuditLog(cfg["audit_path"])
         killswitch = KillSwitch(cfg["stop_sentinel"])
