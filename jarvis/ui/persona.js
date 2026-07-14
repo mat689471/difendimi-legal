@@ -46,8 +46,8 @@ const Persona = (() => {
       `Non è andato a buon fine. Mi permetta di segnalarlo.`,
     ]),
     catastrofico: () => pick([
-      `Mi perdoni, ${appellativo()}, ma è un'operazione irreversibile. Preferisco che la confermi personalmente dal terminale.`,
-      `Un momento, ${appellativo()}. Questa cancellerebbe qualcosa senza ritorno: la lascio decidere a lei, dal terminale.`,
+      `Un momento, ${appellativo()}. È un'operazione irreversibile: la confermi lei, dal terminale.`,
+      `Mi perdoni, ${appellativo()}, ma questa non ha ritorno: la lascio decidere a lei, dal terminale.`,
     ]),
     fermato: () => pick([
       `Sono in pausa, ${appellativo()}. Mi riattivi quando vuole.`,
