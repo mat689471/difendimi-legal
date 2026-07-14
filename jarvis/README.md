@@ -1,8 +1,31 @@
-# Jarvis — modulo automazione di sistema
+# Jarvis — assistente AI modulare
 
-Primo mattone di Jarvis: un assistente che può eseguire operazioni sul
-computer **in autonomia**, con privilegi elevati quando serve, ma con una
-**scatola nera** (audit log) e un **freno d'emergenza** (kill switch).
+Un assistente che può eseguire operazioni sul computer **in autonomia**, con
+privilegi elevati quando serve, ma con una **scatola nera** (audit log) e un
+**freno d'emergenza** (kill switch).
+
+## Il Cervello — l'unico punto a cui parli
+
+Jarvis è fatto di moduli (sistema, contenuti, trading, guardiano). Il **Cervello**
+(`jarvis/brain`) li unisce: gli parli in italiano, lui capisce l'intento e
+agisce — sotto le stesse regole di sicurezza.
+
+```bash
+python -m jarvis.brain                                  # conversazione
+python -m jarvis.brain "esegui df -h"                   # comando di sistema
+python -m jarvis.brain "crea un video sui ricorsi multe" # contenuti
+python -m jarvis.brain "come stai?"                     # stato
+python -m jarvis.brain "fermati"                        # kill switch
+```
+
+**"Ci pensa lui" — la versione onesta:** con `plan_and_do()` Jarvis prende un
+obiettivo, lo scompone in passi e li esegue uno per uno. Il pianificatore a
+regole funziona offline; quello **LLM** (scompone obiettivi complessi con
+Claude) si attiva quando fornisci `ANTHROPIC_API_KEY` e `pip install anthropic`.
+Anche allora ogni passo passa da audit, kill switch, Guardiano e conferma sulle
+cose gravi: **autonomo nei passi, ma sempre sotto il tuo comando.** Non è
+un'entità che parte da sola a gestire un'azienda — è il tuo braccio destro che
+fa il lavoro pesante mentre tu resti la mente.
 
 ## Filosofia di sicurezza
 
