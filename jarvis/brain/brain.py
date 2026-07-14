@@ -34,9 +34,15 @@ class Reply:
 
 class Brain:
     def __init__(self, jarvis: Jarvis | None = None, guardian: Guardian | None = None,
-                 config_path: str = "jarvis/config.yaml"):
+                 config_path: str = "jarvis/config.yaml", responder=None):
         self.jarvis = jarvis or Jarvis.from_config(config_path)
         self.guardian = guardian or Guardian()
+        # risponditore conversazionale (Claude), se disponibile
+        if responder is None:
+            from .responder import LlmResponder
+            r = LlmResponder()
+            responder = r if r.available() else None
+        self.responder = responder
 
     # --- comprensione dell'intento --------------------------------------
     def _route(self, message: str) -> tuple[str, str]:
@@ -122,7 +128,14 @@ class Brain:
             return Reply(intent, testo, advisories,
                          data={"executed": result.executed, "risk": result.risk})
 
-        # help
+        # conversazione libera: se c'è Claude, Jarvis risponde davvero
+        if self.responder is not None:
+            try:
+                return Reply("chat", self.responder.reply(message), advisories)
+            except Exception:  # noqa: BLE001 - se l'LLM fallisce, ripiega sull'aiuto
+                pass
+
+        # aiuto predefinito (senza LLM)
         return Reply("help",
                      "Sono Jarvis, signore. Posso: eseguire comandi ('esegui ...'), "
                      "preparare contenuti ('crea un video su ...'), informarla sul trading, "

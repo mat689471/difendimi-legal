@@ -24,18 +24,34 @@ if (typeof speechSynthesis !== "undefined") {
   speechSynthesis.onvoiceschanged = pickItalianVoice;
 }
 
-// Sintesi del sistema, tunata per il timbro Jarvis (più lento e grave).
+// "Keepalive": Chrome mette in pausa la sintesi sui testi lunghi e la fa
+// suonare "a scatti". Un resume() periodico mentre parla lo evita.
+let _keepAlive = null;
+function _startKeepAlive() {
+  if (_keepAlive) return;
+  _keepAlive = setInterval(() => {
+    if (speechSynthesis.speaking) speechSynthesis.resume();
+    else { clearInterval(_keepAlive); _keepAlive = null; }
+  }, 7000);
+}
+
+// Sintesi tunata per il timbro Jarvis (più lento e grave). Spezza il testo in
+// frasi brevi: è il rimedio robusto allo "scatto" della Web Speech su Chrome.
 function sintetizza(testo) {
-  if (!("speechSynthesis" in window)) return;
+  if (!("speechSynthesis" in window) || !testo) return;
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(testo);
-  u.lang = "it-IT";
-  if (itVoice) u.voice = itVoice;
-  u.rate = Persona.TUNING.rate;
-  u.pitch = Persona.TUNING.pitch;
-  u.onstart = () => setState("speaking");
-  u.onend = () => setState("idle");
-  speechSynthesis.speak(u);
+  const chunks = (testo.match(/[^.!?\n]+[.!?]*/g) || [testo])
+    .map((s) => s.trim()).filter(Boolean);
+  chunks.forEach((chunk, i) => {
+    const u = new SpeechSynthesisUtterance(chunk);
+    u.lang = "it-IT";
+    if (itVoice) u.voice = itVoice;
+    u.rate = Persona.TUNING.rate;
+    u.pitch = Persona.TUNING.pitch;
+    if (i === 0) u.onstart = () => { setState("speaking"); _startKeepAlive(); };
+    if (i === chunks.length - 1) u.onend = () => setState("idle");
+    speechSynthesis.speak(u);
+  });
 }
 
 /* Parla in carattere. Se `chiave` ha un clip pre-renderizzato in voice/,

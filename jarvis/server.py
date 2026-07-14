@@ -25,6 +25,9 @@ ROOT = Path(__file__).resolve().parent
 if str(ROOT.parent) not in sys.path:
     sys.path.insert(0, str(ROOT.parent))
 
+from jarvis.env import load_env  # noqa: E402
+load_env()  # carica jarvis/.env PRIMA di creare il Cervello (chiavi API)
+
 from jarvis.agent import Jarvis  # noqa: E402
 from jarvis.brain import Brain  # noqa: E402
 from jarvis.guardian import Guardian  # noqa: E402

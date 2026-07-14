@@ -66,6 +66,22 @@ def test_help_su_frase_ignota(brain):
     assert "Posso" in r.text
 
 
+def test_conversazione_usa_il_responder_se_presente(tmp_path):
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text(f"autonomy: auto\nstop_sentinel: {tmp_path}/STOP\naudit_path: {tmp_path}/a.jsonl\n",
+                   encoding="utf-8")
+
+    class FakeResponder:
+        def available(self): return True
+        def reply(self, message): return "Con piacere, signore: ecco la mia risposta."
+
+    b = Brain(jarvis=Jarvis.from_config(str(cfg), confirmer=lambda c, r: False),
+              guardian=Guardian(), responder=FakeResponder())
+    r = b.handle("cosa ne pensi del meteo?")
+    assert r.intent == "chat"
+    assert "signore" in r.text
+
+
 # --- guardiano integrato -----------------------------------------------------
 
 def test_guardiano_avvisa_su_comando_irreversibile_di_notte(brain):
