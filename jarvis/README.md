@@ -4,6 +4,22 @@ Un assistente che può eseguire operazioni sul computer **in autonomia**, con
 privilegi elevati quando serve, ma con una **scatola nera** (audit log) e un
 **freno d'emergenza** (kill switch).
 
+## Attivare Jarvis
+
+Un unico comando per accenderlo:
+
+```bash
+pip install -r jarvis/requirements.txt
+python -m jarvis            # controlli + apre l'interfaccia (voce + volto)
+python -m jarvis --check    # solo diagnostica
+```
+
+All'avvio Jarvis verifica che tutto sia a posto, poi stampa un URL col **tuo
+token**. Aprilo nel browser: da lì gli **parli in italiano** (voce o testo) e il
+Cervello coordina i moduli — sistema, contenuti, stato — sotto le regole di
+sicurezza (audit, kill switch, Guardiano, conferma sulle cose gravi).
+L'interfaccia risponde solo a te.
+
 ## Il Cervello — l'unico punto a cui parli
 
 Jarvis è fatto di moduli (sistema, contenuti, trading, guardiano). Il **Cervello**

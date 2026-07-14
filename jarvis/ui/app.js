@@ -65,7 +65,7 @@ if (SR) {
   recognition.onresult = (e) => {
     const testo = Array.from(e.results).map(r => r[0].transcript).join("");
     subtitle.textContent = "“" + testo + "”";
-    if (e.results[e.results.length - 1].isFinal) eseguiComando(testo.trim());
+    if (e.results[e.results.length - 1].isFinal) chiediAJarvis(testo.trim());
   };
   recognition.onend = () => { listening = false; micBtn.classList.remove("on"); if (orb.classList.contains("listening")) setState("idle"); };
   recognition.onerror = (e) => { subtitle.textContent = "Riconoscimento non disponibile (" + e.error + ")."; setState("idle"); };
@@ -100,17 +100,19 @@ async function api(path, opts = {}) {
   return r.json();
 }
 
-async function eseguiComando(comando) {
-  if (!comando) return;
+/* Parla a Jarvis in linguaggio naturale: la richiesta passa dal Cervello,
+ * che capisce l'intento (comando, contenuto, stato…) e risponde. */
+async function chiediAJarvis(messaggio) {
+  if (!messaggio) return;
   setState("busy");
-  subtitle.textContent = "Eseguo: " + comando;
+  subtitle.textContent = "…";
   try {
-    const res = await api("/api/run", {
+    const res = await api("/api/say", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ command: comando }),
+      body: JSON.stringify({ message: messaggio }),
     });
-    interpretaRisultato(res);
+    interpretaRisposta(res);
   } catch (err) {
     subtitle.textContent = "Errore di connessione al backend.";
     parlaPersona("offline");
@@ -120,23 +122,21 @@ async function eseguiComando(comando) {
   aggiornaStato();
 }
 
-function interpretaRisultato(res) {
+function interpretaRisposta(res) {
   if (res.error) { subtitle.textContent = res.error; parlaPersona("errore"); setState("idle"); return; }
-  if (!res.executed) {
-    if (res.risk === "CATASTROPHIC") {
-      subtitle.textContent = "⛔ Operazione irreversibile: va confermata dal terminale.";
-      parlaPersona("catastrofico");
-    } else if (res.note && res.note.toLowerCase().includes("kill switch")) {
-      subtitle.textContent = "⏹ Sono fermato. Riattivami per operare."; parlaPersona("fermato");
-    } else {
-      subtitle.textContent = "Non eseguito: " + (res.note || ""); parlaPersona("non_eseguito");
-    }
-    setState("idle"); return;
-  }
-  const ok = res.exit_code === 0;
-  const out = (res.stdout || res.stderr || "").trim();
-  subtitle.textContent = (ok ? "✓ " : "✗ ") + res.command + (out ? "\n" + out : "");
-  parlaPersona(ok ? "successo" : "errore");
+  const advisories = res.advisories || [];
+  // mostra gli avvisi del Guardiano sopra la risposta
+  const avvisoTesto = advisories.map(a => {
+    const ic = a.level === "attenzione" ? "⚠️" : a.level === "suggerimento" ? "💡" : "ℹ️";
+    return ic + " " + a.message;
+  }).join("\n");
+
+  subtitle.textContent = (avvisoTesto ? avvisoTesto + "\n\n" : "") + (res.text || "");
+
+  // voce: prima l'avviso di attenzione (se c'è), poi la risposta, in un'unica battuta
+  const grave = advisories.find(a => a.level === "attenzione");
+  const daDire = (grave ? grave.message + " " : "") + (res.text || "");
+  sintetizza(daDire);
   setState("idle");
 }
 
@@ -149,7 +149,7 @@ stopBtn.addEventListener("click", async () => {
 });
 
 /* ---------------- Input testuale ---------------- */
-function inviaTesto() { const v = cmdInput.value.trim(); if (v) { cmdInput.value = ""; eseguiComando(v); } }
+function inviaTesto() { const v = cmdInput.value.trim(); if (v) { cmdInput.value = ""; chiediAJarvis(v); } }
 sendBtn.addEventListener("click", inviaTesto);
 cmdInput.addEventListener("keydown", (e) => { if (e.key === "Enter") inviaTesto(); });
 

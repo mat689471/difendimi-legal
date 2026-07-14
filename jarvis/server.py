@@ -26,6 +26,8 @@ if str(ROOT.parent) not in sys.path:
     sys.path.insert(0, str(ROOT.parent))
 
 from jarvis.agent import Jarvis  # noqa: E402
+from jarvis.brain import Brain  # noqa: E402
+from jarvis.guardian import Guardian  # noqa: E402
 
 UI_DIR = ROOT / "ui"
 TOKEN_FILE = ROOT / "logs" / "owner.token"
@@ -34,6 +36,8 @@ ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
 # Via HTTP le operazioni catastrofiche vengono sempre negate.
 _DENY = lambda command, reason: False  # noqa: E731
 _jarvis = Jarvis.from_config(str(ROOT / "config.yaml"), confirmer=_DENY)
+# Il Cervello: capisce il linguaggio naturale e coordina i moduli.
+_brain = Brain(jarvis=_jarvis, guardian=Guardian())
 
 
 def _load_or_create_token() -> str:
@@ -146,6 +150,18 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"error": "JSON non valido"}, 400)
 
         bare = self._bare_path()
+        if bare == "/api/say":
+            # linguaggio naturale -> Cervello (capisce l'intento e coordina)
+            message = (data.get("message") or "").strip()
+            if not message:
+                return self._json({"error": "messaggio mancante"}, 400)
+            reply = _brain.handle(message)
+            return self._json({
+                "text": reply.text, "intent": reply.intent,
+                "advisories": [{"level": a.level, "key": a.key, "message": a.message}
+                               for a in reply.advisories],
+                "data": reply.data,
+            })
         if bare == "/api/run":
             command = (data.get("command") or "").strip()
             if not command:
