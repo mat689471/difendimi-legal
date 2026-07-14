@@ -134,6 +134,22 @@ La **pubblicazione** su YouTube/social non è automatica: richiede le tue
 credenziali e la tua approvazione (l'automazione del posting viola le ToS di
 molte piattaforme). La pipeline prepara tutto; l'ultimo clic è tuo.
 
+### L'Agente Contenuti (il cuore di ContentFlow)
+
+`jarvis/content/agent.py`: dato il **brand** di un cliente (una volta sola) e un
+numero N, genera N contenuti pronti — inventa un'angolazione diversa per
+ciascuno (errore, diritto, scadenza, domanda, caso), ne ricava il brief e lo
+passa alla pipeline. Output coerente col brand, manifest + audit inclusi.
+
+```bash
+python -m jarvis.content.agent jarvis/content/brand.example.json --count 5
+```
+
+Due generatori di idee: **offline** (ruota angolazioni/argomenti, zero costi,
+sempre attivo) e **LLM** (idee originali con Claude, si attiva con
+`ANTHROPIC_API_KEY` + `pip install anthropic`). È il modulo che un cliente
+pagherebbe: mette il brand, riceve contenuti in serie.
+
 ## Il Guardiano — benessere del proprietario
 
 La skill che Jarvis dedica a **te**, non ai compiti. Tutto il resto serve a fare
