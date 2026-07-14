@@ -209,6 +209,8 @@ def main(argv: list[str] | None = None) -> int:
     if not argv:
         print("uso: python -m jarvis.content.agent <brand.json> [--count N]")
         return 1
+    from ..env import load_env
+    load_env()  # carica jarvis/.env (ANTHROPIC_API_KEY per le idee LLM)
     brand = Brand.from_dict(json.loads(Path(argv[0]).read_text(encoding="utf-8")))
     count = 5
     if "--count" in argv:

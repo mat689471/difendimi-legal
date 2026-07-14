@@ -188,6 +188,8 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main(host: str = "127.0.0.1", port: int = 8787):
+    from jarvis.env import load_env
+    load_env()  # carica jarvis/.env se presente (chiavi API)
     httpd = ThreadingHTTPServer((host, port), Handler)
     url = f"http://{host}:{port}/?k={OWNER_TOKEN}"
     print("=" * 68)

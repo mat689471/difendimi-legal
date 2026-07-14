@@ -12,6 +12,7 @@ sicurezza (audit, kill switch, Guardiano, conferma sulle cose gravi).
 from __future__ import annotations
 
 import importlib
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -43,6 +44,11 @@ def _check() -> list[str]:
 
     # opzionali (non bloccano)
     print("Opzionali:")
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        print("  ✓ ANTHROPIC_API_KEY rilevata (funzioni LLM attivabili)")
+    else:
+        print("  · ANTHROPIC_API_KEY assente — metti la chiave in jarvis/.env "
+              "(vedi jarvis/.env.example)")
     node = shutil.which("node")
     print(f"  {'✓' if node else '·'} node {'(' + node + ')' if node else '— serve solo per il render video'}")
     remotion_ok = (ROOT.parent / "remotion" / "node_modules" / "remotion").exists()
@@ -61,6 +67,10 @@ def main() -> int:
     print("=" * 60)
     print("  J.A.R.V.I.S.  —  attivazione")
     print("=" * 60)
+    from jarvis.env import load_env
+    caricate = load_env()
+    if caricate:
+        print(f"Segreti caricati da jarvis/.env: {', '.join(caricate)}\n")
     problemi = _check()
     if problemi:
         print(f"\n⚠️  Attivazione interrotta: risolvi prima {', '.join(problemi)}.")
