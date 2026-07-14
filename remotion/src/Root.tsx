@@ -1,5 +1,5 @@
 import { Composition } from "remotion";
-import { ViralVideo } from "./ViralVideo";
+import { ViralVideo, defaultViralProps } from "./ViralVideo";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -11,6 +11,7 @@ export const RemotionRoot: React.FC = () => {
         fps={30}
         width={1080}
         height={1920}
+        defaultProps={defaultViralProps}
       />
     </>
   );

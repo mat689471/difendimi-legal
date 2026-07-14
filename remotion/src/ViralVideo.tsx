@@ -81,7 +81,7 @@ const PulseBadge: React.FC<{ text: string; startFrame: number }> = ({
 };
 
 // Flashing urgency bar
-const UrgencyBar: React.FC<{ frame: number }> = ({ frame }) => {
+const UrgencyBar: React.FC<{ frame: number; text: string }> = ({ frame, text }) => {
   const flash = Math.floor(frame / 8) % 2 === 0;
   return (
     <div
@@ -99,7 +99,7 @@ const UrgencyBar: React.FC<{ frame: number }> = ({ frame }) => {
         transition: "background 0.1s",
       }}
     >
-      ⚠️ CONOSCI I TUOI DIRITTI ⚠️
+      {text}
     </div>
   );
 };
@@ -127,7 +127,45 @@ const ProgressBar: React.FC<{ progress: number }> = ({ progress }) => (
   </div>
 );
 
-export const ViralVideo: React.FC = () => {
+// Props della pipeline: tutto il CONTENUTO e' guidato dai dati, cosi' Jarvis
+// puo' generare video diversi cambiando solo un brief (vedi jarvis/content).
+export interface ViralVideoProps {
+  brand: string;
+  tagline: string;
+  urgencyBar: string;
+  captions: string[]; // le 7 didascalie centrali, per indice
+  features: string[];
+  ctaBadge: string;
+  stores: string;
+  hashtags: string;
+}
+
+export const defaultViralProps: ViralVideoProps = {
+  brand: "⚖️ DIFENDIMI",
+  tagline: "L'App che rende giustizia accessibile",
+  urgencyBar: "⚠️ CONOSCI I TUOI DIRITTI ⚠️",
+  captions: [
+    "Sei stato fermato dalla polizia?",
+    "Non sai cosa puoi e NON puoi fare? 🚫",
+    "DIFENDIMI ti guida 24/7 con intelligenza artificiale 🤖",
+    "", // slot 4: usa la lista features
+    '"Finalmente posso difendermi da solo" 💬',
+    "30 giorni GRATIS 🎁 Nessuna carta richiesta",
+    "Scarica ora. La legge è dalla tua parte. ⚖️",
+  ],
+  features: [
+    "✅ Diritti in tempo reale",
+    "✅ Documenti legali gratis",
+    "✅ Database leggi italiane",
+  ],
+  ctaBadge: "📲 Scarica DIFENDIMI",
+  stores: "App Store  •  Google Play",
+  hashtags: "#difendimi #diritti #italia #legge #giustizia",
+};
+
+export const ViralVideo: React.FC<Partial<ViralVideoProps>> = (rawProps) => {
+  const p = { ...defaultViralProps, ...rawProps };
+  const cap = (i: number) => p.captions[i] ?? defaultViralProps.captions[i];
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 
@@ -178,7 +216,7 @@ export const ViralVideo: React.FC = () => {
       <AbsoluteFill style={{ opacity: overlayOpacity }}>
         {/* Top urgency bar */}
         <div style={{ position: "absolute", top: 0, left: 0, width: "100%" }}>
-          <UrgencyBar frame={frame} />
+          <UrgencyBar frame={frame} text={p.urgencyBar} />
         </div>
 
         {/* App logo / branding */}
@@ -194,7 +232,7 @@ export const ViralVideo: React.FC = () => {
             }}
           >
             <AnimatedCaption
-              text="⚖️ DIFENDIMI"
+              text={p.brand}
               startFrame={15}
               durationFrames={durationInFrames - 15}
               style={{
@@ -222,7 +260,7 @@ export const ViralVideo: React.FC = () => {
             }}
           >
             <AnimatedCaption
-              text="L'App che rende giustizia accessibile"
+              text={p.tagline}
               startFrame={30}
               durationFrames={durationInFrames - 30}
               style={{
@@ -250,7 +288,7 @@ export const ViralVideo: React.FC = () => {
             }}
           >
             <AnimatedCaption
-              text="Sei stato fermato dalla polizia?"
+              text={cap(0)}
               startFrame={60}
               durationFrames={120}
               style={{
@@ -277,7 +315,7 @@ export const ViralVideo: React.FC = () => {
             }}
           >
             <AnimatedCaption
-              text="Non sai cosa puoi e NON puoi fare? 🚫"
+              text={cap(1)}
               startFrame={195}
               durationFrames={120}
               style={{
@@ -304,7 +342,7 @@ export const ViralVideo: React.FC = () => {
             }}
           >
             <AnimatedCaption
-              text="DIFENDIMI ti guida 24/7 con intelligenza artificiale 🤖"
+              text={cap(2)}
               startFrame={330}
               durationFrames={150}
               style={{
@@ -333,7 +371,7 @@ export const ViralVideo: React.FC = () => {
               gap: 20,
             }}
           >
-            {["✅ Diritti in tempo reale", "✅ Documenti legali gratis", "✅ Database leggi italiane"].map(
+            {p.features.map(
               (feat, i) => (
                 <Sequence key={i} from={495 + i * 25} durationInFrames={150 - i * 25}>
                   <AnimatedCaption
@@ -369,7 +407,7 @@ export const ViralVideo: React.FC = () => {
             }}
           >
             <AnimatedCaption
-              text='"Finalmente posso difendermi da solo" 💬'
+              text={cap(4)}
               startFrame={660}
               durationFrames={150}
               style={{
@@ -396,7 +434,7 @@ export const ViralVideo: React.FC = () => {
             }}
           >
             <AnimatedCaption
-              text="30 giorni GRATIS 🎁 Nessuna carta richiesta"
+              text={cap(5)}
               startFrame={825}
               durationFrames={150}
               style={{
@@ -423,7 +461,7 @@ export const ViralVideo: React.FC = () => {
             }}
           >
             <AnimatedCaption
-              text="Scarica ora. La legge è dalla tua parte. ⚖️"
+              text={cap(6)}
               startFrame={990}
               durationFrames={durationInFrames - 990}
               style={{
@@ -452,7 +490,7 @@ export const ViralVideo: React.FC = () => {
               justifyContent: "center",
             }}
           >
-            <PulseBadge text="📲 Scarica DIFENDIMI" startFrame={495} />
+            <PulseBadge text={p.ctaBadge} startFrame={495} />
           </div>
         </Sequence>
 
@@ -470,7 +508,7 @@ export const ViralVideo: React.FC = () => {
             }}
           >
             <AnimatedCaption
-              text="App Store  •  Google Play"
+              text={p.stores}
               startFrame={600}
               durationFrames={durationInFrames - 600}
               style={{
@@ -497,7 +535,7 @@ export const ViralVideo: React.FC = () => {
             }}
           >
             <AnimatedCaption
-              text="#difendimi #diritti #italia #legge #giustizia"
+              text={p.hashtags}
               startFrame={750}
               durationFrames={durationInFrames - 750}
               style={{

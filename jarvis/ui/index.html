@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jarvis</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="stage">
+    <div class="brand">
+      <h1>JARVIS</h1>
+      <p>ASSISTENTE • VOCE ITALIANA</p>
+    </div>
+
+    <div class="orb-wrap" id="orb">
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="orb"></div>
+    </div>
+
+    <div class="subtitle" id="subtitle">Pronto. Premi il microfono o scrivi un comando.</div>
+
+    <div class="controls">
+      <button class="mic" id="micBtn">🎙️ Parla</button>
+      <button id="testBtn">🔊 Prova voce</button>
+      <button class="stop" id="stopBtn">⏹ Ferma Jarvis</button>
+    </div>
+
+    <div class="textbar">
+      <input id="cmdInput" placeholder="Parla o scrivi a Jarvis…" autocomplete="off" />
+      <button id="sendBtn">Invia</button>
+    </div>
+  </main>
+
+  <aside class="panel">
+    <h2>Stato</h2>
+    <div class="status-row"><span class="dot" id="dot"></span><span id="statusText">operativo</span></div>
+    <h2>Scatola nera — audit</h2>
+    <div class="log" id="log"></div>
+  </aside>
+
+  <script src="persona.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
