@@ -111,6 +111,24 @@ La **pubblicazione** su YouTube/social non è automatica: richiede le tue
 credenziali e la tua approvazione (l'automazione del posting viola le ToS di
 molte piattaforme). La pipeline prepara tutto; l'ultimo clic è tuo.
 
+## Il Guardiano — benessere del proprietario
+
+La skill che Jarvis dedica a **te**, non ai compiti. Tutto il resto serve a fare
+cose; questa protegge la persona che le chiede. Non blocca mai nulla — tu
+comandi sempre — ma alza con garbo la voce della prudenza:
+
+- azione **irreversibile a notte fonda** → «dormiamoci su, deciderà con la mente lucida»;
+- **denaro reale** → «nessuna operazione vale la sua serenità: è sicuro?»;
+- azioni **a raffica** (stanchezza/impulsività) → «stiamo andando veloci, rallento?»;
+- **sessione lunga** → «una pausa la aiuterebbe: il lavoro resta, lei viene prima».
+
+Parla poco e bene (ogni avviso ha un tempo di riposo, niente assillo). È il senso
+vero di *"non ti tradisco"*, rivolto alla tua persona.
+
+```bash
+python -m jarvis.guardian   # alcune scene di esempio
+```
+
 ## Trading (demo-first)
 
 Modulo `jarvis/trading`: opera con **limiti hard** e sotto lo stesso audit log
