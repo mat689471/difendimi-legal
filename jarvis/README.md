@@ -150,6 +150,27 @@ sempre attivo) e **LLM** (idee originali con Claude, si attiva con
 `ANTHROPIC_API_KEY` + `pip install anthropic`). È il modulo che un cliente
 pagherebbe: mette il brand, riceve contenuti in serie.
 
+### Render vero dei video (.mp4)
+
+`jarvis/content/render.py` collega la pipeline a Remotion e produce **file
+.mp4** veri (non solo props). Trova da solo il browser (usa il Chrome Headless
+Shell pre-installato) e renderizza con GL software, quindi funziona anche su
+server senza GPU. Rispetta kill switch e audit.
+
+```bash
+cd remotion && npm install          # una volta: dipendenze Remotion
+python -m jarvis.content.agent jarvis/content/brand.example.json --count 5 --render
+```
+
+Due verità oneste sul render:
+- **È lento su CPU**: ~9 minuti per un video da 45s (rendering software, niente
+  GPU). Per fare volume serve **Remotion Lambda** (AWS): render in parallelo,
+  molto più rapido. È il costo variabile vero di cui parla `saas/PLAN.md`.
+- **Lo sfondo è un filmato fisso** (`remotion/public/video.webm`): l'overlay del
+  brand è corretto, ma il video di base è un placeholder condiviso. Per un
+  prodotto vendibile serve **materiale video per-brand/per-argomento** (stock,
+  caricato dal cliente, o generato). È il prossimo pezzo reale, non un dettaglio.
+
 ## Il Guardiano — benessere del proprietario
 
 La skill che Jarvis dedica a **te**, non ai compiti. Tutto il resto serve a fare

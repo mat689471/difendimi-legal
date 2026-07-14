@@ -119,27 +119,29 @@ def prepare(brief: dict) -> BuildOutput:
     social_path.write_text(social_package(brief, props), encoding="utf-8")
 
     output_video = out_dir / f"{slug}.mp4"
-    render_command = (
-        f'cd "{REMOTION}" && npx remotion render {COMPOSITION_ID} '
-        f'"{output_video}" --props="{props_path}"'
-    )
+    from .render import render_command as _render_command  # lazy: evita import circolare
+    render_command = _render_command(props_path, output_video)
     return BuildOutput(slug, props_path, output_video, social_path, render_command,
                        [props_path, social_path])
 
 
 def run(brief: dict, jarvis=None, execute: bool = True) -> BuildOutput:
-    """Prepara e (se execute) renderizza il video TRAMITE Jarvis, cosi' il
-    render finisce nell'audit log ed e' fermabile col kill switch."""
+    """Prepara e (se execute) renderizza davvero il video in .mp4, sotto kill
+    switch e audit di Jarvis."""
+    from .render import render as _render
     out = prepare(brief)
     print(f"[pipeline] props   -> {out.props_path}")
     print(f"[pipeline] social  -> {out.social_path}")
-    print(f"[pipeline] render  -> {out.render_command}")
     if not execute:
+        print(f"[pipeline] render  -> {out.render_command}")
         return out
     if jarvis is None:
         from jarvis.agent import Jarvis
         jarvis = Jarvis.from_config(str(REPO / "jarvis" / "config.yaml"))
-    jarvis.execute_plan([out.render_command])
+    print(f"[pipeline] rendering -> {out.output_video} …")
+    ok = _render(out.props_path, out.output_video,
+                 killswitch=jarvis.killswitch, audit=jarvis.audit)
+    print(f"[pipeline] render {'OK' if ok else 'FALLITO'}: {out.output_video}")
     return out
 
 

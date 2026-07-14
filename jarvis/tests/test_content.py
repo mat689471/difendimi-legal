@@ -47,7 +47,8 @@ def test_prepare_scrive_props_e_social(tmp_path, monkeypatch):
     assert out.social_path.exists()
     data = json.loads(out.props_path.read_text(encoding="utf-8"))
     assert data["captions"][0] == "Ciao"
-    assert "render DifendimiViral" in out.render_command
+    assert "remotion render" in out.render_command
+    assert "DifendimiViral" in out.render_command
 
 
 def test_config_non_valida_solleva(tmp_path):

@@ -29,6 +29,8 @@ class Brand:
     """La configurazione che il cliente inserisce una volta sola."""
     name: str                       # nome interno/slug
     display: str                    # come appare nel video (es. "⚖️ DIFENDIMI")
+    tagline: str = ""               # sottotitolo sotto il nome
+    urgency: str = ""               # barra in alto (es. "⚖️ CONSULENZA GRATUITA ⚖️")
     audience: str = "i tuoi clienti"
     topics: list[str] = field(default_factory=list)
     features: list[str] = field(default_factory=list)
@@ -43,6 +45,7 @@ class Brand:
     def from_dict(cls, d: dict) -> "Brand":
         return cls(
             name=d["name"], display=d.get("display", d["name"]),
+            tagline=d.get("tagline", ""), urgency=d.get("urgency", ""),
             audience=d.get("audience", "i tuoi clienti"),
             topics=d.get("topics", []), features=d.get("features", []),
             offer=d.get("offer", ""), cta=d.get("cta", ""),
@@ -92,6 +95,8 @@ class IdeaGenerator:
                 "name": f"{brand.name}-{i+1:02d}-{tag}",
                 "title": hook_t.format(**ctx),
                 "brand": brand.display,
+                "tagline": brand.tagline,
+                "urgency": brand.urgency,
                 "hook": hook_t.format(**ctx),
                 "agitate": agitate_t.format(**ctx),
                 "solution": solution_t.format(**ctx),
@@ -161,24 +166,34 @@ class Piece:
     topic: str
     props: str
     social: str
+    video: str | None = None
 
 
 class ContentAgent:
     """Orchestratore: brand -> idee -> pipeline -> contenuti + manifest."""
 
-    def __init__(self, generator=None, audit=None):
+    def __init__(self, generator=None, audit=None, killswitch=None):
         self.generator = generator or IdeaGenerator()
         self.audit = audit
+        self.killswitch = killswitch
 
-    def produce(self, brand: Brand, count: int = 5) -> list[Piece]:
+    def produce(self, brand: Brand, count: int = 5, render: bool = False) -> list[Piece]:
         pieces: list[Piece] = []
         for brief in self.generator.briefs(brand, count):
             angle = brief.pop("_angle", "n/d")
             topic = brief.pop("_topic", "")
             out = prepare(brief)
-            pieces.append(Piece(out.slug, angle, topic, str(out.props_path), str(out.social_path)))
+            video = None
+            if render:
+                from .render import render as _render
+                ok = _render(out.props_path, out.output_video,
+                             killswitch=self.killswitch, audit=self.audit)
+                video = str(out.output_video) if ok else None
+            pieces.append(Piece(out.slug, angle, topic, str(out.props_path),
+                                str(out.social_path), video))
             if self.audit:
-                self.audit.record("content_generated", brand=brand.name, slug=out.slug, angle=angle)
+                self.audit.record("content_generated", brand=brand.name, slug=out.slug,
+                                  angle=angle, rendered=bool(video))
 
         manifest_dir = REMOTION / "out" / slugify(brand.name)
         manifest_dir.mkdir(parents=True, exist_ok=True)
@@ -198,14 +213,27 @@ def main(argv: list[str] | None = None) -> int:
     count = 5
     if "--count" in argv:
         count = int(argv[argv.index("--count") + 1])
+    do_render = "--render" in argv
 
     gen = LlmIdeaGenerator()
-    agent = ContentAgent(generator=gen if gen.available() else IdeaGenerator())
+    # collega audit + kill switch, così i render sono tracciati e fermabili
+    from ..agent import load_config
+    from ..core import AuditLog, KillSwitch
+    cfg = load_config()
+    audit = AuditLog(cfg["audit_path"])
+    killswitch = KillSwitch(cfg["stop_sentinel"])
+    agent = ContentAgent(generator=gen if gen.available() else IdeaGenerator(),
+                         audit=audit, killswitch=killswitch)
     print(f"[agente] genero {count} contenuti per «{brand.display}» "
-          f"({'LLM' if isinstance(agent.generator, LlmIdeaGenerator) else 'offline'})")
-    for p in agent.produce(brand, count):
+          f"({'LLM' if isinstance(agent.generator, LlmIdeaGenerator) else 'offline'})"
+          f"{' + render .mp4' if do_render else ''}")
+    for p in agent.produce(brand, count, render=do_render):
         print(f"  ✓ [{p.angle:8}] {p.slug}")
         print(f"     social: {p.social}")
+        if p.video:
+            print(f"     video:  {p.video}")
+        elif do_render:
+            print(f"     video:  ⚠️ render non riuscito")
     return 0
 
 
