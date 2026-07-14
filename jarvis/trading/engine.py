@@ -61,15 +61,26 @@ class TradingEngine:
 
         pos = self.broker.open(order)
         self.audit.record("trade_opened", order=tag, position_id=pos.id,
-                          entry=pos.entry_price, mode=self.risk.config.mode)
+                          entry=pos.entry_price, sl=pos.sl, tp=pos.tp,
+                          mode=self.risk.config.mode)
         return pos
 
-    def close_position(self, position_id: int, price: float | None = None) -> float:
+    def close_position(self, position_id: int, price: float | None = None,
+                       reason: str = "manuale") -> float:
         pnl = self.broker.close(position_id, price)
         self.risk.register_realized(pnl)
         self.audit.record("trade_closed", position_id=position_id, pnl=round(pnl, 2),
-                          realized_today=round(self.risk.realized_pnl_today, 2))
+                          reason=reason, realized_today=round(self.risk.realized_pnl_today, 2))
         return pnl
+
+    def update_market(self, symbol: str, price: float) -> list[tuple[int, str]]:
+        """Aggiorna il prezzo e chiude automaticamente le posizioni che hanno
+        toccato stop-loss o take-profit, registrando P&L e audit. E' il modo
+        corretto di 'far scorrere' il mercato: SL/TP passano dal rischio."""
+        triggered = self.broker.mark(symbol, price)
+        for pos_id, why in triggered:
+            self.close_position(pos_id, price, reason=why)
+        return triggered
 
     def snapshot(self) -> dict:
         return {

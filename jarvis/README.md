@@ -119,7 +119,7 @@ e kill switch del resto di Jarvis. Regola d'oro sulla progressione:
 `paper` (simulato) → `demo` (conto demo reale Fusion Market) → `live` (soldi veri).
 
 ```bash
-python -m jarvis.trading   # demo: strategia SMA su prezzi sintetici, 0 euro reali
+python -m jarvis.trading   # demo: TrendRsi + SL/TP + sizing sul rischio, 0 euro reali
 ```
 
 Sicurezza:
@@ -128,8 +128,22 @@ Sicurezza:
   aprire. Nessun ordine passa senza l'ok del risk manager.
 - **`live` = doppio interruttore**: serve `mode: live` **e** `allow_live: true`,
   **e** la conferma manuale di *ogni* ordine. Di default entrambi off.
-- **MT5/Fusion Market**: l'adattatore (`mt5_adapter.py`) è disattivo finché non
-  lo colleghi tu, richiede il pacchetto `MetaTrader5` (solo Windows) e rifiuta i
-  server non-demo salvo attivazione live esplicita.
 - Una **strategia non esegue**: propone segnali; l'esecuzione (con i limiti)
   resta al motore. Una strategia sbagliata non può sforare i limiti hard.
+
+Strumenti da trading serio:
+- **Stop-loss / take-profit** sugli ordini: `engine.update_market(symbol, price)`
+  fa scorrere il prezzo e chiude in automatico le posizioni che li toccano,
+  registrando P&L e audit (così anche lo stop rientra nel conteggio della
+  perdita giornaliera).
+- **Position sizing sul rischio** (`size_for_risk`): dimensiona il volume perché
+  la perdita allo stop sia una piccola % del conto — non rischiare mai troppo.
+- **Strategie**: `SmaCrossover` (didattica), `RsiReversion` (mean-reversion),
+  `TrendRsi` (pullback filtrato dal trend, default più conservativo). Il
+  risultato dipende **sempre** dalle condizioni di mercato.
+
+Collegamento reale **MT5/Fusion Market** (`mt5_adapter.py`): implementato
+(order_send, positions_get, chiusura, SL/TP, equity) ma da usare consapevolmente
+— richiede il pacchetto `MetaTrader5` (solo Windows, terminale aperto), le tue
+credenziali **demo**, e rifiuta i server non-demo salvo `live=True` esplicito.
+Non è coperto dai test automatici: va provato sul tuo conto demo.

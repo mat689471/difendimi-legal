@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from jarvis.core import AuditLog, KillSwitch
 from jarvis.trading import (
     Order, PaperBroker, RiskConfig, RiskManager, TradingEngine, SmaCrossover,
+    RsiReversion, TrendRsi, size_for_risk,
 )
 
 
@@ -90,3 +91,60 @@ def test_sma_emette_solo_sui_crossover():
     assert signals[0] == "flat" and signals[1] == "flat" and signals[2] == "flat"
     # deve comparire almeno un buy e un sell nel percorso su-e-giu'
     assert "buy" in signals and "sell" in signals
+
+
+# --- stop-loss / take-profit -------------------------------------------------
+
+def test_buy_chiude_su_stop_loss(tmp_path):
+    eng, broker, _ = _engine(tmp_path, RiskConfig(mode="paper"))
+    broker.set_point_value("EURUSD", 1.0)
+    eng.place_order(Order("EURUSD", "buy", 0.10, price=100.0, sl=98.0, tp=105.0))
+    # prezzo scende sotto lo stop -> chiusura automatica in perdita
+    triggered = eng.update_market("EURUSD", 97.5)
+    assert triggered and triggered[0][1] == "sl"
+    assert broker.positions() == []
+    assert eng.risk.realized_pnl_today < 0
+
+def test_sell_chiude_su_take_profit(tmp_path):
+    eng, broker, _ = _engine(tmp_path, RiskConfig(mode="paper"))
+    broker.set_point_value("EURUSD", 1.0)
+    eng.place_order(Order("EURUSD", "sell", 0.10, price=100.0, sl=102.0, tp=95.0))
+    triggered = eng.update_market("EURUSD", 94.0)  # scende: profitto per lo short
+    assert triggered and triggered[0][1] == "tp"
+    assert eng.risk.realized_pnl_today > 0
+
+def test_sl_tp_non_scatta_dentro_range(tmp_path):
+    eng, broker, _ = _engine(tmp_path, RiskConfig(mode="paper"))
+    eng.place_order(Order("EURUSD", "buy", 0.10, price=100.0, sl=98.0, tp=105.0))
+    assert eng.update_market("EURUSD", 101.0) == []
+    assert len(broker.positions()) == 1
+
+
+# --- position sizing ---------------------------------------------------------
+
+def test_size_for_risk():
+    # rischio 1% di 10000 = 100; distanza stop 2, point_value 10 -> 100/(2*10) = 5.0
+    assert size_for_risk(10_000, 0.01, entry=100, stop=98, point_value=10) == 5.0
+
+def test_size_for_risk_stop_nullo_da_zero():
+    assert size_for_risk(10_000, 0.01, entry=100, stop=100, point_value=10) == 0.0
+
+def test_size_for_risk_rispetta_il_massimo():
+    assert size_for_risk(10_000, 0.10, entry=100, stop=99, point_value=10, max_volume=1.0) == 1.0
+
+
+# --- strategie RSI -----------------------------------------------------------
+
+def test_rsi_reversion_compra_in_ipervenduto_e_vende_in_ipercomprato():
+    strat = RsiReversion(period=3, oversold=30, overbought=70)
+    down = [strat.signal(p) for p in [100, 98, 96, 94, 92, 90]]
+    assert "buy" in down          # discesa costante -> RSI basso -> buy
+    up = [strat.signal(p) for p in [92, 95, 98, 101, 104, 107]]
+    assert "sell" in up           # risalita costante -> RSI alto -> sell
+
+def test_trend_rsi_non_va_controtrend():
+    # discesa costante: trend giu', RSI basso. TrendRsi NON deve comprare
+    # controtendenza (compra solo se prezzo sopra la SMA).
+    strat = TrendRsi(trend=5, period=3, oversold=35, overbought=65)
+    signals = [strat.signal(p) for p in [110, 108, 106, 104, 102, 100, 98, 96]]
+    assert "buy" not in signals

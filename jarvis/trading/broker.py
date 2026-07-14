@@ -23,6 +23,8 @@ class Order:
     side: str          # "buy" | "sell"
     volume: float      # lotti
     price: float | None = None  # per il paper: prezzo di fill
+    sl: float | None = None     # stop-loss (prezzo)
+    tp: float | None = None     # take-profit (prezzo)
 
 
 @dataclass
@@ -34,11 +36,29 @@ class Position:
     entry_price: float
     current_price: float
     point_value: float = 1.0
+    sl: float | None = None
+    tp: float | None = None
 
     @property
     def unrealized_pnl(self) -> float:
         direction = 1 if self.side == "buy" else -1
         return (self.current_price - self.entry_price) * direction * self.volume * self.point_value
+
+    def hit(self) -> str | None:
+        """Ritorna 'sl' o 'tp' se il prezzo corrente ha toccato lo stop o il
+        target, altrimenti None. Per un long: SL sotto, TP sopra; per uno short
+        e' l'inverso."""
+        if self.side == "buy":
+            if self.sl is not None and self.current_price <= self.sl:
+                return "sl"
+            if self.tp is not None and self.current_price >= self.tp:
+                return "tp"
+        else:  # sell
+            if self.sl is not None and self.current_price >= self.sl:
+                return "sl"
+            if self.tp is not None and self.current_price <= self.tp:
+                return "tp"
+        return None
 
 
 class Broker(ABC):
@@ -79,15 +99,24 @@ class PaperBroker(Broker):
             entry_price=order.price,
             current_price=order.price,
             point_value=self._point_values.get(order.symbol, 1.0),
+            sl=order.sl,
+            tp=order.tp,
         )
         self._positions[pos.id] = pos
         return pos
 
-    def mark(self, symbol: str, price: float) -> None:
-        """Aggiorna il prezzo corrente delle posizioni su un simbolo."""
+    def mark(self, symbol: str, price: float) -> list[tuple[int, str]]:
+        """Aggiorna il prezzo corrente delle posizioni su un simbolo e ritorna
+        la lista (id, motivo) di quelle che hanno toccato SL o TP. Non le chiude:
+        la chiusura la decide il motore, che deve aggiornare il rischio."""
+        triggered: list[tuple[int, str]] = []
         for pos in self._positions.values():
             if pos.symbol == symbol:
                 pos.current_price = price
+                reason = pos.hit()
+                if reason:
+                    triggered.append((pos.id, reason))
+        return triggered
 
     def close(self, position_id: int, price: float | None = None) -> float:
         pos = self._positions.pop(position_id)

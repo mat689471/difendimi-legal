@@ -30,6 +30,27 @@ class RiskDecision:
     needs_confirmation: bool = False
 
 
+def size_for_risk(balance: float, risk_pct: float, entry: float, stop: float,
+                  point_value: float, *, max_volume: float | None = None) -> float:
+    """Dimensiona la posizione perche' la perdita allo stop sia ~ risk_pct del
+    conto. Regola cardine del trading serio: non rischiare mai piu' di una
+    piccola frazione per operazione.
+
+        volume = (balance * risk_pct) / (distanza_stop * point_value)
+
+    Ritorna 0 se lo stop coincide con l'ingresso (distanza nulla). Il volume
+    e' arrotondato a 2 decimali e limitato da max_volume, se dato.
+    """
+    stop_distance = abs(entry - stop)
+    if stop_distance == 0 or point_value <= 0 or risk_pct <= 0:
+        return 0.0
+    volume = (balance * risk_pct) / (stop_distance * point_value)
+    volume = round(volume, 2)
+    if max_volume is not None:
+        volume = min(volume, max_volume)
+    return volume
+
+
 @dataclass
 class RiskManager:
     config: RiskConfig
