@@ -3,3 +3,6 @@ remotion/node_modules/
 remotion/out/
 *.pyc
 __pycache__/
+
+# Output generato dagli script di prospezione (contiene dati di aziende reali)
+prospecting/output/
