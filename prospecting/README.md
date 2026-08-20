@@ -43,20 +43,62 @@ Dove trovare comunque un'email, in ordine di resa:
 
 ### 1. Chiave Google Maps (obbligatoria)
 
-1. Vai su [console.cloud.google.com](https://console.cloud.google.com/) e crea un progetto
-2. Attiva **Places API (New)**
-3. Crea una chiave API in *Credenziali*
-4. Limitala alla sola Places API, così una chiave rubata non ti costa nulla
+**Serve una carta di credito.** Google chiede un account di fatturazione
+attivo prima di rilasciare la chiave, anche se resti nel gratuito. Non è
+un abbonamento e non ti addebita nulla finché stai sotto le soglie, ma la
+carta va inserita: se non vuoi farlo, questi script non li puoi usare.
+
+1. Vai su [console.cloud.google.com](https://console.cloud.google.com/) e accedi col tuo account Google
+2. In alto, dal menu dei progetti, **Nuovo progetto** → dagli un nome → **Crea**
+3. Menu ☰ → **Fatturazione** → collega un account di fatturazione (qui inserisci la carta)
+4. Menu ☰ → **API e servizi** → **Libreria** → cerca **Places API (New)** → **Abilita**
+5. Menu ☰ → **API e servizi** → **Credenziali** → **Crea credenziali** → **Chiave API**
+6. Copia la chiave, poi **Modifica chiave** → in *Restrizioni API* scegli
+   **Limita chiave** e seleziona solo **Places API (New)** → **Salva**
+
+Il passo 6 non saltarlo: una chiave senza restrizioni, se finisce in giro,
+può essere usata da altri su qualsiasi servizio Google e la fattura è tua.
 
 ```bash
 export GOOGLE_MAPS_API_KEY="la-tua-chiave"
 ```
 
-Google ha un livello gratuito mensile che per questi volumi è ampiamente
-sufficiente, ma **le tariffe cambiano**: controlla i costi correnti nella
-console e imposta un tetto di spesa prima di lanciare ricerche grosse.
-Il `FieldMask` degli script chiede solo i campi necessari proprio per
-restare nella fascia economica.
+#### Quanto costa davvero
+
+Da marzo 2025 Google ha **eliminato il credito unico da 200 $/mese** e lo ha
+sostituito con soglie gratuite separate per tipo di chiamata, che si azzerano
+ogni primo del mese e non si accumulano:
+
+| Fascia | Gratis al mese |
+|---|---|
+| Essentials | ~10.000 chiamate |
+| Pro | ~5.000 chiamate |
+| Enterprise | ~1.000 chiamate |
+
+Ogni richiesta **viene fatturata alla fascia più alta fra i campi che chiede**.
+Questo è il meccanismo da capire, ed è il motivo per cui gli script chiedono
+solo i campi necessari:
+
+- La **ricerca** (`find-leads.js`, campi `rating`, `websiteUri`, ecc.) ricade
+  in fascia **Pro**. Con ~5.000 chiamate gratuite e 20 risultati per chiamata,
+  è tantissimo: non la esaurirai.
+- L'**arricchimento** con le recensioni ricade in fascia **Enterprise**, la più
+  cara e con solo ~1.000 chiamate gratuite. Per questo `find-leads.js` lo fa
+  **solo sui migliori 40 lead senza sito**, non su tutti.
+
+Le tariffe cambiano: la tabella qui sopra è una guida, il dato buono è quello
+nella tua console.
+
+#### Metti un tetto, non solo un avviso
+
+Un avviso di budget ti manda una mail *dopo* che hai speso. Quello che ferma
+davvero la spesa è il limite di quota:
+
+Menu ☰ → **API e servizi** → **Places API (New)** → scheda **Quote** →
+imposta un massimo di richieste al giorno (per iniziare, 500/giorno è
+abbondante e ti rende impossibile prendere una brutta sorpresa).
+
+Fallo **prima** della prima ricerca, non dopo.
 
 ### 2. Chiave PageSpeed (facoltativa)
 
