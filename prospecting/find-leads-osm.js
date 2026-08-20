@@ -70,13 +70,26 @@ function parseArgs(argv) {
 /** Costruisce la query Overpass QL per una città e un gruppo di tag. */
 function buildQuery(citta, coppie, max) {
   const blocchi = coppie.map(([k, v]) => `nwr["${k}"~"${v}"](area.a);`).join('');
-  return `[out:json][timeout:180];`
+  return `[out:json][timeout:90];`
     + `area["name"="${citta}"]["admin_level"~"8|7|6"]->.a;`
     + `(${blocchi});`
     + `out center tags ${max};`;
 }
 
 const attendi = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Node non applica alcun timeout a fetch: un server che accetta la connessione
+// e poi tace la lascia appesa per sempre, e i tentativi qui sotto non partono
+// nemmeno. Il limite va imposto a mano.
+async function fetchConTimeout(url, opzioni, ms) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  try {
+    return await fetch(url, { ...opzioni, signal: ctrl.signal });
+  } finally {
+    clearTimeout(t);
+  }
+}
 
 /**
  * Interroga i mirror Overpass. Sono server pubblici gratuiti sotto carico
@@ -85,7 +98,8 @@ const attendi = (ms) => new Promise((r) => setTimeout(r, ms));
  * una singola sfortuna farebbe fallire l'intera ricerca.
  */
 async function interroga(query) {
-  const TENTATIVI = 3;
+  const TENTATIVI = 2;
+  const TIMEOUT_MS = 100000;
   let ultimoErrore;
 
   for (const url of MIRROR) {
@@ -93,38 +107,39 @@ async function interroga(query) {
 
     for (let n = 1; n <= TENTATIVI; n++) {
       try {
-        const res = await fetch(url, {
+        process.stdout.write(`  ${host}: interrogo... `);
+        const res = await fetchConTimeout(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ data: query }),
-        });
+        }, TIMEOUT_MS);
         const testo = await res.text();
 
         // Il limite è per indirizzo IP e si libera da solo dopo qualche minuto.
         if (res.status === 429 || /rate_limited/i.test(testo)) {
           ultimoErrore = 'limite di richieste raggiunto';
-          console.log(`  ${host}: limite raggiunto`);
+          console.log('limite raggiunto');
           break;                                   // inutile insistere: cambia mirror
         }
         if (!res.ok) {
           ultimoErrore = `HTTP ${res.status}`;
           if (n < TENTATIVI) {
-            console.log(`  ${host}: HTTP ${res.status}, ritento fra ${n * 5}s (${n}/${TENTATIVI - 1})`);
+            console.log(`HTTP ${res.status}, ritento fra ${n * 5}s`);
             await attendi(n * 5000);
             continue;
           }
+          console.log(`HTTP ${res.status}`);
           break;
         }
 
         const dati = JSON.parse(testo);
-        console.log(`  ${host}: ${dati.elements?.length || 0} elementi`);
+        console.log(`${dati.elements?.length || 0} elementi`);
         return dati.elements || [];
       } catch (err) {
-        ultimoErrore = err.message;
-        if (n < TENTATIVI) {
-          console.log(`  ${host}: ${err.message}, ritento fra ${n * 5}s (${n}/${TENTATIVI - 1})`);
-          await attendi(n * 5000);
-        }
+        const motivo = err.name === 'AbortError' ? `nessuna risposta entro ${TIMEOUT_MS / 1000}s` : err.message;
+        ultimoErrore = motivo;
+        console.log(motivo);
+        if (n < TENTATIVI) await attendi(n * 5000);
       }
     }
   }
