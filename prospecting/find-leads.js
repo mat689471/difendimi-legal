@@ -55,8 +55,36 @@ const DETAIL_FIELDS = [
   'primaryTypeDisplayName',
 ].join(',');
 
+/**
+ * Categorie pronte, scritte come le cerca la gente su Google.
+ * Le query generiche ("negozio") rendono male: meglio il mestiere preciso.
+ */
+const PRESET = {
+  artigiani: [
+    'idraulico', 'elettricista', 'fabbro', 'imbianchino', 'falegname',
+    'installatore condizionatori', 'antennista', 'serramentista', 'traslochi',
+  ],
+  ristorazione: [
+    'ristorante', 'pizzeria', 'trattoria', 'osteria', 'bar caffetteria',
+    'gelateria', 'pasticceria', 'agriturismo', 'sushi',
+  ],
+  benessere: [
+    'parrucchiere', 'barbiere', 'centro estetico', 'palestra',
+    'centro massaggi', 'nail center', 'centro benessere',
+  ],
+  professionisti: [
+    'commercialista', 'avvocato', 'dentista', 'fisioterapista',
+    'geometra', 'architetto', 'consulente del lavoro', 'veterinario',
+  ],
+  negozi: [
+    'ottica', 'ferramenta', 'fioraio', 'gioielleria', 'abbigliamento',
+    'panificio', 'macelleria', 'enoteca', 'articoli sportivi',
+  ],
+};
+PRESET.tutto = Object.values(PRESET).flat();
+
 function parseArgs(argv) {
-  const args = { citta: '', categorie: '', max: 60, minRecensioni: 0 };
+  const args = { citta: '', categorie: '', preset: '', max: 60, minRecensioni: 0 };
   for (let i = 2; i < argv.length; i += 2) {
     const key = argv[i].replace(/^--/, '');
     if (key in args) args[key] = argv[i + 1];
@@ -174,12 +202,20 @@ async function main() {
     console.error('Manca GOOGLE_MAPS_API_KEY. Vedi prospecting/README.md');
     process.exit(1);
   }
-  if (!args.citta || !args.categorie) {
-    console.error('Uso: node prospecting/find-leads.js --citta "Modena" --categorie "idraulico,pizzeria"');
+  if (args.preset && !PRESET[args.preset]) {
+    console.error(`Preset sconosciuto: "${args.preset}". Disponibili: ${Object.keys(PRESET).join(', ')}`);
+    process.exit(1);
+  }
+  if (!args.citta || (!args.categorie && !args.preset)) {
+    console.error('Uso: node prospecting/find-leads.js --citta "Modena" --preset tutto');
+    console.error(`     node prospecting/find-leads.js --citta "Modena" --categorie "idraulico,pizzeria"`);
+    console.error(`\nPreset disponibili: ${Object.keys(PRESET).join(', ')}`);
     process.exit(1);
   }
 
-  const categorie = args.categorie.split(',').map((c) => c.trim()).filter(Boolean);
+  const categorie = args.preset
+    ? PRESET[args.preset]
+    : args.categorie.split(',').map((c) => c.trim()).filter(Boolean);
   const perCategoria = Math.max(1, Math.ceil(args.max / categorie.length));
   const visti = new Set();
   const leads = [];

@@ -74,11 +74,7 @@ export PAGESPEED_API_KEY="la-tua-chiave"
 ### Trovare i lead
 
 ```bash
-node prospecting/find-leads.js \
-  --citta "Modena" \
-  --categorie "idraulico,elettricista,parrucchiere,pizzeria,officina" \
-  --max 100 \
-  --minRecensioni 5
+node prospecting/find-leads.js --citta "Modena" --preset tutto --max 200 --minRecensioni 5
 ```
 
 Opzioni:
@@ -86,9 +82,33 @@ Opzioni:
 | Opzione | Cosa fa |
 |---|---|
 | `--citta` | Città o zona da battere |
-| `--categorie` | Categorie separate da virgola |
+| `--preset` | Gruppo di categorie pronto (sotto) |
+| `--categorie` | In alternativa: categorie tue, separate da virgola |
 | `--max` | Tetto di risultati totali (contiene i costi) |
 | `--minRecensioni` | Scarta le schede quasi vuote |
+
+### Preset disponibili
+
+| Preset | Copre |
+|---|---|
+| `artigiani` | Idraulici, elettricisti, fabbri, imbianchini, falegnami, condizionamento, antennisti, serramentisti, traslochi |
+| `ristorazione` | Ristoranti, pizzerie, trattorie, osterie, bar, gelaterie, pasticcerie, agriturismi, sushi |
+| `benessere` | Parrucchieri, barbieri, centri estetici, palestre, massaggi, nail center |
+| `professionisti` | Commercialisti, avvocati, dentisti, fisioterapisti, geometri, architetti, veterinari |
+| `negozi` | Ottiche, ferramenta, fiorai, gioiellerie, abbigliamento, panifici, macellerie, enoteche |
+| `tutto` | Tutti e cinque i gruppi (42 categorie) |
+
+### Una raccomandazione su `tutto`
+
+`--preset tutto` fa 42 ricerche e può restituire diverse centinaia di attività:
+consuma quota API e ti lascia una lista che non riuscirai a lavorare davvero.
+**Conviene partire da un preset solo.** `artigiani` è il migliore per cominciare:
+è il gruppo dove la percentuale di attività senza sito è più alta, il budget
+c'è, e la decisione la prende una persona sola senza riunioni.
+
+Quando quel gruppo è esaurito, passa al successivo. Meglio 40 lead lavorati
+bene che 400 lasciati a metà — e le mail funzionano solo se le personalizzi
+una per una.
 
 Produce in `output/`:
 - **`leads-<città>.json`** — tutto: recensioni testuali, foto, orari, priorità
