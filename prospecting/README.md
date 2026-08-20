@@ -39,6 +39,48 @@ Dove trovare comunque un'email, in ordine di resa:
 
 ---
 
+## Due strade: con carta e senza
+
+| | `find-leads.js` (Google) | `find-leads-osm.js` (OpenStreetMap) |
+|---|---|---|
+| Carta di credito | **richiesta** | **non serve** |
+| Costo | gratis entro le soglie | sempre gratis |
+| Nome e indirizzo | ✅ | ✅ |
+| **Ha un sito?** | ✅ | ✅ |
+| Telefono | ✅ quasi sempre | ⚠️ circa 1 su 5 |
+| Email | ❌ mai | ⚠️ rarissima |
+| Recensioni e voto | ✅ | ❌ non esistono in OSM |
+| Foto | ✅ | ❌ |
+| Copertura | quasi totale | buona in città, scarsa nei paesi |
+
+**Il dato che conta di più — chi ha un sito e chi no — ce l'hanno tutte e due.**
+È il resto a fare la differenza.
+
+Se non puoi o non vuoi usare la carta, parti da OpenStreetMap: ti dà la lista
+di chi non ha un sito, e i numeri di telefono mancanti li recuperi a mano dal
+link a Google Maps che trovi in ogni riga del CSV. Su 40 lead è meno di un'ora
+di lavoro.
+
+### Percorso gratuito, senza carta
+
+```bash
+node prospecting/find-leads-osm.js --citta "Modena" --preset artigiani
+```
+
+Stessi preset dell'altro script (`artigiani`, `ristorazione`, `benessere`,
+`professionisti`, `negozi`, `tutto`), tradotti nei tag di OpenStreetMap.
+
+Nel CSV che ottieni, la colonna **`cercaSuGoogle`** contiene per ogni attività
+un link già pronto: lo apri, si apre la scheda Google con nome e indirizzo
+compilati, copi il numero e lo incolli nella colonna `telefono`. È il modo per
+avere i contatti senza pagare nulla.
+
+I server Overpass sono pubblici e gratuiti, quindi ogni tanto sono
+sovraccarichi o limitano le richieste: lo script prova tre mirror e ritenta.
+Se falliscono tutti, aspetta cinque minuti e rilancia — non è un errore tuo.
+
+---
+
 ## Configurazione
 
 ### 1. Chiave Google Maps (obbligatoria)
@@ -243,7 +285,8 @@ e la reputazione di quello che insiste te la porti dietro per anni.
 
 ```
 prospecting/
-├── find-leads.js                    ricerca attività + classificazione
+├── find-leads.js                    ricerca via Google Places (serve carta)
+├── find-leads-osm.js                ricerca via OpenStreetMap (gratis, senza carta)
 ├── audit-site.js                    analisi dei siti esistenti
 ├── emails/
 │   ├── 01-senza-sito.md             3 varianti + piè di pagina
