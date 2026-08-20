@@ -206,6 +206,7 @@ prospecting/
 ├── emails/
 │   ├── 01-senza-sito.md             3 varianti + piè di pagina
 │   ├── 02-sito-da-rifare.md         4 varianti per difetto rilevato
-│   └── 03-follow-up-e-risposte.md   solleciti, anteprima, prezzo, obiezioni
+│   ├── 03-follow-up-e-risposte.md   solleciti, anteprima, obiezioni
+│   └── 04-listino-e-canone.md       le due formule, trattativa, regole contrattuali
 └── output/                          generato dagli script (non versionato)
 ```

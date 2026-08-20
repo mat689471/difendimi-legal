@@ -95,39 +95,29 @@ Nota che il prezzo arriva **solo dopo** che ha visto il lavoro.
 ## 4. Se chiedono il prezzo prima dell'anteprima
 
 Succede spesso. Non rifiutare di rispondere — sembra poco trasparente e li
-perdi. Dai il numero, poi riporta il discorso all'anteprima.
+perdi. Dai i numeri, poi riporta il discorso all'anteprima.
 
-### Il listino
-
-| | Attivazione | Canone mensile |
-|---|---|---|
-| **Sito completo** | **290 €** | **29 €/mese** |
-| Solo sito, nessuna gestione | 390 € una tantum | — |
-
-Nel canone: dominio, hosting, certificato di sicurezza, backup, aggiornamenti
-e modifiche ai testi quando servono. Senza canone il sito è suo, ma dominio,
-hosting e modifiche se li gestisce da solo.
-
-**Proponi sempre per prima la formula col canone.** Il cliente vede 290 €
-invece di 390 € e sceglie quasi sempre quella. Per te sono 29 € al mese che
-tornano ogni mese: dopo dieci clienti sono 290 € ricorrenti, che valgono più
-di qualunque lavoro singolo. È questo che regge l'attività, non il prezzo
-d'ingresso.
+**Listino, formule e trattativa stanno in [`04-listino-e-canone.md`](04-listino-e-canone.md).**
+In sintesi: **290 € + 29 €/mese** con tutto incluso, oppure **390 € una tantum**
+senza gestione. Di' sempre per prima quella col canone.
 
 ```
 Buongiorno,
 
-le dico subito i numeri, così si regola.
+le dico i numeri così si regola.
 
-Sono 290 euro di attivazione e 29 euro al mese, e nel mensile è
-compreso tutto: dominio, hosting, sicurezza, backup e le modifiche
-ai testi quando le servono. Se preferisce non avere un canone,
-sono 390 euro una volta sola e poi il sito è suo, ma dominio e
-modifiche se li gestisce lei.
+Ci sono due modi. Il primo è 290 euro all'inizio e 29 euro al mese:
+dentro c'è tutto, dominio, hosting, sicurezza, backup e le modifiche
+ai testi quando servono. Lei non deve pensare a niente.
 
-Detto questo, preferisco mandarle prima l'anteprima: così vede
-esattamente cosa riceve e il prezzo lo valuta su una cosa concreta.
-Gliela preparo?
+Il secondo è 390 euro una volta sola: il sito è suo e finisce lì, ma
+dominio e hosting li paga a parte lei e le modifiche gliele faccio
+a 50 euro l'una.
+
+In tutti e due i casi il sito è di sua proprietà.
+
+Detto questo, preferisco mandarle prima l'anteprima: così vede cosa
+riceve e il prezzo lo valuta su una cosa concreta. Gliela preparo?
 
 [FIRMA]
 ```
@@ -143,28 +133,8 @@ veri da mostrare piuttosto che listini alti e nessun lavoro. Le
 condizioni sono queste adesso; fra qualche mese non saranno più queste.
 ```
 
-Non dire mai "perché costa poco farlo" o "è un lavoro semplice": svaluta
-quello che stai vendendo e ti prepara la trattativa al ribasso.
-
-### Le due regole da non violare
-
-**Non scendere sotto i 290 €.** Chi tratta su un prezzo già basso è
-esattamente il cliente che ti farà rifare la home quattro volte e pagherà in
-ritardo. Se insiste, togli qualcosa invece di scontare: meno pagine, niente
-prenotazione online. Il prezzo scende perché scende il lavoro, non perché hai
-ceduto.
-
-**Tieni lo stesso listino per tutti.** In una città media i commercianti si
-parlano, e scoprire di aver pagato il doppio del collega è il modo più rapido
-per perdere entrambi.
-
-### Quando alzare
-
-Ai primi 8-10 clienti questa fascia va benissimo: ti serve il portfolio.
-Da lì in poi alza — soprattutto su dentisti, avvocati e commercialisti, dove
-un prezzo troppo basso non attira, insospettisce. Chi è già cliente resta
-alle sue condizioni: è il vantaggio che si è guadagnato arrivando presto,
-e glielo dici, perché è anche il motivo per cui ti manderà altri clienti.
+Non dire mai "perché costa poco farlo": svaluta quello che vendi e ti prepara
+la trattativa al ribasso.
 
 ## 5. Le obiezioni che sentirai davvero
 
@@ -216,9 +186,11 @@ di solito è raccogliere foto e testi da lei, non il lavoro tecnico.
 | Anteprime richieste | 3-8 |
 | Clienti chiusi | 1-3 |
 
-A 290 € di attivazione, **1-3 clienti ogni 100 mail** significa 290-870 € più
-29-87 € al mese che si sommano ai mesi successivi. Il valore vero di questo
-lavoro sta nella seconda colonna, non nella prima.
+A 290 € di attivazione, **1-3 clienti ogni 100 mail** significa 290-870 €
+subito più 29-87 € al mese che restano. Sembra poco, ma è la parte che si
+somma: la stessa tornata di mail ripetuta ogni mese costruisce un'entrata
+fissa che al dodicesimo mese vale più di tutte le attivazioni messe insieme.
+Vedi la tabella in [`04-listino-e-canone.md`](04-listino-e-canone.md).
 
 **Non mandare 100 mail il primo giorno.** Da un dominio nuovo, 15-20 al
 giorno per le prime due settimane: raffiche improvvise fanno finire tutto
