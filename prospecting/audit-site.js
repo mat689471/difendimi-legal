@@ -207,10 +207,33 @@ async function auditUrl(url, nome = '') {
     };
   }
 
-  const problemi = analizzaHtml(page);
-  if (page.status >= 400) {
-    problemi.push({ peso: 60, codice: 'ERRORE_HTTP', messaggio: `Il server risponde con errore ${page.status}` });
+  // Una risposta di errore non e' il sito: il corpo e' una pagina di errore (o
+  // vuoto). Passarla alle euristiche produrrebbe difetti inventati — "manca il
+  // title", "nessun contatto" — che sono veri della pagina di errore e falsi
+  // del sito. Un server rotto e' gia' di per se' il difetto piu' grave.
+  if (page.status >= 500) {
+    return {
+      nome, url, urlFinale: page.finalUrl, raggiungibile: true, status: page.status,
+      punteggio: 0, ...verdetto(0),
+      problemi: [{
+        peso: 100, codice: 'SITO_NON_FUNZIONANTE',
+        messaggio: `Il sito non si apre: il server risponde con errore ${page.status}. `
+          + 'Chi lo cerca non vede niente. Verifica anche dal telefono prima di usarlo come argomento.',
+      }],
+    };
   }
+  if (page.status >= 400) {
+    return {
+      nome, url, urlFinale: page.finalUrl, raggiungibile: true, status: page.status,
+      punteggio: null, ...verdetto(null),
+      problemi: [{
+        peso: 0, codice: 'ERRORE_HTTP',
+        messaggio: `Il server risponde ${page.status}. Aprilo nel browser per capire se e' rotto o se blocca solo gli strumenti automatici.`,
+      }],
+    };
+  }
+
+  const problemi = analizzaHtml(page);
 
   const penalita = problemi.reduce((s, p) => s + p.peso, 0);
   const punteggio = Math.max(0, 100 - penalita);
