@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Studio Dentistico Dott.ssa Elena Della Pina — Carrara</title>
+<meta name="description" content="Studio dentistico a Carrara, in Via Carriona 63. Ci prendiamo cura anche di chi ha paura del dentista. Bambini benvenuti. Chiama lo 0585 73408.">
+<meta name="theme-color" content="#0D6E7D">
+<link rel="canonical" href="https://www.studiodellapina.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Studio Dentistico Dott.ssa Elena Della Pina — Carrara">
+<meta property="og:description" content="Dal dentista senza paura. Studio a Carrara, Via Carriona 63. Bambini benvenuti.">
+<meta property="og:locale" content="it_IT">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Palette: teal clinico per la fiducia, corallo caldo per togliere
+   il freddo dell'ambulatorio. Contrasti verificati: corpo 12.8:1,
+   ogni coppia interattiva sopra 4.5:1 — il paziente tipo ha 50+
+   anni e una sensibilita' al contrasto gia' ridotta.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --bg:#FBF9F6; --card:#FFFFFF;
+  --ink:#10333D; --ink-soft:#4A6670;
+  --brand:#0D6E7D; --brand-dark:#0A5763;
+  --go:#166F4E;
+  --warm:#C1522F; --warm-soft:#FDEBE3;
+  --line:#E4DED6;
+  --r:16px; --r-lg:24px;
+  --sp:clamp(1rem,4vw,1.5rem);
+  --shadow:0 1px 2px rgba(16,51,61,.05),0 8px 24px -12px rgba(16,51,61,.18);
+  --bar:76px; /* altezza barra chiamata mobile */
+  font-synthesis-weight:none;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:400 clamp(17px,1.05rem,19px)/1.65 "Source Sans 3",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  overflow-x:hidden;
+}
+h1,h2,h3{font-family:Lexend,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.12;letter-spacing:-.02em;margin:0;text-wrap:balance}
+p{margin:0;text-wrap:pretty}
+a{color:inherit}
+img{max-width:100%;height:auto;display:block}
+:focus-visible{outline:3px solid var(--brand);outline-offset:3px;border-radius:6px}
+
+.wrap{width:min(1120px,100% - 2*var(--sp));margin-inline:auto}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:8px;top:-60px;background:var(--brand);color:#fff;padding:.7rem 1rem;border-radius:8px;z-index:100;transition:top .2s}
+.skip:focus{top:8px}
+
+/* ── Bottoni ───────────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.6rem;
+  min-height:56px;padding:0 1.5rem;border-radius:999px;
+  font-family:Lexend;font-weight:600;font-size:1.05rem;text-decoration:none;
+  border:2px solid transparent;cursor:pointer;
+  transition:transform .15s ease,box-shadow .2s ease,background-color .2s ease;
+}
+.btn:active{transform:scale(.97)}
+.btn-call{background:var(--go);color:#fff;box-shadow:0 6px 18px -6px rgba(22,111,78,.55)}
+.btn-call:hover{background:#125B40}
+.btn-book{background:var(--card);color:var(--brand-dark);border-color:var(--brand)}
+.btn-book:hover{background:#F1F8F9}
+.btn svg{width:22px;height:22px;flex:none}
+
+/* ── Header ────────────────────────────────────────────────── */
+header{position:relative;z-index:5;padding:1.1rem 0}
+.head{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.logo{display:flex;align-items:center;gap:.7rem;text-decoration:none}
+.logo-mark{width:42px;height:42px;flex:none;border-radius:12px;background:var(--brand);display:grid;place-items:center}
+.logo-mark svg{width:24px;height:24px;color:#fff}
+.logo b{font-family:Lexend;font-weight:600;font-size:1.02rem;display:block;line-height:1.25}
+.logo span{font-size:.83rem;color:var(--ink-soft);display:block;line-height:1.2}
+.head-call{display:none}
+@media(min-width:800px){
+  .head-call{display:inline-flex;font-family:Lexend;font-weight:600;text-decoration:none;color:var(--brand-dark);align-items:center;gap:.5rem;font-size:1.08rem}
+  .head-call svg{width:20px;height:20px}
+}
+
+/* ── Hero: l'unico colpo d'effetto ─────────────────────────────
+   Due masse di colore che respirano lentamente (12s). Solo
+   transform e opacity: nessun reflow, costo GPU trascurabile.
+   L'evidenziatore sotto "senza paura" si disegna al caricamento:
+   il movimento racconta il messaggio invece di decorare.
+   ───────────────────────────────────────────────────────────── */
+.hero{position:relative;padding:clamp(2.5rem,7vw,5rem) 0 clamp(3rem,8vw,5.5rem);isolation:isolate}
+.aurora{position:absolute;inset:-20% -10% auto;height:130%;z-index:-1;pointer-events:none;filter:blur(60px);opacity:.55}
+.blob{position:absolute;border-radius:50%;will-change:transform}
+.b1{width:52vmax;height:52vmax;left:-12vmax;top:-14vmax;background:radial-gradient(circle,#7FD4DE 0%,transparent 68%);animation:drift1 14s ease-in-out infinite}
+.b2{width:44vmax;height:44vmax;right:-14vmax;top:2vmax;background:radial-gradient(circle,#FFC7AC 0%,transparent 68%);animation:drift2 17s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(4%,3%,0) scale(1.1)}}
+@keyframes drift2{0%,100%{transform:translate3d(0,0,0) scale(1.06)}50%{transform:translate3d(-5%,4%,0) scale(1)}}
+
+.hero h1{font-size:clamp(2.3rem,8.5vw,4.4rem);font-weight:700;max-width:16ch}
+.mark{position:relative;white-space:nowrap}
+.mark svg{position:absolute;left:-.06em;right:-.06em;bottom:-.12em;width:calc(100% + .12em);height:.42em;color:var(--warm);overflow:visible}
+.mark path{stroke:currentColor;stroke-width:9;stroke-linecap:round;fill:none;
+  stroke-dasharray:340;stroke-dashoffset:340;animation:draw .9s cubic-bezier(.65,0,.35,1) .5s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+.hero p.lead{font-size:clamp(1.1rem,2.6vw,1.3rem);color:var(--ink-soft);max-width:52ch;margin-top:1.4rem}
+.hero-cta{display:flex;flex-wrap:wrap;gap:.85rem;margin-top:2rem}
+.hero-cta .btn{flex:1 1 auto;min-width:min(100%,15rem)}
+
+.trust{display:flex;flex-wrap:wrap;gap:.6rem 1.6rem;margin-top:2.2rem;padding-top:1.5rem;border-top:1px solid var(--line);font-size:.95rem;color:var(--ink-soft)}
+.trust b{color:var(--ink);font-family:Lexend;font-weight:600}
+.trust>div{display:flex;align-items:center;gap:.5rem}
+.trust svg{width:19px;height:19px;color:var(--brand);flex:none}
+
+/* ── Sezioni ───────────────────────────────────────────────── */
+section{padding:clamp(3rem,8vw,5rem) 0}
+.eyebrow{font-family:Lexend;font-weight:600;font-size:.83rem;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin-bottom:.9rem}
+h2{font-size:clamp(1.75rem,4.6vw,2.6rem);font-weight:600;max-width:20ch}
+.sec-lead{color:var(--ink-soft);max-width:58ch;margin-top:1rem;font-size:1.08rem}
+
+.calm{background:var(--warm-soft);border-radius:var(--r-lg);padding:clamp(1.6rem,5vw,3rem)}
+.calm h2{max-width:24ch}
+
+.pillars{display:grid;gap:1rem;margin-top:2rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr))}
+.pillar{background:var(--card);border-radius:var(--r);padding:1.5rem;box-shadow:var(--shadow)}
+.pillar .ico{width:44px;height:44px;border-radius:12px;background:#F1F8F9;display:grid;place-items:center;margin-bottom:1rem}
+.pillar .ico svg{width:24px;height:24px;color:var(--brand)}
+.pillar h3{font-size:1.15rem;font-weight:600;margin-bottom:.5rem}
+.pillar p{color:var(--ink-soft);font-size:1rem}
+
+.services{display:grid;gap:.9rem;margin-top:2rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr))}
+.svc{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:1.35rem;display:flex;gap:.9rem;align-items:flex-start}
+.svc svg{width:26px;height:26px;color:var(--brand);flex:none;margin-top:.15rem}
+.svc h3{font-size:1.05rem;font-weight:600;margin-bottom:.3rem}
+.svc p{font-size:.97rem;color:var(--ink-soft)}
+
+/* Bambini: l'unico punto dove il colore si alza di tono */
+.kids{background:linear-gradient(135deg,#0D6E7D,#0A5763);color:#fff;border-radius:var(--r-lg);padding:clamp(1.75rem,5vw,3.25rem)}
+.kids .eyebrow{color:#9FE7F0}
+.kids h2{color:#fff}
+.kids p{color:#D6EFF3;max-width:52ch;margin-top:1rem}
+.kids-dots{display:flex;gap:.5rem;margin-top:1.75rem}
+.kids-dots i{width:34px;height:10px;border-radius:99px;display:block}
+
+.quotes{display:grid;gap:1rem;margin-top:2rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr))}
+.quote{background:var(--card);border-radius:var(--r);padding:1.5rem;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.stars{display:flex;gap:2px;margin-bottom:.9rem}
+.stars svg{width:18px;height:18px;color:#E8A33D}
+.quote p{font-size:1.02rem}
+.quote cite{margin-top:1rem;font-style:normal;font-size:.9rem;color:var(--ink-soft)}
+
+.chips{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1.75rem}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.5rem 1rem;font-size:.94rem;color:var(--ink-soft)}
+
+.info{display:grid;gap:1.25rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,19rem),1fr));margin-top:2rem}
+.info-card{background:var(--card);border-radius:var(--r);padding:1.6rem;box-shadow:var(--shadow)}
+.info-card h3{font-size:1.1rem;font-weight:600;display:flex;align-items:center;gap:.6rem;margin-bottom:1rem}
+.info-card h3 svg{width:22px;height:22px;color:var(--brand)}
+.hours{list-style:none;padding:0;margin:0}
+.hours li{display:flex;justify-content:space-between;gap:1rem;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:1rem}
+.hours li:last-child{border:0}
+.hours .day{color:var(--ink-soft)}
+.hours b{font-family:Lexend;font-weight:500}
+.info-card a{color:var(--brand-dark);font-weight:600}
+
+footer{padding:2.5rem 0 calc(2.5rem + var(--bar));border-top:1px solid var(--line);color:var(--ink-soft);font-size:.92rem}
+@media(min-width:800px){footer{padding-bottom:2.5rem}}
+footer p+p{margin-top:.5rem}
+
+/* ── Barra di chiamata fissa: l'elemento che converte ───────────
+   Il paziente in ansia cerca un numero, non un menu. Su mobile
+   resta sempre a portata di pollice, sopra la home bar.
+   ───────────────────────────────────────────────────────────── */
+.callbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  display:flex;gap:.6rem;padding:.7rem var(--sp) calc(.7rem + env(safe-area-inset-bottom));
+  background:rgba(251,249,246,.94);backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);
+}
+.callbar .btn{flex:1;min-height:52px;font-size:1rem;padding:0 .8rem}
+@media(min-width:800px){.callbar{display:none}}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .mark path{stroke-dashoffset:0}
+  .blob{animation:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Vai al contenuto</a>
+
+<header>
+  <div class="wrap head">
+    <a class="logo" href="#main">
+      <span class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C9.5 2 8.5 3 6.5 3 4 3 2 5 2 8.5c0 4 2 8 3.5 11 .8 1.6 2.7 1.6 3.2-.2l.9-3c.2-.7.8-1.2 1.6-1.2h1.6c.8 0 1.4.5 1.6 1.2l.9 3c.5 1.8 2.4 1.8 3.2.2C20 16.5 22 12.5 22 8.5 22 5 20 3 17.5 3 15.5 3 14.5 2 12 2Z"/></svg>
+      </span>
+      <span>
+        <b>Studio Dott.ssa Elena Della Pina</b>
+        <span>Odontoiatria a Carrara</span>
+      </span>
+    </a>
+    <a class="head-call" href="tel:+39058573408">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92Z"/></svg>
+      0585 73408
+    </a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO ─────────────────────────────────────────────────── -->
+  <div class="hero">
+    <div class="aurora" aria-hidden="true">
+      <span class="blob b1"></span>
+      <span class="blob b2"></span>
+    </div>
+    <div class="wrap">
+      <h1>Dal dentista,<br><span class="mark">senza paura<svg viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M4 13 C 80 4, 210 4, 296 11"/></svg></span>.</h1>
+      <p class="lead">Se rimandi da anni, se ti mette a disagio anche solo pensarci: qui non c'è fretta e non c'è giudizio. Ti spieghiamo tutto prima, e andiamo al tuo ritmo.</p>
+
+      <div class="hero-cta">
+        <a class="btn btn-call" href="tel:+39058573408">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92Z"/></svg>
+          Chiama 0585 73408
+        </a>
+        <a class="btn btn-book" href="#prenota">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Prenota online
+        </a>
+      </div>
+
+      <div class="trust">
+        <div><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><span><b>4,4 su 5</b> su Google</span></div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Aperti anche <b>il sabato</b></span></div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg><span><b>Convenzionati</b> con le principali assicurazioni</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPATIA ──────────────────────────────────────────────── -->
+  <section>
+    <div class="wrap">
+      <div class="calm">
+        <p class="eyebrow">Se hai paura</p>
+        <h2>Avere paura del dentista è più comune di quanto pensi.</h2>
+        <p class="sec-lead">Non è una debolezza e non serve giustificarsi. Spesso nasce da una brutta esperienza, a volte da tanti anni fa. Il nostro lavoro comincia da lì: capire cosa ti preoccupa, e toglierlo di mezzo un passo alla volta.</p>
+
+        <div class="pillars">
+          <div class="pillar">
+            <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg></span>
+            <h3>Prima parliamo</h3>
+            <p>La prima visita serve a conoscersi e a guardare la situazione con calma. Nessuno ti mette sulla poltrona senza spiegarti cosa succede.</p>
+          </div>
+          <div class="pillar">
+            <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <h3>Al tuo ritmo</h3>
+            <p>Si può dividere il percorso in più appuntamenti brevi. Se serve fermarsi un momento, ci si ferma: basta alzare una mano.</p>
+          </div>
+          <div class="pillar">
+            <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="4" y="9" width="16" height="12" rx="2"/></svg></span>
+            <h3>Nessun giudizio</h3>
+            <p>Se non vieni da anni, non te lo faremo pesare. Interessa solo da dove si riparte, non quanto tempo è passato.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVIZI ──────────────────────────────────────────────── -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">Cosa facciamo</p>
+      <h2>Tutte le cure in un unico studio</h2>
+      <p class="sec-lead">Dalla pulizia periodica agli interventi più complessi, senza doverti spostare altrove.</p>
+
+      <div class="services">
+        <div class="svc">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22c-1.5 0-2-1.5-2.5-3.5S8 15 6.5 15c-2 0-3-2-3-5.5C3.5 6 5.5 4 8 4c1.8 0 2.6.8 4 .8S14.2 4 16 4c2.5 0 4.5 2 4.5 5.5 0 3.5-1 5.5-3 5.5-1.5 0-2.5 1.5-3 3.5S13.5 22 12 22Z"/></svg>
+          <div><h3>Igiene e prevenzione</h3><p>Pulizia professionale e controlli periodici per non arrivare mai all'urgenza.</p></div>
+        </div>
+        <div class="svc">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M5 8l7-6 7 6"/><circle cx="12" cy="15" r="3"/></svg>
+          <div><h3>Conservativa ed endodonzia</h3><p>Carie e devitalizzazioni, per salvare il dente naturale quando è possibile.</p></div>
+        </div>
+        <div class="svc">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v10M8 7h8M9 13h6l-1.5 8h-3L9 13Z"/></svg>
+          <div><h3>Implantologia</h3><p>Sostituzione dei denti mancanti con soluzioni fisse e stabili.</p></div>
+        </div>
+        <div class="svc">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16M4 15h16"/><circle cx="8" cy="9" r="2"/><circle cx="15" cy="15" r="2"/></svg>
+          <div><h3>Ortodonzia</h3><p>Apparecchi per bambini e adulti, anche con soluzioni poco visibili.</p></div>
+        </div>
+        <div class="svc">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 1.9 4.5L19 8l-3.5 3.3.9 4.7-4.4-2.4L7.6 16l.9-4.7L5 8l5.1-.5L12 3Z"/></svg>
+          <div><h3>Estetica del sorriso</h3><p>Sbiancamento e faccette, con un risultato naturale e non appariscente.</p></div>
+        </div>
+        <div class="svc">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="5"/><path d="M9 8.5h.01M15 8.5h.01M9.5 11.5a3.5 3.5 0 0 0 5 0"/><path d="M5 21c1.5-3 4-4.5 7-4.5s5.5 1.5 7 4.5"/></svg>
+          <div><h3>Odontoiatria pediatrica</h3><p>Prime visite e cure per i più piccoli, con i tempi e i modi giusti per loro.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BAMBINI ──────────────────────────────────────────────── -->
+  <section>
+    <div class="wrap">
+      <div class="kids">
+        <p class="eyebrow">Con i bambini</p>
+        <h2>Uno studio dove i bambini stanno volentieri</h2>
+        <p>Colori, giochi e il tempo di prendere confidenza prima di aprire la bocca. Un bambino che non si spaventa oggi è un adulto che dal dentista ci va senza problemi — ed è il regalo più grande che potete fargli.</p>
+        <div class="kids-dots" aria-hidden="true">
+          <i style="background:#FFC7AC"></i><i style="background:#9FE7F0"></i>
+          <i style="background:#FFE08A"></i><i style="background:#B5E8A8"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIANZE ────────────────────────────────────────────
+       ATTENZIONE PRIMA DI PUBBLICARE
+       Questi tre testi sono SEGNAPOSTO scritti sul tema ricorrente
+       delle recensioni ("mi hanno fatto superare la paura"), non
+       sono recensioni reali di persone reali.
+       Prima di mandare il sito al cliente: aprire le recensioni
+       Google dello studio, PARAFRASARE tre recensioni vere (non
+       copiarle: sono coperte da copyright) e sostituire firma e
+       testo. Se non si parafrasa, togliere l'intera sezione.
+       ───────────────────────────────────────────────────────── -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">Cosa dicono i pazienti</p>
+      <h2>Chi arriva impaurito, di solito torna tranquillo</h2>
+
+      <div class="quotes">
+        <blockquote class="quote">
+          <div class="stars" role="img" aria-label="5 stelle su 5">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg>
+          </div>
+          <p>[SEGNAPOSTO — sostituire con una recensione vera parafrasata]</p>
+          <cite>— Nome da inserire, Carrara</cite>
+        </blockquote>
+        <blockquote class="quote">
+          <div class="stars" role="img" aria-label="5 stelle su 5">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg>
+          </div>
+          <p>[SEGNAPOSTO — sostituire con una recensione vera parafrasata]</p>
+          <cite>— Nome da inserire, Carrara</cite>
+        </blockquote>
+        <blockquote class="quote">
+          <div class="stars" role="img" aria-label="5 stelle su 5">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/></svg>
+          </div>
+          <p>[SEGNAPOSTO — sostituire con una recensione vera parafrasata]</p>
+          <cite>— Nome da inserire, Carrara</cite>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONVENZIONI ──────────────────────────────────────────── -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">Convenzioni</p>
+      <h2>Se hai un'assicurazione sanitaria, probabilmente siamo convenzionati</h2>
+      <div class="chips">
+        <span class="chip">Fasi</span><span class="chip">Fasdac</span><span class="chip">Faschim</span>
+        <span class="chip">Casagit</span><span class="chip">Generali</span><span class="chip">Blue Assistance</span>
+        <span class="chip">Poste Assicura</span><span class="chip">Welion</span>
+        <span class="chip">Salute Semplice</span><span class="chip">Andi</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTATTI ─────────────────────────────────────────────── -->
+  <section id="prenota">
+    <div class="wrap">
+      <p class="eyebrow">Dove siamo</p>
+      <h2>Vieni a trovarci a Carrara</h2>
+
+      <div class="info">
+        <div class="info-card">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>Indirizzo</h3>
+          <p>Via Carriona 63<br>54033 Carrara (MS)</p>
+          <p style="margin-top:1rem"><a href="https://www.google.com/maps/search/?api=1&query=Via+Carriona+63+54033+Carrara+MS" target="_blank" rel="noopener">Apri in Google Maps</a></p>
+        </div>
+
+        <div class="info-card">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Orari</h3>
+          <ul class="hours">
+            <li><span class="day">Lunedì – Venerdì</span><b>8:30 – 20:00</b></li>
+            <li><span class="day">Sabato</span><b>9:00 – 15:00</b></li>
+            <li><span class="day">Domenica</span><b>Chiuso</b></li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92Z"/></svg>Contatti</h3>
+          <p>Studio: <a href="tel:+39058573408">0585 73408</a></p>
+          <p>Cellulare: <a href="tel:+393662675345">366 2675345</a></p>
+          <p style="margin-top:1rem;color:var(--ink-soft);font-size:.95rem">Se preferisci, scrivici su Facebook: rispondiamo in giornata.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Studio Dentistico Dott.ssa Elena Della Pina</strong> — Via Carriona 63, 54033 Carrara (MS)</p>
+    <p>Tel. 0585 73408 · Cell. 366 2675345</p>
+    <!-- Aggiungere prima della consegna: P.IVA, numero iscrizione Albo Odontoiatri
+         (obbligatorio per legge nella comunicazione sanitaria), direttore sanitario. -->
+    <p style="margin-top:1rem">Sito realizzato da <strong>[NOME DA DECIDERE]</strong></p>
+  </div>
+</footer>
+
+<!-- Barra fissa mobile: sempre a portata di pollice -->
+<nav class="callbar" aria-label="Contatti rapidi">
+  <a class="btn btn-call" href="tel:+39058573408">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92Z"/></svg>
+    Chiama
+  </a>
+  <a class="btn btn-book" href="#prenota">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    Prenota
+  </a>
+</nav>
+</body>
+</html>
