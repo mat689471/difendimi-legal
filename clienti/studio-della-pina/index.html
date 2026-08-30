@@ -106,7 +106,11 @@ header{position:relative;z-index:6;padding:1.5rem 0}
 .meta b{color:var(--ink);font-weight:600}
 
 /* ── Sezioni ───────────────────────────────────────────────── */
-section{padding:clamp(4rem,11vw,8rem) 0;position:relative;z-index:2}
+/* Il respiro tra sezioni si sommava: 8rem sotto + 8rem sopra davano
+   256px di vuoto su schermi larghi, che si legge come un difetto di
+   caricamento. Meta' del margine sta sopra, il resto lo da' il ritmo
+   interno della sezione. */
+section{padding:clamp(3rem,7vw,5rem) 0;position:relative;z-index:2}
 .rule{height:1px;background:var(--hair);border:0;margin:0}
 .eyebrow{font-size:.76rem;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:1.4rem;font-weight:600}
 h2{font-size:clamp(2.1rem,6.2vw,4rem);max-width:17ch}
