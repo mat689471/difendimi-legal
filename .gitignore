@@ -11,3 +11,9 @@ prospecting/output/
 .env
 .env.local
 *.key
+
+# Artefatti di build dei progetti cliente
+.next/
+clienti/**/node_modules/
+clienti/**/.next/
+next-env.d.ts

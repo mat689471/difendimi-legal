@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root { --marquee-duration: 42s; }
+
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+    /* Trama minerale appena percettibile: richiama il marmo apuano senza
+       caricare immagini. Due gradienti, costo zero. */
+    background-image:
+      radial-gradient(60rem 40rem at 12% -10%, rgba(45,106,79,.07), transparent 60%),
+      radial-gradient(50rem 36rem at 92% 8%, rgba(138,106,63,.06), transparent 62%);
+    background-attachment: fixed;
+  }
+
+  /* Focus visibile su tutto: requisito, non opzione. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-forest ring-offset-2 ring-offset-bg rounded-sm;
+  }
+
+  ::selection { @apply bg-forest text-white; }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/60;
+    box-shadow: 0 1px 2px rgba(22, 35, 28, 0.04), 0 16px 40px -24px rgba(22, 35, 28, 0.3);
+  }
+  .wrap { @apply mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8; }
+  .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.18em] text-forest-light; }
+}
+
+/* Chi ha chiesto meno movimento riceve la pagina ferma, non rallentata. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
