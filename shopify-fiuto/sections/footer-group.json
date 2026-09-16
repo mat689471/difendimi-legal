@@ -1,0 +1,64 @@
+{
+  "type": "footer",
+  "name": "t:names.footer",
+  "sections": {
+    "fiuto_footer": {
+      "type": "fiuto-footer",
+      "blocks": {
+        "col_shop": {
+          "type": "menu",
+          "settings": {
+            "title": "Negozio",
+            "menu": "main-menu"
+          }
+        },
+        "col_info": {
+          "type": "menu",
+          "settings": {
+            "title": "Informazioni",
+            "menu": "footer"
+          }
+        },
+        "col_help": {
+          "type": "contact",
+          "settings": {
+            "title": "Assistenza",
+            "email": "",
+            "text": "<p>Scrivici dalla pagina Contatti: rispondiamo a ogni messaggio.</p>"
+          }
+        },
+        "col_social": {
+          "type": "social",
+          "settings": {
+            "title": "Social",
+            "links": ""
+          }
+        }
+      },
+      "block_order": [
+        "col_shop",
+        "col_info",
+        "col_help",
+        "col_social"
+      ],
+      "settings": {
+        "background": "#0F1A10",
+        "eyebrow": "Resta in contatto",
+        "heading": "Idee di gioco, non spam.",
+        "text": "<p>Nuovi giochi, modi diversi di usare quelli che hai già, e niente altro.</p>",
+        "show_newsletter": true,
+        "newsletter_placeholder": "La tua email",
+        "newsletter_button": "Iscriviti",
+        "newsletter_success": "Iscrizione registrata. Grazie!",
+        "newsletter_note": "",
+        "wordmark": "FIUTO",
+        "legal_extra": "",
+        "show_payment_icons": true,
+        "payments_label": "Metodi di pagamento"
+      }
+    }
+  },
+  "order": [
+    "fiuto_footer"
+  ]
+}

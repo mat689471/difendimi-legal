@@ -1,0 +1,158 @@
+{%- comment -%}
+  FIUTO — Bento grid
+  Composable editorial grid: media tiles, copy tiles, data tiles and product
+  tiles. Each block chooses its own footprint, so the merchant can rebuild the
+  composition from the theme editor without touching code.
+{%- endcomment -%}
+
+<section class="f-bento f-section{% if section.settings.scheme == 'dark' %} f-dark{% endif %}"
+  style="--f-bento-bg: {{ section.settings.background }};">
+  <div class="f-wrap f-wrap--wide">
+    <header class="f-bento__head">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="f-eyebrow" data-f-reveal>{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="f-h2 f-reveal-text" data-f-split="45">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+    </header>
+
+    <div class="f-bento__grid" data-f-stagger="90">
+      {%- for block in section.blocks -%}
+        <article
+          class="f-bento__tile f-bento__tile--{{ block.type }} f-bento__tile--span{{ block.settings.span }}{% if block.settings.tall %} f-bento__tile--tall{% endif %}"
+          data-f-reveal
+          {{ block.shopify_attributes }}
+          {% if block.settings.accent != blank %}style="--f-tile-accent: {{ block.settings.accent }};"{% endif %}
+        >
+          {%- case block.type -%}
+            {%- when 'media' -%}
+              {%- if block.settings.image != blank -%}
+                <div class="f-bento__media" data-f-scroll-parallax="26">
+                  <img
+                    src="{{ block.settings.image | image_url: width: 1200 }}"
+                    srcset="{{ block.settings.image | image_url: width: 600 }} 600w, {{ block.settings.image | image_url: width: 1200 }} 1200w"
+                    sizes="(min-width: 990px) 46vw, 92vw"
+                    alt="{{ block.settings.image.alt | escape }}"
+                    width="{{ block.settings.image.width }}"
+                    height="{{ block.settings.image.height }}"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                </div>
+              {%- endif -%}
+              {%- if block.settings.title != blank or block.settings.text != blank -%}
+                <div class="f-bento__overlay">
+                  {%- if block.settings.title != blank -%}<h3 class="f-h3">{{ block.settings.title }}</h3>{%- endif -%}
+                  {%- if block.settings.text != blank -%}<div class="f-body">{{ block.settings.text }}</div>{%- endif -%}
+                </div>
+              {%- endif -%}
+
+            {%- when 'text' -%}
+              <div class="f-bento__copy">
+                {%- if block.settings.kicker != blank -%}<p class="f-eyebrow f-eyebrow--plain">{{ block.settings.kicker }}</p>{%- endif -%}
+                {%- if block.settings.title != blank -%}<h3 class="f-h3">{{ block.settings.title }}</h3>{%- endif -%}
+                {%- if block.settings.text != blank -%}<div class="f-body">{{ block.settings.text }}</div>{%- endif -%}
+                {%- if block.settings.link_label != blank -%}
+                  <a class="f-link" href="{{ block.settings.link | default: '#' }}">{{ block.settings.link_label }} <span aria-hidden="true">&rarr;</span></a>
+                {%- endif -%}
+              </div>
+
+            {%- when 'stat' -%}
+              <div class="f-bento__stat">
+                <p class="f-bento__stat-value f-num">{{ block.settings.value }}</p>
+                <p class="f-bento__stat-label">{{ block.settings.label }}</p>
+              </div>
+
+            {%- when 'product' -%}
+              {%- assign p = block.settings.product -%}
+              {%- if p != blank -%}
+                <a class="f-bento__product" href="{{ p.url }}">
+                  <div class="f-bento__product-media">
+                    <img
+                      src="{{ p.featured_image | image_url: width: 700 }}"
+                      alt="{{ p.featured_image.alt | default: p.title | escape }}"
+                      width="{{ p.featured_image.width }}"
+                      height="{{ p.featured_image.height }}"
+                      loading="lazy"
+                      decoding="async"
+                    >
+                  </div>
+                  <div class="f-bento__product-body">
+                    <h3 class="f-h3">{{ p.title | split: '—' | first | strip }}</h3>
+                    <p class="f-bento__product-price">{{ p.price | money }}</p>
+                    <span class="f-link">{{ block.settings.link_label }} <span aria-hidden="true">&rarr;</span></span>
+                  </div>
+                </a>
+              {%- endif -%}
+          {%- endcase -%}
+        </article>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Fiuto · Bento",
+  "tag": "section",
+  "class": "fiuto-section fiuto-section--bento",
+  "settings": [
+    { "type": "select", "id": "scheme", "label": "Tema", "options": [{ "value": "light", "label": "Chiaro" }, { "value": "dark", "label": "Scuro" }], "default": "light" },
+    { "type": "color", "id": "background", "label": "Sfondo", "default": "#EDE3D1" },
+    { "type": "text", "id": "eyebrow", "label": "Occhiello", "default": "In pratica" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Tre gesti, dieci minuti, un cane soddisfatto." }
+  ],
+  "blocks": [
+    {
+      "type": "media",
+      "name": "Tile immagine",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Immagine" },
+        { "type": "text", "id": "title", "label": "Titolo" },
+        { "type": "richtext", "id": "text", "label": "Testo" },
+        { "type": "range", "id": "span", "label": "Larghezza", "min": 1, "max": 3, "step": 1, "default": 2 },
+        { "type": "checkbox", "id": "tall", "label": "Tile alto", "default": false },
+        { "type": "color", "id": "accent", "label": "Accento" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Tile testo",
+      "settings": [
+        { "type": "text", "id": "kicker", "label": "Kicker" },
+        { "type": "text", "id": "title", "label": "Titolo" },
+        { "type": "richtext", "id": "text", "label": "Testo" },
+        { "type": "text", "id": "link_label", "label": "Testo link" },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "range", "id": "span", "label": "Larghezza", "min": 1, "max": 3, "step": 1, "default": 1 },
+        { "type": "checkbox", "id": "tall", "label": "Tile alto", "default": false },
+        { "type": "color", "id": "accent", "label": "Accento" }
+      ]
+    },
+    {
+      "type": "stat",
+      "name": "Tile dato",
+      "settings": [
+        { "type": "text", "id": "value", "label": "Valore" },
+        { "type": "text", "id": "label", "label": "Etichetta" },
+        { "type": "range", "id": "span", "label": "Larghezza", "min": 1, "max": 3, "step": 1, "default": 1 },
+        { "type": "checkbox", "id": "tall", "label": "Tile alto", "default": false },
+        { "type": "color", "id": "accent", "label": "Accento" }
+      ]
+    },
+    {
+      "type": "product",
+      "name": "Tile prodotto",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Prodotto" },
+        { "type": "text", "id": "link_label", "label": "Testo link", "default": "Scopri" },
+        { "type": "range", "id": "span", "label": "Larghezza", "min": 1, "max": 3, "step": 1, "default": 1 },
+        { "type": "checkbox", "id": "tall", "label": "Tile alto", "default": false },
+        { "type": "color", "id": "accent", "label": "Accento" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Fiuto · Bento" }]
+}
+{% endschema %}

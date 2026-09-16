@@ -1,0 +1,135 @@
+{%- comment -%}
+  FIUTO — Editorial product showcase
+  Custom product cards built directly from the store catalogue: real titles,
+  real prices, real media (second image cross-fades on hover / is simply the
+  second frame on touch). Nothing is hardcoded — pick a collection and the
+  section follows it.
+{%- endcomment -%}
+
+{%- liquid
+  assign coll = section.settings.collection
+  assign limit = section.settings.products_to_show
+-%}
+
+<section class="f-showcase f-section" id="fiuto-showcase-{{ section.id }}">
+  <div class="f-wrap f-wrap--wide">
+    <header class="f-showcase__head">
+      <div class="f-showcase__head-copy">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="f-eyebrow" data-f-reveal>{{ section.settings.eyebrow }}</p>
+        {%- endif -%}
+        <h2 class="f-h2 f-reveal-text" data-f-split="45">{{ section.settings.heading }}</h2>
+      </div>
+      {%- if section.settings.link_label != blank -%}
+        <a
+          class="f-btn f-btn--ghost f-showcase__head-link"
+          href="{{ coll.url | default: section.settings.link }}"
+          data-f-reveal
+          data-f-magnet="0.14"
+        >
+          {{ section.settings.link_label }}
+          <span class="f-btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      {%- endif -%}
+    </header>
+
+    {%- if coll != blank and coll.products.size > 0 -%}
+      <ul class="f-showcase__grid" role="list" data-f-stagger="110">
+        {%- for product in coll.products limit: limit -%}
+          {%- liquid
+            assign first_img = product.featured_image
+            assign second_img = blank
+            for media in product.media limit: 3
+              if media.id != product.featured_media.id and media.media_type == 'image'
+                assign second_img = media.preview_image
+                break
+              endif
+            endfor
+            assign short_title = product.title | split: '—' | first | strip
+            assign descriptor = product.title | split: '—' | last | strip
+            if descriptor == short_title
+              assign descriptor = product.type
+            endif
+          -%}
+          <li class="f-card" data-f-reveal>
+            <a class="f-card__link" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+              <div class="f-card__media">
+                <span class="f-card__index f-num" aria-hidden="true">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+
+                <img
+                  class="f-card__img f-card__img--front"
+                  src="{{ first_img | image_url: width: 900 }}"
+                  srcset="{{ first_img | image_url: width: 450 }} 450w, {{ first_img | image_url: width: 900 }} 900w"
+                  sizes="(min-width: 990px) 30vw, 88vw"
+                  alt="{{ first_img.alt | default: product.title | escape }}"
+                  width="{{ first_img.width }}"
+                  height="{{ first_img.height }}"
+                  loading="lazy"
+                  decoding="async"
+                >
+                {%- if second_img != blank -%}
+                  <img
+                    class="f-card__img f-card__img--back"
+                    src="{{ second_img | image_url: width: 900 }}"
+                    srcset="{{ second_img | image_url: width: 450 }} 450w, {{ second_img | image_url: width: 900 }} 900w"
+                    sizes="(min-width: 990px) 30vw, 88vw"
+                    alt=""
+                    width="{{ second_img.width }}"
+                    height="{{ second_img.height }}"
+                    loading="lazy"
+                    decoding="async"
+                    aria-hidden="true"
+                  >
+                {%- endif -%}
+
+                {%- unless product.available -%}
+                  <span class="f-card__badge f-card__badge--out">{{ section.settings.sold_out_label }}</span>
+                {%- endunless -%}
+
+                <span class="f-card__cta">
+                  <span>{{ section.settings.card_cta }}</span>
+                  <span class="f-btn__arrow" aria-hidden="true">&rarr;</span>
+                </span>
+              </div>
+
+              <div class="f-card__body">
+                <h3 class="f-card__title">{{ short_title }}</h3>
+                {%- if descriptor != blank -%}
+                  <p class="f-card__descriptor">{{ descriptor | truncate: 52 }}</p>
+                {%- endif -%}
+                <p class="f-card__price">
+                  {%- if product.compare_at_price > product.price -%}
+                    <s>{{ product.compare_at_price | money }}</s>
+                  {%- endif -%}
+                  <strong>{{ product.price | money }}</strong>
+                </p>
+              </div>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p class="f-body f-showcase__empty">{{ section.settings.empty_text }}</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Fiuto · Vetrina prodotti",
+  "tag": "section",
+  "class": "fiuto-section fiuto-section--showcase",
+  "settings": [
+    { "type": "collection", "id": "collection", "label": "Collezione" },
+    { "type": "range", "id": "products_to_show", "label": "Prodotti", "min": 2, "max": 12, "step": 1, "default": 4 },
+    { "type": "text", "id": "eyebrow", "label": "Occhiello", "default": "La collezione" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Quattro modi di far lavorare il naso." },
+    { "type": "text", "id": "link_label", "label": "Testo link", "default": "Vedi tutti" },
+    { "type": "url", "id": "link", "label": "Link (se nessuna collezione)" },
+    { "type": "text", "id": "card_cta", "label": "CTA sulla card", "default": "Scopri" },
+    { "type": "text", "id": "sold_out_label", "label": "Etichetta esaurito", "default": "Esaurito" },
+    { "type": "text", "id": "empty_text", "label": "Testo se vuota", "default": "Seleziona una collezione dal tema per mostrare i prodotti." }
+  ],
+  "presets": [{ "name": "Fiuto · Vetrina prodotti" }]
+}
+{% endschema %}

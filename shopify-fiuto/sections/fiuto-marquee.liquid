@@ -1,0 +1,56 @@
+{%- comment -%}
+  FIUTO — Marquee band
+  Transition strip between scenes. The track duplicates itself in JS until it
+  overflows the viewport, then skews slightly with scroll velocity.
+{%- endcomment -%}
+
+<section
+  class="f-marquee f-section{% if section.settings.scheme == 'dark' %} f-dark{% endif %}"
+  style="--f-marquee-speed: {{ section.settings.speed }}s; --f-marquee-bg: {{ section.settings.background }}; --f-marquee-fg: {{ section.settings.text_color }};"
+  aria-hidden="true"
+>
+  <div class="f-marquee__viewport">
+    <div class="f-marquee__track" data-f-marquee>
+      <div class="f-marquee__group">
+        {%- for block in section.blocks -%}
+          <span class="f-marquee__item" {{ block.shopify_attributes }}>{{ block.settings.text }}</span>
+          <span class="f-marquee__sep">{{ section.settings.separator }}</span>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+<p class="f-visually-hidden">{% for block in section.blocks %}{{ block.settings.text }}. {% endfor %}</p>
+
+{% schema %}
+{
+  "name": "Fiuto · Marquee",
+  "tag": "section",
+  "class": "fiuto-section fiuto-section--marquee",
+  "settings": [
+    { "type": "select", "id": "scheme", "label": "Tema", "options": [{ "value": "dark", "label": "Scuro" }, { "value": "light", "label": "Chiaro" }], "default": "dark" },
+    { "type": "color", "id": "background", "label": "Sfondo", "default": "#0F1A10" },
+    { "type": "color", "id": "text_color", "label": "Testo", "default": "#F6F1E7" },
+    { "type": "text", "id": "separator", "label": "Separatore", "default": "•" },
+    { "type": "range", "id": "speed", "label": "Durata ciclo (s)", "min": 10, "max": 80, "step": 2, "default": 34, "unit": "s" }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Parola",
+      "settings": [{ "type": "text", "id": "text", "label": "Testo", "default": "Anti-noia" }]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Fiuto · Marquee",
+      "blocks": [
+        { "type": "item", "settings": { "text": "Anti-noia" } },
+        { "type": "item", "settings": { "text": "Olfatto" } },
+        { "type": "item", "settings": { "text": "Slow feeding" } },
+        { "type": "item", "settings": { "text": "Calma" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

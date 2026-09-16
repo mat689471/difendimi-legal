@@ -1,0 +1,53 @@
+{%- comment -%}
+  FIUTO — Closing call to action
+  Full-bleed statement with a soft spotlight that follows the pointer on
+  desktop and a magnetic primary button.
+{%- endcomment -%}
+
+<section
+  class="f-cta f-section{% if section.settings.scheme == 'dark' %} f-dark{% endif %}"
+  style="--f-cta-bg: {{ section.settings.background }};"
+>
+  <div class="f-cta__glow" aria-hidden="true" data-f-parallax="-24"></div>
+  <span class="f-grain-layer"></span>
+
+  <div class="f-wrap f-cta__inner">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="f-eyebrow" data-f-reveal>{{ section.settings.eyebrow }}</p>
+    {%- endif -%}
+    <h2 class="f-mega f-cta__title f-reveal-text" data-f-split="48">{{ section.settings.heading }}</h2>
+    {%- if section.settings.text != blank -%}
+      <div class="f-lead f-cta__lead" data-f-reveal style="--f-delay:200ms;">{{ section.settings.text }}</div>
+    {%- endif -%}
+    <div class="f-cta__actions" data-f-stagger="90">
+      {%- if section.settings.cta_label != blank -%}
+        <a class="f-btn f-btn--amber" href="{{ section.settings.cta_link | default: '#' }}" data-f-reveal data-f-magnet="0.18">
+          {{ section.settings.cta_label }} <span class="f-btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      {%- endif -%}
+      {%- if section.settings.cta2_label != blank -%}
+        <a class="f-btn f-btn--ghost" href="{{ section.settings.cta2_link | default: '#' }}" data-f-reveal>{{ section.settings.cta2_label }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Fiuto · CTA finale",
+  "tag": "section",
+  "class": "fiuto-section fiuto-section--cta",
+  "settings": [
+    { "type": "select", "id": "scheme", "label": "Tema", "options": [{ "value": "dark", "label": "Scuro" }, { "value": "light", "label": "Chiaro" }], "default": "dark" },
+    { "type": "color", "id": "background", "label": "Sfondo", "default": "#0F1A10" },
+    { "type": "text", "id": "eyebrow", "label": "Occhiello", "default": "Pronti?" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Dai al naso qualcosa da fare." },
+    { "type": "richtext", "id": "text", "label": "Testo" },
+    { "type": "text", "id": "cta_label", "label": "Bottone primario", "default": "Scopri la collezione" },
+    { "type": "url", "id": "cta_link", "label": "Link primario" },
+    { "type": "text", "id": "cta2_label", "label": "Bottone secondario" },
+    { "type": "url", "id": "cta2_link", "label": "Link secondario" }
+  ],
+  "presets": [{ "name": "Fiuto · CTA finale" }]
+}
+{% endschema %}

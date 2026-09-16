@@ -1,0 +1,112 @@
+{%- comment -%}
+  FIUTO — Scroll story
+  A tall section with a sticky stage. As the visitor scrolls, the product photo
+  cross-fades and scales while the matching chapter of copy lights up. Without
+  JavaScript (or with reduced motion) every chapter stays legible and the stage
+  shows the first image — the content is never gated behind the animation.
+{%- endcomment -%}
+
+{%- liquid
+  assign chapters = section.blocks | where: 'type', 'chapter'
+  assign steps = chapters.size
+  if steps == 0
+    assign steps = 1
+  endif
+-%}
+
+<section
+  class="f-story f-section{% if section.settings.scheme == 'dark' %} f-dark{% endif %}"
+  id="fiuto-story-{{ section.id }}"
+  data-f-story
+  style="--f-story-bg: {{ section.settings.background }}; --f-story-fg: {{ section.settings.text_color }}; --f-story-steps: {{ steps }}; min-height: calc(100svh + {{ steps }} * {{ section.settings.scroll_length }}svh);"
+>
+  {%- if section.settings.anchor != blank -%}<span id="{{ section.settings.anchor }}" class="f-anchor" aria-hidden="true"></span>{%- endif -%}
+
+  <div class="f-story__sticky">
+    <div class="f-story__glow" aria-hidden="true"></div>
+    <span class="f-grain-layer"></span>
+
+    <div class="f-wrap f-wrap--wide f-story__grid">
+      <header class="f-story__head">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="f-eyebrow" data-f-reveal>{{ section.settings.eyebrow }}</p>
+        {%- endif -%}
+        <h2 class="f-h2 f-reveal-text" data-f-split="45">{{ section.settings.heading }}</h2>
+      </header>
+
+      <div class="f-story__stage" aria-hidden="true">
+        {%- for block in chapters -%}
+          {%- assign img = block.settings.image -%}
+          {%- if img == blank and block.settings.product != blank -%}
+            {%- assign img = block.settings.product.featured_image -%}
+          {%- endif -%}
+          <figure class="f-story__scene" data-f-scene {{ block.shopify_attributes }}>
+            {%- if img != blank -%}
+              <img
+                src="{{ img | image_url: width: 1000 }}"
+                srcset="{{ img | image_url: width: 500 }} 500w, {{ img | image_url: width: 1000 }} 1000w"
+                sizes="(min-width: 990px) 40vw, 72vw"
+                alt=""
+                width="{{ img.width }}"
+                height="{{ img.height }}"
+                loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                decoding="async"
+              >
+            {%- endif -%}
+          </figure>
+        {%- endfor -%}
+      </div>
+
+      <ol class="f-story__chapters">
+        {%- for block in chapters -%}
+          <li class="f-story__chapter" data-f-chapter {{ block.shopify_attributes }}>
+            <span class="f-story__index f-num">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+            <div class="f-story__chapter-body">
+              <h3 class="f-h3">{{ block.settings.title }}</h3>
+              <div class="f-body">{{ block.settings.text }}</div>
+              {%- if block.settings.link_label != blank and block.settings.link != blank -%}
+                <a class="f-link f-story__chapter-link" href="{{ block.settings.link }}">
+                  {{ block.settings.link_label }} <span aria-hidden="true">&rarr;</span>
+                </a>
+              {%- endif -%}
+            </div>
+          </li>
+        {%- endfor -%}
+      </ol>
+
+      <div class="f-story__rail f-rail" aria-hidden="true"><span class="f-rail__fill"></span></div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Fiuto · Scroll story",
+  "tag": "section",
+  "class": "fiuto-section fiuto-section--story",
+  "settings": [
+    { "type": "select", "id": "scheme", "label": "Tema", "options": [{ "value": "dark", "label": "Scuro" }, { "value": "light", "label": "Chiaro" }], "default": "dark" },
+    { "type": "color", "id": "background", "label": "Sfondo", "default": "#0F1A10" },
+    { "type": "color", "id": "text_color", "label": "Testo", "default": "#F6F1E7" },
+    { "type": "text", "id": "anchor", "label": "ID ancora", "default": "fiuto-come-funziona" },
+    { "type": "text", "id": "eyebrow", "label": "Occhiello", "default": "Come funziona" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Dalla ciotola alla caccia al tesoro." },
+    { "type": "range", "id": "scroll_length", "label": "Lunghezza scroll per capitolo", "min": 40, "max": 120, "step": 10, "default": 70, "unit": "vh" }
+  ],
+  "blocks": [
+    {
+      "type": "chapter",
+      "name": "Capitolo",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Titolo" },
+        { "type": "richtext", "id": "text", "label": "Testo" },
+        { "type": "image_picker", "id": "image", "label": "Immagine" },
+        { "type": "product", "id": "product", "label": "Prodotto (immagine di riserva)" },
+        { "type": "text", "id": "link_label", "label": "Testo link" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Fiuto · Scroll story" }]
+}
+{% endschema %}

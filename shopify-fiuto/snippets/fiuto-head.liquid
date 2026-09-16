@@ -1,0 +1,22 @@
+{%- comment -%}
+  FIUTO — custom design layer.
+  Loads the display typeface, the design-system stylesheet and the motion engine.
+  Rendered from layout/theme.liquid, after Horizon's own stylesheets so the
+  custom layer always wins the cascade without needing !important everywhere.
+{%- endcomment -%}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&display=swap"
+  media="print"
+  onload="this.media='all'"
+>
+<noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&display=swap">
+</noscript>
+
+{{ 'fiuto-core.css' | asset_url | stylesheet_tag }}
+{{ 'fiuto-sections.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'fiuto-motion.js' | asset_url }}" defer></script>

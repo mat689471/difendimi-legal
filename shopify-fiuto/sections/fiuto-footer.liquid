@@ -1,0 +1,205 @@
+{%- comment -%}
+  FIUTO — Footer
+  A real, finished footer: newsletter (Shopify customer form), live menus,
+  live shop policies, live payment icons and a giant wordmark that parallaxes
+  as the page bottoms out. Nothing here is decorative filler.
+{%- endcomment -%}
+
+<section class="f-footer f-dark" style="--f-footer-bg: {{ section.settings.background }};">
+  <span class="f-grain-layer"></span>
+  <div class="f-footer__glow" aria-hidden="true"></div>
+
+  <div class="f-wrap f-wrap--wide f-footer__inner">
+    <div class="f-footer__top">
+      <div class="f-footer__pitch">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="f-eyebrow" data-f-reveal>{{ section.settings.eyebrow }}</p>
+        {%- endif -%}
+        <h2 class="f-h2 f-reveal-text" data-f-split="40">{{ section.settings.heading }}</h2>
+        {%- if section.settings.text != blank -%}
+          <div class="f-body f-footer__pitch-text" data-f-reveal>{{ section.settings.text }}</div>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.show_newsletter -%}
+        <div class="f-footer__newsletter" data-f-reveal>
+          {%- form 'customer', id: 'FiutoNewsletter', class: 'f-newsletter' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <label class="f-visually-hidden" for="FiutoNewsletterEmail">
+              {{ section.settings.newsletter_placeholder }}
+            </label>
+            <div class="f-newsletter__field">
+              <input
+                id="FiutoNewsletterEmail"
+                type="email"
+                name="contact[email]"
+                autocomplete="email"
+                autocapitalize="off"
+                autocorrect="off"
+                required
+                placeholder="{{ section.settings.newsletter_placeholder | escape }}"
+              >
+              <button type="submit" class="f-newsletter__submit" aria-label="{{ section.settings.newsletter_button | escape }}">
+                <span>{{ section.settings.newsletter_button }}</span>
+                <span class="f-btn__arrow" aria-hidden="true">&rarr;</span>
+              </button>
+            </div>
+            {%- if form.errors -%}
+              <p class="f-newsletter__msg f-newsletter__msg--error" role="alert">
+                {{ form.errors.translated_fields.email }} {{ form.errors.messages.email }}
+              </p>
+            {%- elsif form.posted_successfully? -%}
+              <p class="f-newsletter__msg f-newsletter__msg--ok" role="status">
+                {{ section.settings.newsletter_success }}
+              </p>
+            {%- endif -%}
+            {%- if section.settings.newsletter_note != blank -%}
+              <p class="f-newsletter__note">{{ section.settings.newsletter_note }}</p>
+            {%- endif -%}
+          {%- endform -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="f-footer__columns">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'menu' -%}
+            {%- assign menu = linklists[block.settings.menu] -%}
+            {%- if menu.links.size > 0 -%}
+              <nav class="f-footer__col" aria-label="{{ block.settings.title | escape }}" {{ block.shopify_attributes }}>
+                <h3 class="f-footer__col-title">{{ block.settings.title | default: menu.title }}</h3>
+                <ul role="list">
+                  {%- for link in menu.links -%}
+                    <li><a class="f-footer__link" href="{{ link.url }}">{{ link.title }}</a></li>
+                  {%- endfor -%}
+                </ul>
+              </nav>
+            {%- endif -%}
+
+          {%- when 'policies' -%}
+            <nav class="f-footer__col" aria-label="{{ block.settings.title | escape }}" {{ block.shopify_attributes }}>
+              <h3 class="f-footer__col-title">{{ block.settings.title }}</h3>
+              <ul role="list">
+                {%- for policy in shop.policies -%}
+                  {%- if policy != blank -%}
+                    <li><a class="f-footer__link" href="{{ policy.url }}">{{ policy.title }}</a></li>
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            </nav>
+
+          {%- when 'contact' -%}
+            <div class="f-footer__col" {{ block.shopify_attributes }}>
+              <h3 class="f-footer__col-title">{{ block.settings.title }}</h3>
+              <ul role="list">
+                {%- if block.settings.email != blank -%}
+                  <li><a class="f-footer__link" href="mailto:{{ block.settings.email }}">{{ block.settings.email }}</a></li>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <li class="f-footer__note">{{ block.settings.text }}</li>
+                {%- endif -%}
+              </ul>
+            </div>
+
+          {%- when 'social' -%}
+            {%- assign links = block.settings.links | newline_to_br | split: '<br />' -%}
+            {%- if links.size > 0 and block.settings.links != blank -%}
+              <nav class="f-footer__col" aria-label="{{ block.settings.title | escape }}" {{ block.shopify_attributes }}>
+                <h3 class="f-footer__col-title">{{ block.settings.title }}</h3>
+                <ul role="list">
+                  {%- for line in links -%}
+                    {%- assign parts = line | strip | split: '|' -%}
+                    {%- if parts.size == 2 -%}
+                      <li>
+                        <a class="f-footer__link" href="{{ parts[1] | strip }}" rel="noopener" target="_blank">
+                          {{ parts[0] | strip }}
+                        </a>
+                      </li>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </ul>
+              </nav>
+            {%- endif -%}
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+
+    <div class="f-footer__wordmark" aria-hidden="true" data-f-scroll-parallax="-30">
+      <span>{{ section.settings.wordmark | default: shop.name }}</span>
+    </div>
+
+    <div class="f-footer__bottom">
+      <p class="f-footer__legal">
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
+        {%- if section.settings.legal_extra != blank %} · {{ section.settings.legal_extra }}{% endif -%}
+      </p>
+
+      {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+        <ul class="f-footer__payments" role="list" aria-label="{{ section.settings.payments_label | escape }}">
+          {%- for type in shop.enabled_payment_types -%}
+            <li>{{ type | payment_type_svg_tag: class: 'f-footer__payment-icon' }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Fiuto · Footer",
+  "tag": "section",
+  "class": "fiuto-section fiuto-section--footer",
+  "settings": [
+    { "type": "color", "id": "background", "label": "Sfondo", "default": "#0F1A10" },
+    { "type": "text", "id": "eyebrow", "label": "Occhiello", "default": "Resta in contatto" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Idee di gioco, non spam." },
+    { "type": "richtext", "id": "text", "label": "Testo" },
+    { "type": "header", "content": "Newsletter" },
+    { "type": "checkbox", "id": "show_newsletter", "label": "Mostra newsletter", "default": true },
+    { "type": "text", "id": "newsletter_placeholder", "label": "Placeholder", "default": "La tua email" },
+    { "type": "text", "id": "newsletter_button", "label": "Testo bottone", "default": "Iscriviti" },
+    { "type": "text", "id": "newsletter_success", "label": "Messaggio di conferma", "default": "Iscrizione registrata. Grazie!" },
+    { "type": "text", "id": "newsletter_note", "label": "Nota sotto il form" },
+    { "type": "header", "content": "Chiusura" },
+    { "type": "text", "id": "wordmark", "label": "Wordmark", "default": "FIUTO" },
+    { "type": "text", "id": "legal_extra", "label": "Testo legale aggiuntivo" },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Mostra icone di pagamento", "default": true },
+    { "type": "text", "id": "payments_label", "label": "Etichetta pagamenti", "default": "Metodi di pagamento" }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Colonna menu",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Titolo", "default": "Negozio" },
+        { "type": "link_list", "id": "menu", "label": "Menu", "default": "footer" }
+      ]
+    },
+    {
+      "type": "policies",
+      "name": "Colonna policy",
+      "settings": [{ "type": "text", "id": "title", "label": "Titolo", "default": "Informazioni legali" }]
+    },
+    {
+      "type": "contact",
+      "name": "Colonna contatti",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Titolo", "default": "Assistenza" },
+        { "type": "text", "id": "email", "label": "Email" },
+        { "type": "richtext", "id": "text", "label": "Testo" }
+      ]
+    },
+    {
+      "type": "social",
+      "name": "Colonna social",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Titolo", "default": "Social" },
+        { "type": "textarea", "id": "links", "label": "Un link per riga: Nome | https://…" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Fiuto · Footer" }]
+}
+{% endschema %}

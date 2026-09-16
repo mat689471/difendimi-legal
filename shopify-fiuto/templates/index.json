@@ -1,0 +1,192 @@
+{
+  "sections": {
+    "fiuto_hero": {
+      "type": "fiuto-hero",
+      "settings": {
+        "eyebrow": "Enrichment per cani",
+        "heading": "Il naso è il gioco.",
+        "subheading": "<p>Il tuo cane distrugge casa quando si annoia? Tappetini olfattivi, lick mat, ciotole lente e dispenser che trasformano la pappa in una caccia al tesoro.</p>",
+        "image": "shopify://shop_images/975445622401.jpg",
+        "product": "dog-sniffing-mat-dog-puzzle-toy-pet-snack-feeding-mat-boring-interactive-game-training-blanket-snuffle-feeding-training-mat",
+        "collection": "enrichment",
+        "cta_label": "Scopri i giochi",
+        "cta_link": "shopify://collections/enrichment",
+        "cta2_label": "Come funziona",
+        "cta2_link": "#fiuto-come-funziona",
+        "stat_products_label": "giochi nella collezione",
+        "stat_price_label": "prezzo di partenza",
+        "stat_free_value": "4",
+        "stat_free_label": "tipi di gioco: fiuto, leccata, ciotola, dispenser",
+        "tag_label": "naso al lavoro",
+        "height": "full",
+        "show_rings": true,
+        "scroll_label": "Scorri",
+        "scroll_target": "#fiuto-come-funziona"
+      }
+    },
+    "fiuto_marquee": {
+      "type": "fiuto-marquee",
+      "blocks": {
+        "m1": { "type": "item", "settings": { "text": "Tappetino olfattivo" } },
+        "m2": { "type": "item", "settings": { "text": "Lick mat" } },
+        "m3": { "type": "item", "settings": { "text": "Ciotola lenta" } },
+        "m4": { "type": "item", "settings": { "text": "Dispenser snack" } },
+        "m5": { "type": "item", "settings": { "text": "Anti-noia" } }
+      },
+      "block_order": ["m1", "m2", "m3", "m4", "m5"],
+      "settings": {
+        "scheme": "dark",
+        "background": "#0F1A10",
+        "text_color": "#F6F1E7",
+        "separator": "•",
+        "speed": 38
+      }
+    },
+    "fiuto_story": {
+      "type": "fiuto-story",
+      "blocks": {
+        "c1": {
+          "type": "chapter",
+          "settings": {
+            "title": "Nascondi la pappa",
+            "text": "<p>Spargi croccantini e premietti tra le frange in pile del tappetino olfattivo. La razione di sempre, distribuita in modo diverso.</p>",
+            "image": "shopify://shop_images/975445622401.jpg",
+            "link_label": "Vedi il tappetino",
+            "link": "shopify://products/dog-sniffing-mat-dog-puzzle-toy-pet-snack-feeding-mat-boring-interactive-game-training-blanket-snuffle-feeding-training-mat"
+          }
+        },
+        "c2": {
+          "type": "chapter",
+          "settings": {
+            "title": "Lascia lavorare il naso",
+            "text": "<p>Il cane annusa, scava tra le frange e cerca pezzo per pezzo. Il pasto smette di essere un gesto da dieci secondi e diventa un'attività.</p>",
+            "image": "shopify://shop_images/288081210177.jpg"
+          }
+        },
+        "c3": {
+          "type": "chapter",
+          "settings": {
+            "title": "Rallenta i morsi",
+            "text": "<p>La ciotola anti-ingozzamento ha ostacoli sul fondo, il lick mat una superficie da leccare con ventose che lo tengono fermo: due modi per allungare i tempi del pasto.</p>",
+            "image": "shopify://shop_images/1161481685364.jpg",
+            "link_label": "Vedi la ciotola",
+            "link": "shopify://products/pet-bowl-anti-choking-slow-feeding-puzzle-feeder"
+          }
+        },
+        "c4": {
+          "type": "chapter",
+          "settings": {
+            "title": "Fallo giocare anche da solo",
+            "text": "<p>Il dispenser a dondolo rilascia i croccantini poco per volta mentre il cane lo spinge e lo fa rotolare per casa.</p>",
+            "image": "shopify://shop_images/e664cbf2-2a45-4fb9-b9c3-7d700c205cea.jpg",
+            "link_label": "Vedi il dispenser",
+            "link": "shopify://products/food-dispensing-dog-toy-tumbler-leaky-food-ball-puzzle-toys-interactive-slowly-feeding-protect-stomach-increase-intelligence-pets-toy-pet-products"
+          }
+        }
+      },
+      "block_order": ["c1", "c2", "c3", "c4"],
+      "settings": {
+        "scheme": "dark",
+        "background": "#0F1A10",
+        "text_color": "#F6F1E7",
+        "eyebrow": "Come funziona",
+        "heading": "Dalla ciotola alla caccia al tesoro.",
+        "scroll_length": 70
+      }
+    },
+    "fiuto_showcase": {
+      "type": "fiuto-showcase",
+      "settings": {
+        "collection": "enrichment",
+        "products_to_show": 4,
+        "eyebrow": "La collezione",
+        "heading": "Quattro modi di far lavorare il naso.",
+        "link_label": "Vedi tutti",
+        "card_cta": "Scopri",
+        "sold_out_label": "Esaurito",
+        "empty_text": "Seleziona una collezione dal tema per mostrare i prodotti."
+      }
+    },
+    "fiuto_bento": {
+      "type": "fiuto-bento",
+      "blocks": {
+        "b1": {
+          "type": "media",
+          "settings": {
+            "image": "shopify://shop_images/2785699646551.jpg",
+            "title": "Il tappetino olfattivo",
+            "text": "<p>Frange in pile dove sparire croccantini e premietti. Si arrotola, si lava, si riempie in trenta secondi.</p>",
+            "span": 2,
+            "tall": true
+          }
+        },
+        "b2": {
+          "type": "text",
+          "settings": {
+            "kicker": "01 — Riempi",
+            "title": "La razione di sempre",
+            "text": "<p>Distribuisci il cibo tra le frange, nelle scanalature della ciotola o dentro il dispenser.</p>",
+            "span": 1
+          }
+        },
+        "b3": {
+          "type": "text",
+          "settings": {
+            "kicker": "02 — Lascia cercare",
+            "title": "Il naso fa il resto",
+            "text": "<p>Annusa, scava, spinge. Ogni pezzo va trovato prima di essere mangiato.</p>",
+            "span": 1,
+            "link_label": "Guarda la collezione",
+            "link": "shopify://collections/enrichment"
+          }
+        },
+        "b4": {
+          "type": "stat",
+          "settings": {
+            "value": "4",
+            "label": "giochi nella collezione Enrichment: tappetino, lick mat, ciotola lenta, dispenser",
+            "span": 1
+          }
+        },
+        "b5": {
+          "type": "product",
+          "settings": {
+            "product": "dog-licking-mat-slow-feeder-peanut-lick-pad-with-suction",
+            "link_label": "Scopri",
+            "span": 1
+          }
+        },
+        "b6": {
+          "type": "product",
+          "settings": {
+            "product": "food-dispensing-dog-toy-tumbler-leaky-food-ball-puzzle-toys-interactive-slowly-feeding-protect-stomach-increase-intelligence-pets-toy-pet-products",
+            "link_label": "Scopri",
+            "span": 1
+          }
+        }
+      },
+      "block_order": ["b1", "b2", "b3", "b4", "b5", "b6"],
+      "settings": {
+        "scheme": "light",
+        "background": "#EDE3D1",
+        "eyebrow": "In pratica",
+        "heading": "Tre gesti e il pasto diventa un gioco."
+      }
+    },
+    "fiuto_cta": {
+      "type": "fiuto-cta",
+      "settings": {
+        "scheme": "dark",
+        "background": "#0F1A10",
+        "eyebrow": "Pronti?",
+        "heading": "Dai al naso qualcosa da fare.",
+        "text": "<p>Scegli il gioco giusto per il tuo cane e trasforma la prossima pappa in una ricerca.</p>",
+        "cta_label": "Scopri la collezione",
+        "cta_link": "shopify://collections/enrichment",
+        "cta2_label": "Domande frequenti",
+        "cta2_link": "shopify://pages/domande-frequenti"
+      }
+    }
+  },
+  "order": ["fiuto_hero", "fiuto_marquee", "fiuto_story", "fiuto_showcase", "fiuto_bento", "fiuto_cta"]
+}
