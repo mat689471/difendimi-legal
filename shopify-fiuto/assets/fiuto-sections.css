@@ -39,23 +39,31 @@
 @keyframes f-drift-a { to { transform: translate3d(-4vw, 4vh, 0) scale(1.1); } }
 @keyframes f-drift-b { to { transform: translate3d(4vw, -3vh, 0) scale(1.08); } }
 
-/* Concentric "scent" waves radiating from the product */
+/* Concentric "scent" waves radiating from the product.
+   Thin outlines only — a filled ring stack reads as a grey disc on cream. */
 .f-hero__rings {
   position: absolute;
-  top: 46%; left: 26%;
-  width: 30vw; height: 30vw;
+  inset: 50% auto auto 50%;
+  width: min(120%, 760px);
+  aspect-ratio: 1;
   translate: -50% -50%;
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 1px rgb(20 24 15 / 0.07),
-    0 0 0 14vw rgb(20 24 15 / 0.035),
-    0 0 0 26vw rgb(20 24 15 / 0.022);
-  animation: f-rings 7.5s var(--f-ease-io) infinite;
+  z-index: 0;
+  pointer-events: none;
 }
+.f-hero__rings i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgb(20 24 15 / 0.12);
+  opacity: 0;
+  animation: f-rings 8s var(--f-ease-io) infinite;
+}
+.f-hero__rings i:nth-child(2) { animation-delay: 2.6s; }
+.f-hero__rings i:nth-child(3) { animation-delay: 5.2s; }
 @keyframes f-rings {
-  0% { transform: scale(0.72); opacity: 0; }
-  22% { opacity: 1; }
-  100% { transform: scale(1.35); opacity: 0; }
+  0% { transform: scale(0.52); opacity: 0; }
+  18% { opacity: 0.9; }
+  100% { transform: scale(1.18); opacity: 0; }
 }
 
 .f-hero__inner {
@@ -107,7 +115,7 @@
    a stacking context sits between the photo and the page, so mix-blend-mode can
    only reach its own parent. Giving that parent an opaque gradient that ends on
    the exact page colour turns the studio shot into a seamless cut-out. */
-.f-hero__halo { display: none; }
+.f-hero__stage > .f-hero__media { z-index: 1; }
 
 .f-hero__media {
   position: relative;
@@ -240,13 +248,14 @@
       "tail stage";
     column-gap: clamp(2rem, 4vw, 4rem);
     row-gap: clamp(1.25rem, 2.5vw, 2rem);
+    grid-template-rows: min-content min-content;
     align-items: center;
     align-content: center;
   }
   .f-hero__head { align-self: end; }
   .f-hero__tail { align-self: start; }
-  .f-hero__title { font-size: clamp(3.2rem, 6vw, 5.6rem); }
-  .f-hero__media { width: min(108%, 640px); margin-inline-start: -4%; }
+  .f-hero__title { font-size: clamp(3.2rem, 5.6vw, 5.2rem); }
+  .f-hero__media { width: min(104%, 580px); margin-inline-start: -2%; }
 }
 
 /* ---- mobile-first hero: message, then product, then the path forward ---- */
