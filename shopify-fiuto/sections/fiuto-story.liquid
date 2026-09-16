@@ -63,12 +63,16 @@
             <span class="f-story__index f-num">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
             <div class="f-story__chapter-body">
               <h3 class="f-h3">{{ block.settings.title }}</h3>
-              <div class="f-body">{{ block.settings.text }}</div>
-              {%- if block.settings.link_label != blank and block.settings.link != blank -%}
-                <a class="f-link f-story__chapter-link" href="{{ block.settings.link }}">
-                  {{ block.settings.link_label }} <span aria-hidden="true">&rarr;</span>
-                </a>
-              {%- endif -%}
+              <div class="f-story__chapter-detail">
+                <div>
+                  <div class="f-body">{{ block.settings.text }}</div>
+                  {%- if block.settings.link_label != blank and block.settings.link != blank -%}
+                    <a class="f-link f-story__chapter-link" href="{{ block.settings.link }}">
+                      {{ block.settings.link_label }} <span aria-hidden="true">&rarr;</span>
+                    </a>
+                  {%- endif -%}
+                </div>
+              </div>
             </div>
           </li>
         {%- endfor -%}

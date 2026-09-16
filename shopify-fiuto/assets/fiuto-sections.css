@@ -25,14 +25,14 @@
   opacity: 0.85;
 }
 .f-hero__glow--a {
-  width: 62vw; height: 62vw;
-  right: -14vw; top: -18vw;
+  width: 58vw; height: 58vw;
+  left: -20vw; top: -20vw;
   background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--f-amber) 52%, transparent), transparent 66%);
   animation: f-drift-a 22s ease-in-out infinite alternate;
 }
 .f-hero__glow--b {
-  width: 54vw; height: 54vw;
-  left: -16vw; bottom: -22vw;
+  width: 52vw; height: 52vw;
+  left: -8vw; bottom: -26vw;
   background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--f-lime) 46%, transparent), transparent 68%);
   animation: f-drift-b 26s ease-in-out infinite alternate;
 }
@@ -42,8 +42,8 @@
 /* Concentric "scent" waves radiating from the product */
 .f-hero__rings {
   position: absolute;
-  top: 50%; left: 72%;
-  width: 34vw; height: 34vw;
+  top: 46%; left: 26%;
+  width: 30vw; height: 30vw;
   translate: -50% -50%;
   border-radius: 50%;
   box-shadow:
@@ -103,28 +103,11 @@
 /* ---- stage ---- */
 .f-hero__stage { position: relative; display: grid; place-items: center; }
 
-/* Warm halo — never white, so the multiply blend keeps studio shots seamless
-   against the bone surface instead of re-introducing a visible photo box. */
-.f-hero__halo {
-  position: absolute;
-  inset: 2% 0 4%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 44%, color-mix(in srgb, var(--f-amber-soft) 46%, transparent), color-mix(in srgb, var(--f-sand) 60%, transparent) 52%, transparent 72%);
-  filter: blur(26px);
-  pointer-events: none;
-}
-/* Soft contact shadow grounds the floating product */
-.f-hero__stage::after {
-  content: "";
-  position: absolute;
-  left: 50%; bottom: 4%;
-  width: 46%; height: 5%;
-  translate: -50% 0;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgb(20 24 15 / 0.22), transparent 70%);
-  filter: blur(16px);
-  pointer-events: none;
-}
+/* The halo now lives on the media box itself (see .f-hero__media background):
+   a stacking context sits between the photo and the page, so mix-blend-mode can
+   only reach its own parent. Giving that parent an opaque gradient that ends on
+   the exact page colour turns the studio shot into a seamless cut-out. */
+.f-hero__halo { display: none; }
 
 .f-hero__media {
   position: relative;
@@ -133,13 +116,20 @@
   display: grid;
   place-items: center;
   margin: 0;
+  background:
+    radial-gradient(
+      circle at 50% 46%,
+      color-mix(in srgb, var(--f-amber-soft) 46%, var(--f-bone)) 0%,
+      color-mix(in srgb, var(--f-amber-soft) 20%, var(--f-bone)) 34%,
+      color-mix(in srgb, var(--f-sand) 42%, var(--f-bone)) 56%,
+      var(--f-bone) 74%
+    );
 }
 .f-hero__img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   mix-blend-mode: multiply;
-  filter: drop-shadow(0 38px 46px rgb(20 24 15 / 0.18));
   translate: var(--f-px, 0px) var(--f-py, 0px);
   animation: f-float 8s ease-in-out infinite;
 }
@@ -251,6 +241,7 @@
     column-gap: clamp(2rem, 4vw, 4rem);
     row-gap: clamp(1.25rem, 2.5vw, 2rem);
     align-items: center;
+    align-content: center;
   }
   .f-hero__head { align-self: end; }
   .f-hero__tail { align-self: start; }
@@ -365,11 +356,21 @@
   transition: opacity 0.85s var(--f-ease), transform 1.1s var(--f-ease);
 }
 .f-story__scene.is-active { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
+.f-story__scene {
+  border-radius: var(--f-radius-lg);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 40%,
+      color-mix(in srgb, var(--f-amber-soft) 40%, #F6F1E7) 0%,
+      color-mix(in srgb, var(--f-amber-soft) 14%, #F6F1E7) 40%,
+      #EFE7D8 100%);
+  box-shadow: 0 40px 80px -40px rgb(0 0 0 / 0.6), 0 2px 0 rgb(255 255 255 / 0.08) inset;
+}
 .f-story__scene img {
   width: 100%; height: 100%;
   object-fit: contain;
-  border-radius: var(--f-radius-lg);
-  filter: drop-shadow(0 40px 60px rgb(0 0 0 / 0.45));
+  padding: 5%;
+  mix-blend-mode: multiply;
 }
 
 /* chapters */
@@ -403,7 +404,16 @@
 }
 .f-story__chapter.is-active .f-story__index::after { transform: scaleX(1); }
 .f-story__chapter-body { display: flex; flex-direction: column; gap: 0.5rem; }
-.f-story__chapter-body .f-h3 { font-size: clamp(1.25rem, 2.3vw, 1.9rem); }
+.f-story__chapter-body .f-h3 { font-size: clamp(1.2rem, 2.1vw, 1.75rem); }
+/* Collapsed until active: the column stays compact and the eye has one place to go. */
+.f-story__chapter-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.6s var(--f-ease), opacity 0.5s var(--f-ease);
+}
+.f-story__chapter-detail > div { overflow: hidden; display: flex; flex-direction: column; gap: 0.5rem; }
+.f-story__chapter.is-active .f-story__chapter-detail { grid-template-rows: 1fr; opacity: 1; }
 .f-story__chapter-body .f-body { max-width: 46ch; color: var(--f-ink-mute); }
 .f-story__chapter-body .f-body p { margin: 0; }
 .f-story__chapter-link { margin-top: 0.35rem; color: var(--f-amber); align-self: flex-start; }
@@ -449,6 +459,7 @@
 .f-story:not([data-f-active]) { min-height: 0 !important; }
 .f-story:not([data-f-active]) .f-story__sticky { position: static; min-height: 0; }
 .f-story:not([data-f-active]) .f-story__chapter { opacity: 1; }
+.f-story:not([data-f-active]) .f-story__chapter-detail { grid-template-rows: 1fr; opacity: 1; }
 .f-story:not([data-f-active]) .f-story__scene { position: relative; opacity: 1; transform: none; }
 .f-story:not([data-f-active]) .f-story__scene + .f-story__scene { display: none; }
 
@@ -487,17 +498,17 @@
   border-radius: var(--f-radius);
   overflow: hidden;
   background:
-    radial-gradient(120% 92% at 50% 4%, color-mix(in srgb, var(--f-amber-soft) 40%, transparent), transparent 62%),
-    var(--f-sand);
+    radial-gradient(118% 90% at 50% 6%, color-mix(in srgb, var(--f-amber-soft) 62%, transparent), transparent 64%),
+    linear-gradient(180deg, color-mix(in srgb, var(--f-sand) 70%, var(--f-paper)) 0%, var(--f-sand) 100%);
   box-shadow: var(--f-shadow-sm);
   transition: box-shadow 0.6s var(--f-ease), transform 0.6s var(--f-ease);
   isolation: isolate;
 }
 .f-card__img {
   position: absolute;
-  inset: 8%;
-  width: 84%;
-  height: 84%;
+  inset: 5%;
+  width: 90%;
+  height: 90%;
   object-fit: contain;
   mix-blend-mode: multiply;
   transition: opacity 0.6s var(--f-ease), transform 1s var(--f-ease);
