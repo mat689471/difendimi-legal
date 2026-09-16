@@ -952,18 +952,19 @@
 
 /* ============================ PRODUCT PAGE ============================== */
 /* Gallery: soft warm panels instead of raw edge-to-edge photographs. */
-body[data-template^="product"] media-gallery { gap: clamp(0.5rem, 1vw, 0.9rem); }
-body[data-template^="product"] .product-media-container {
-  border-radius: var(--f-radius);
+#MainContent[data-template^="product"] media-gallery { gap: clamp(0.5rem, 1vw, 0.9rem); }
+#MainContent[data-template^="product"] media-gallery .product-media-container,
+#MainContent[data-template^="product"] media-gallery .product-media {
+  border-radius: var(--f-radius) !important;
   overflow: hidden;
   background:
     radial-gradient(118% 88% at 50% 6%, color-mix(in srgb, var(--f-amber-soft) 40%, transparent), transparent 62%),
     var(--f-sand);
   isolation: isolate;
 }
-body[data-template^="product"] .product-media-container img { mix-blend-mode: multiply; }
+#MainContent[data-template^="product"] media-gallery img { mix-blend-mode: multiply; }
 
-body[data-template^="product"] .product-details { padding-inline-start: clamp(0rem, 2vw, 1.5rem); }
+#MainContent[data-template^="product"] .product-details { padding-inline-start: clamp(0rem, 2vw, 1.5rem); }
 
 /* Native Horizon sticky bar, restyled to the Fiuto system */
 .sticky-add-to-cart__bar {
@@ -1019,4 +1020,17 @@ product-card.f-reveal-card.is-in { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   product-card.f-reveal-card { opacity: 1 !important; transform: none !important; }
+}
+
+
+/* ============================ SECTION BACKGROUNDS ======================= */
+/* Horizon paints each section's colour into a z-index:-2 layer. When the
+   section itself has no stacking context that layer falls behind the page
+   background and the colour silently disappears (the announcement bar showed
+   cream on every template except the home page, where Horizon happens to raise
+   the header group). Isolating the section keeps the layer where it belongs. */
+#header-group > .shopify-section:has(.announcement-bar),
+#MainContent > .shopify-section:has(> .section-background),
+footer .shopify-section:has(> .section-background) {
+  isolation: isolate;
 }

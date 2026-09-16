@@ -580,7 +580,7 @@ product-card .badge,
 }
 
 /* ---------- 8. COLLECTION PAGE ------------------------------------------ */
-body[data-template^="collection"] .content-for-layout { padding-top: 0; }
+#MainContent[data-template^="collection"] .content-for-layout { padding-top: 0; }
 
 .f-collection-hero {
   position: relative;
@@ -599,8 +599,8 @@ body[data-template^="collection"] .content-for-layout { padding-top: 0; }
 }
 
 /* Sticky, refined filter/sort bar */
-[data-template^="collection"] .facets,
-[data-template^="collection"] .collection__filters {
+#MainContent[data-template^="collection"] .facets,
+#MainContent[data-template^="collection"] .collection__filters {
   position: sticky;
   top: calc(var(--header-height, 64px) + 8px);
   z-index: 20;
@@ -610,8 +610,8 @@ body[data-template^="collection"] .content-for-layout { padding-top: 0; }
   border-radius: var(--f-radius-pill);
   padding-inline: 0.75rem;
 }
-[data-template^="collection"] .facets button,
-[data-template^="collection"] .facets summary {
+#MainContent[data-template^="collection"] .facets button,
+#MainContent[data-template^="collection"] .facets summary {
   border-radius: var(--f-radius-pill) !important;
 }
 
@@ -620,28 +620,28 @@ body[data-template^="collection"] .content-for-layout { padding-top: 0; }
 .pagination-controls button { border-radius: var(--f-radius-pill) !important; }
 
 /* ---------- 9. PRODUCT PAGE --------------------------------------------- */
-body[data-template^="product"] .product-media-container,
-body[data-template^="product"] .product-media {
+#MainContent[data-template^="product"] .product-media-container,
+#MainContent[data-template^="product"] .product-media {
   border-radius: var(--f-radius-lg);
   overflow: hidden;
   background:
     radial-gradient(110% 80% at 50% 0%, color-mix(in srgb, var(--f-amber-soft) 30%, transparent), transparent 60%),
     var(--f-sand);
 }
-body[data-template^="product"] .product-media img { mix-blend-mode: multiply; }
+#MainContent[data-template^="product"] .product-media img { mix-blend-mode: multiply; }
 
 /* Sticky info column on desktop */
 @media (min-width: 990px) {
-  body[data-template^="product"] .product-information,
-  body[data-template^="product"] [class*="product-details"] {
+  #MainContent[data-template^="product"] .product-information,
+  #MainContent[data-template^="product"] [class*="product-details"] {
     position: sticky;
     top: calc(var(--header-height, 72px) + 24px);
     align-self: start;
   }
 }
 
-body[data-template^="product"] .product-title,
-body[data-template^="product"] h1 {
+#MainContent[data-template^="product"] .product-title,
+#MainContent[data-template^="product"] h1 {
   font-family: var(--f-display);
   font-size: clamp(1.75rem, 3.2vw, 2.75rem);
   letter-spacing: -0.035em;
