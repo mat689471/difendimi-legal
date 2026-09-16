@@ -17,6 +17,18 @@
 }
 
 .f-hero__bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.f-hero > .f-grain-layer,
+.f-hero__bg > .f-grain-layer { display: none; }
+.f-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background-image: var(--f-grain);
+  opacity: 0.3;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
 
 .f-hero__glow {
   position: absolute;
@@ -74,6 +86,10 @@
   width: 100%;
 }
 
+/* Desktop keeps head + tail in one column so the tall product stage can never
+   inflate the text rows; mobile dissolves the wrapper with display:contents so
+   the grid can slot the product between the headline and the call to action. */
+.f-hero__copy { display: flex; flex-direction: column; gap: clamp(1.1rem, 2.4vw, 1.75rem); grid-area: copy; }
 .f-hero__head { grid-area: head; display: flex; flex-direction: column; gap: clamp(0.9rem, 2vw, 1.35rem); align-items: flex-start; }
 .f-hero__tail { grid-area: tail; display: flex; flex-direction: column; gap: clamp(1.1rem, 2.2vw, 1.5rem); align-items: flex-start; }
 .f-hero__eyebrow { color: var(--f-leaf); font-weight: 700; }
@@ -243,17 +259,10 @@
 @media (min-width: 900px) {
   .f-hero__inner {
     grid-template-columns: minmax(0, 1.04fr) minmax(0, 1fr);
-    grid-template-areas:
-      "head stage"
-      "tail stage";
+    grid-template-areas: "copy stage";
     column-gap: clamp(2rem, 4vw, 4rem);
-    row-gap: clamp(1.25rem, 2.5vw, 2rem);
-    grid-template-rows: min-content min-content;
     align-items: center;
-    align-content: center;
   }
-  .f-hero__head { align-self: end; }
-  .f-hero__tail { align-self: start; }
   .f-hero__title { font-size: clamp(3.2rem, 5.6vw, 5.2rem); }
   .f-hero__media { width: min(104%, 580px); margin-inline-start: -2%; }
 }
@@ -264,6 +273,7 @@
     min-height: 0;
     padding-block: calc(var(--header-height, 58px) + clamp(1.5rem, 6vw, 2.5rem)) clamp(4.5rem, 14vw, 6rem);
   }
+  .f-hero__copy { display: contents; }
   .f-hero__inner {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas: "head" "stage" "tail";
