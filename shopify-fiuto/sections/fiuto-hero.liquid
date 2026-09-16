@@ -26,6 +26,11 @@
   endif
 -%}
 
+{%- comment -%} The hero photograph is the LCP element: ask for it early. {%- endcomment -%}
+{%- if hero_image != blank -%}
+  <link rel="preload" as="image" href="{{ hero_image | image_url: width: 1400 }}" fetchpriority="high">
+{%- endif -%}
+
 <section
   class="f-hero f-section"
   id="fiuto-hero-{{ section.id }}"
