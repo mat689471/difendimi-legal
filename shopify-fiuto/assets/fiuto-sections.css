@@ -1034,3 +1034,31 @@ product-card.f-reveal-card.is-in { opacity: 1; transform: none; }
 footer .shopify-section:has(> .section-background) {
   isolation: isolate;
 }
+
+/* ============================ MOBILE REFINEMENTS ======================== */
+@media (max-width: 899px) {
+  /* Keep the two floating chips out of each other's way on narrow screens */
+  .f-hero__chip--tag { top: 1%; right: 0; bottom: auto; }
+  .f-hero__chip--product { bottom: -1%; left: 0; }
+}
+@media (max-width: 360px) {
+  .f-hero__chip--tag { display: none; }
+}
+
+/* Product gallery on phones: inset panels instead of edge-to-edge photos */
+@media (max-width: 749px) {
+  #MainContent[data-template^="product"] media-gallery .product-media-container,
+  #MainContent[data-template^="product"] media-gallery .product-media {
+    border-radius: var(--f-radius) !important;
+  }
+  #MainContent[data-template^="product"] media-gallery {
+    padding-inline: var(--f-gutter);
+  }
+  /* A long dot row has to wrap rather than squeeze: the dots keep their
+     touch-sized hit area, the row just uses a second line when it needs one. */
+  #MainContent[data-template^="product"] [class*="slideshow-controls"] {
+    flex-wrap: wrap;
+    row-gap: 2px;
+    max-width: 100%;
+  }
+}

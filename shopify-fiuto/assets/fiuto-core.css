@@ -461,27 +461,45 @@ theme-drawer, .header-drawer, dialog.header-drawer {
 dialog[class*="drawer"] .drawer__content {
   background: var(--f-bone);
 }
-/* Large tappable menu items with staggered reveal */
+/* Large tappable menu items with a staggered entrance */
+.menu-drawer__menu-item,
 .header-drawer a[href],
-.menu-drawer a[href] {
+.menu-drawer a[href]:not(.resource-card__link):not(.button) {
   font-family: var(--f-display);
-  font-size: clamp(1.75rem, 8vw, 2.5rem);
+  font-size: clamp(1.6rem, 7.5vw, 2.25rem);
   font-weight: 700;
   letter-spacing: -0.035em;
-  line-height: 1.12;
-  min-height: 52px;
+  line-height: 1.1;
+  min-height: 56px;
   display: flex;
   align-items: center;
+  text-decoration: none;
 }
-.header-drawer[open] a[href] {
-  animation: f-drawer-in 0.6s var(--f-ease) backwards;
+.menu-drawer__menu-item { position: relative; }
+.menu-drawer__menu-item::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 8px;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s var(--f-ease);
 }
-.header-drawer[open] a[href]:nth-child(1) { animation-delay: 0.05s; }
-.header-drawer[open] a[href]:nth-child(2) { animation-delay: 0.10s; }
-.header-drawer[open] a[href]:nth-child(3) { animation-delay: 0.15s; }
-.header-drawer[open] a[href]:nth-child(4) { animation-delay: 0.20s; }
-.header-drawer[open] a[href]:nth-child(5) { animation-delay: 0.25s; }
-.header-drawer[open] a[href]:nth-child(6) { animation-delay: 0.30s; }
+.menu-drawer__menu-item:active::after,
+.menu-drawer__menu-item:focus-visible::after { transform: scaleX(1); }
+
+dialog[open] .menu-drawer__menu-item,
+[open] > * > .menu-drawer__menu-item {
+  animation: f-drawer-in 0.55s var(--f-ease) backwards;
+}
+.menu-drawer__menu-item:nth-of-type(1) { animation-delay: 0.05s; }
+.menu-drawer__menu-item:nth-of-type(2) { animation-delay: 0.10s; }
+.menu-drawer__menu-item:nth-of-type(3) { animation-delay: 0.15s; }
+.menu-drawer__menu-item:nth-of-type(4) { animation-delay: 0.20s; }
+.menu-drawer__menu-item:nth-of-type(5) { animation-delay: 0.25s; }
+.menu-drawer__menu-item:nth-of-type(6) { animation-delay: 0.30s; }
+.menu-drawer__close-button { min-width: 44px; min-height: 44px; }
 @keyframes f-drawer-in {
   from { opacity: 0; transform: translate3d(0, 24px, 0); }
   to { opacity: 1; transform: none; }
@@ -740,6 +758,30 @@ input[type="search"] {
   border-radius: var(--f-radius-pill) !important;
 }
 
+/* ---------- 11b. TOUCH TARGETS ------------------------------------------ */
+/* Anything a thumb has to hit gets a 44px row on touch devices, even when the
+   label itself is short. */
+@media (hover: none) {
+  .f-footer__link,
+  .f-collhero__crumbs a,
+  .f-story__chapter-link,
+  .f-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .f-footer__col ul { gap: 0; }
+  .header-actions__action,
+  .header__actions button,
+  .header__actions a {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
 /* ---------- 12. UTILITIES + A11Y ---------------------------------------- */
 .f-visually-hidden {
   position: absolute !important;
@@ -776,4 +818,11 @@ input[type="search"] {
   .f-hero__rings, .f-hero__glow--a, .f-hero__glow--b,
   .f-hero__pulse, .f-hero__scroll-line::after { animation: none !important; }
   .f-hero__img { translate: none !important; }
+}
+
+/* Drawer safe area so the featured row at the bottom is never cut off */
+.menu-drawer,
+.menu-drawer__inner,
+dialog[class*="menu-drawer"] {
+  padding-bottom: max(2rem, env(safe-area-inset-bottom));
 }
