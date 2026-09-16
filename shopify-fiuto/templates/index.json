@@ -13,10 +13,10 @@
         "cta_link": "shopify://collections/enrichment",
         "cta2_label": "Come funziona",
         "cta2_link": "#fiuto-come-funziona",
-        "stat_products_label": "giochi nella collezione",
+        "stat_products_label": "giochi in collezione",
         "stat_price_label": "prezzo di partenza",
         "stat_free_value": "4",
-        "stat_free_label": "tipi di gioco: fiuto, leccata, ciotola, dispenser",
+        "stat_free_label": "tipi di gioco per il naso",
         "tag_label": "naso al lavoro",
         "height": "full",
         "show_rings": true,
@@ -27,13 +27,44 @@
     "fiuto_marquee": {
       "type": "fiuto-marquee",
       "blocks": {
-        "m1": { "type": "item", "settings": { "text": "Tappetino olfattivo" } },
-        "m2": { "type": "item", "settings": { "text": "Lick mat" } },
-        "m3": { "type": "item", "settings": { "text": "Ciotola lenta" } },
-        "m4": { "type": "item", "settings": { "text": "Dispenser snack" } },
-        "m5": { "type": "item", "settings": { "text": "Anti-noia" } }
+        "m1": {
+          "type": "item",
+          "settings": {
+            "text": "Tappetino olfattivo"
+          }
+        },
+        "m2": {
+          "type": "item",
+          "settings": {
+            "text": "Lick mat"
+          }
+        },
+        "m3": {
+          "type": "item",
+          "settings": {
+            "text": "Ciotola lenta"
+          }
+        },
+        "m4": {
+          "type": "item",
+          "settings": {
+            "text": "Dispenser snack"
+          }
+        },
+        "m5": {
+          "type": "item",
+          "settings": {
+            "text": "Anti-noia"
+          }
+        }
       },
-      "block_order": ["m1", "m2", "m3", "m4", "m5"],
+      "block_order": [
+        "m1",
+        "m2",
+        "m3",
+        "m4",
+        "m5"
+      ],
       "settings": {
         "scheme": "dark",
         "background": "#0F1A10",
@@ -84,7 +115,12 @@
           }
         }
       },
-      "block_order": ["c1", "c2", "c3", "c4"],
+      "block_order": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ],
       "settings": {
         "scheme": "dark",
         "background": "#0F1A10",
@@ -165,7 +201,14 @@
           }
         }
       },
-      "block_order": ["b1", "b2", "b3", "b4", "b5", "b6"],
+      "block_order": [
+        "b1",
+        "b2",
+        "b3",
+        "b4",
+        "b5",
+        "b6"
+      ],
       "settings": {
         "scheme": "light",
         "background": "#EDE3D1",
@@ -188,5 +231,12 @@
       }
     }
   },
-  "order": ["fiuto_hero", "fiuto_marquee", "fiuto_story", "fiuto_showcase", "fiuto_bento", "fiuto_cta"]
+  "order": [
+    "fiuto_hero",
+    "fiuto_marquee",
+    "fiuto_story",
+    "fiuto_showcase",
+    "fiuto_bento",
+    "fiuto_cta"
+  ]
 }

@@ -405,13 +405,17 @@ body[data-f-overhero="true"] header-component.header .header__row--top { border:
 }
 
 /* Logo wordmark when no image logo is set */
-.header h1.visually-hidden + * { font-family: var(--f-display); }
-.header__logo-text,
-.header a[href="/"] .logo__text {
-  font-family: var(--f-display) !important;
+.header-logo,
+.header-logo a,
+.header-logo span,
+.header-logo__text {
+  font-family: var(--f-display);
   font-weight: 800;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.055em;
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  line-height: 1;
 }
+.header-logo a { text-decoration: none; }
 
 /* Icon buttons get a soft ring */
 .header-actions__action,

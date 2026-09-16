@@ -42,13 +42,15 @@
   </div>
 
   <div class="f-wrap f-wrap--wide f-hero__inner">
-    <div class="f-hero__copy">
+    <div class="f-hero__head">
       {%- if section.settings.eyebrow != blank -%}
         <p class="f-eyebrow f-hero__eyebrow" data-f-reveal>{{ section.settings.eyebrow }}</p>
       {%- endif -%}
 
       <h1 class="f-mega f-hero__title f-reveal-text" data-f-split="52">{{ section.settings.heading }}</h1>
+    </div>
 
+    <div class="f-hero__tail">
       {%- if section.settings.subheading != blank -%}
         <div class="f-lead f-hero__lead" data-f-reveal style="--f-delay: 260ms;">
           {{ section.settings.subheading }}

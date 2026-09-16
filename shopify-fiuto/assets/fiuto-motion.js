@@ -24,7 +24,7 @@
     if (ticking) return;
     ticking = true;
     raf(function () {
-      var y = window.scrollY || window.pageYOffset;
+      var y = scrollTop();
       for (var i = 0; i < scrollTasks.length; i++) scrollTasks[i](y);
       ticking = false;
     });
@@ -37,6 +37,27 @@
 
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function lerp(a, b, t) { return a + (b - a) * t; }
+
+  /* Horizon turns .page-wrapper into the scroll container from 990px up
+     (html/body become overflow:hidden), so window.scrollY stays at 0 there.
+     Everything scroll-driven reads through these two helpers instead. */
+  function getScroller() {
+    var w = document.querySelector('.page-wrapper');
+    if (w && w.scrollHeight > w.clientHeight + 1) {
+      var oy = getComputedStyle(w).overflowY;
+      if (oy === 'auto' || oy === 'scroll') return w;
+    }
+    return null;
+  }
+  function scrollTop() {
+    var s = getScroller();
+    return s ? s.scrollTop : (window.scrollY || window.pageYOffset || 0);
+  }
+  function maxScroll() {
+    var s = getScroller();
+    if (s) return s.scrollHeight - s.clientHeight;
+    return document.documentElement.scrollHeight - window.innerHeight;
+  }
 
   /* ---------------------------------------------------------------- reveal */
   function initReveal(root) {
@@ -136,9 +157,8 @@
     body.setAttribute('data-f-overhero', overHero ? 'true' : 'false');
 
     scrollTasks.push(function (y) {
-      var doc = document.documentElement;
-      var max = doc.scrollHeight - window.innerHeight;
-      body.style.setProperty('--f-page-progress', max > 0 ? (y / max).toFixed(4) : '0');
+      var max = maxScroll();
+      body.style.setProperty('--f-page-progress', max > 0 ? clamp(y / max, 0, 1).toFixed(4) : '0');
 
       var state = 'top';
       if (y > 24) state = 'scrolled';
@@ -282,7 +302,7 @@
     });
 
     if (reduce) return;
-    var lastY = window.scrollY;
+    var lastY = scrollTop();
     scrollTasks.push(function (y) {
       var v = clamp((y - lastY) / 18, -3.2, 3.2);
       lastY = y;
@@ -337,6 +357,15 @@
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
+    var sc = getScroller();
+    if (sc) sc.addEventListener('scroll', onScroll, { passive: true });
+    /* The scroll container swaps at the 990px breakpoint — rebind on change. */
+    var mq = window.matchMedia('(min-width: 990px)');
+    mq.addEventListener('change', function () {
+      var next = getScroller();
+      if (next) next.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    });
     raf(loop);
     onScroll();
   }

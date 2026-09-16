@@ -62,11 +62,12 @@
   position: relative;
   z-index: 2;
   display: grid;
-  gap: clamp(2rem, 5vw, 3.5rem);
-  align-items: center;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  width: 100%;
 }
 
-.f-hero__copy { display: flex; flex-direction: column; gap: clamp(1.1rem, 2.2vw, 1.6rem); align-items: flex-start; }
+.f-hero__head { grid-area: head; display: flex; flex-direction: column; gap: clamp(0.9rem, 2vw, 1.35rem); align-items: flex-start; }
+.f-hero__tail { grid-area: tail; display: flex; flex-direction: column; gap: clamp(1.1rem, 2.2vw, 1.5rem); align-items: flex-start; }
 .f-hero__eyebrow { color: var(--f-leaf); font-weight: 700; }
 
 .f-hero__title {
@@ -102,12 +103,27 @@
 /* ---- stage ---- */
 .f-hero__stage { position: relative; display: grid; place-items: center; }
 
+/* Warm halo — never white, so the multiply blend keeps studio shots seamless
+   against the bone surface instead of re-introducing a visible photo box. */
 .f-hero__halo {
   position: absolute;
-  inset: 4% 4% 8%;
+  inset: 2% 0 4%;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 42%, rgb(255 255 255 / 0.9), color-mix(in srgb, var(--f-amber-soft) 40%, transparent) 46%, transparent 68%);
-  filter: blur(18px);
+  background: radial-gradient(circle at 50% 44%, color-mix(in srgb, var(--f-amber-soft) 46%, transparent), color-mix(in srgb, var(--f-sand) 60%, transparent) 52%, transparent 72%);
+  filter: blur(26px);
+  pointer-events: none;
+}
+/* Soft contact shadow grounds the floating product */
+.f-hero__stage::after {
+  content: "";
+  position: absolute;
+  left: 50%; bottom: 4%;
+  width: 46%; height: 5%;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgb(20 24 15 / 0.22), transparent 70%);
+  filter: blur(16px);
+  pointer-events: none;
 }
 
 .f-hero__media {
@@ -227,22 +243,46 @@
 }
 
 @media (min-width: 900px) {
-  .f-hero__inner { grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr); gap: clamp(2rem, 4vw, 4rem); }
-  .f-hero__title { font-size: clamp(3.4rem, 6.4vw, 6.2rem); }
-  .f-hero__media { width: min(115%, 720px); margin-inline-start: -7%; }
+  .f-hero__inner {
+    grid-template-columns: minmax(0, 1.04fr) minmax(0, 1fr);
+    grid-template-areas:
+      "head stage"
+      "tail stage";
+    column-gap: clamp(2rem, 4vw, 4rem);
+    row-gap: clamp(1.25rem, 2.5vw, 2rem);
+    align-items: center;
+  }
+  .f-hero__head { align-self: end; }
+  .f-hero__tail { align-self: start; }
+  .f-hero__title { font-size: clamp(3.2rem, 6vw, 5.6rem); }
+  .f-hero__media { width: min(108%, 640px); margin-inline-start: -4%; }
 }
+
+/* ---- mobile-first hero: message, then product, then the path forward ---- */
 @media (max-width: 899px) {
-  .f-hero { padding-block: clamp(2.5rem, 8vw, 4rem) clamp(4.5rem, 12vw, 6rem); }
-  .f-hero__inner { grid-template-rows: auto auto; }
-  .f-hero__stage { order: -1; }
-  .f-hero__media { width: min(100%, 460px); aspect-ratio: 1 / 0.86; }
-  .f-hero__chip--product { left: -1%; bottom: 2%; }
-  .f-hero__chip--tag { right: 0; top: 4%; }
-  .f-hero__rings { left: 50%; top: 32%; width: 62vw; height: 62vw; }
+  .f-hero {
+    min-height: 0;
+    padding-block: calc(var(--header-height, 58px) + clamp(1.5rem, 6vw, 2.5rem)) clamp(4.5rem, 14vw, 6rem);
+  }
+  .f-hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "head" "stage" "tail";
+    row-gap: clamp(1.25rem, 4vw, 2rem);
+  }
+  .f-hero__title { font-size: clamp(2.6rem, 13vw, 4.2rem); max-width: 11ch; }
+  .f-hero__media { width: min(100%, 430px); aspect-ratio: 1 / 0.82; }
+  .f-hero__chip--product { left: 0; bottom: -2%; }
+  .f-hero__chip--tag { right: 0; top: auto; bottom: 8%; }
+  .f-hero__rings { left: 50%; top: 46%; width: 66vw; height: 66vw; }
+  .f-hero__stats { gap: 1.25rem 1.75rem; }
+  .f-hero__stat dd { max-width: 16ch; }
+  .f-hero__actions { width: 100%; }
+  .f-hero__actions .f-btn { flex: 1 1 auto; min-width: 0; }
 }
 @media (max-width: 420px) {
   .f-hero__chip--product { padding: 0.4rem 0.75rem 0.4rem 0.4rem; font-size: 0.75rem; }
   .f-hero__chip-media { width: 36px; height: 36px; }
+  .f-hero__chip--tag { font-size: 0.6875rem; padding: 0.4rem 0.75rem; }
 }
 
 /* ============================ MARQUEE =================================== */
