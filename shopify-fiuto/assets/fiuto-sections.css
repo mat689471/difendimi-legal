@@ -83,7 +83,6 @@
   z-index: 2;
   display: grid;
   gap: clamp(1.5rem, 4vw, 2.5rem);
-  width: 100%;
 }
 
 /* Desktop keeps head + tail in one column so the tall product stage can never
@@ -271,7 +270,7 @@
 @media (max-width: 899px) {
   .f-hero {
     min-height: 0;
-    padding-block: calc(var(--header-height, 58px) + clamp(1.5rem, 6vw, 2.5rem)) clamp(4.5rem, 14vw, 6rem);
+    padding-block: calc(var(--header-height, 58px) + clamp(2.25rem, 9vw, 3.5rem)) clamp(4.5rem, 14vw, 6rem);
   }
   .f-hero__copy { display: contents; }
   .f-hero__inner {
@@ -280,7 +279,7 @@
     row-gap: clamp(1.25rem, 4vw, 2rem);
   }
   .f-hero__title { font-size: clamp(2.6rem, 13vw, 4.2rem); max-width: 11ch; }
-  .f-hero__media { width: min(100%, 430px); aspect-ratio: 1 / 0.82; }
+  .f-hero__media { width: min(100%, 420px); aspect-ratio: 1 / 0.76; }
   .f-hero__chip--product { left: 0; bottom: -2%; }
   .f-hero__chip--tag { right: 0; top: auto; bottom: 8%; }
   .f-hero__rings { left: 50%; top: 46%; width: 66vw; height: 66vw; }
