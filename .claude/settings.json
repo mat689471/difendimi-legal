@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 .claude/skills/ui-ux-pro-max/scripts/search.py:*)",
+      "Bash(python3 .claude/skills/design/scripts/cip/search.py:*)",
+      "Bash(python3 .claude/skills/design-system/scripts/search-slides.py:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true
+}
