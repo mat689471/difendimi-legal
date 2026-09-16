@@ -1,7 +1,7 @@
 {%- comment -%}
   FIUTO — Product support strip
   Rendered under the product information on product pages. Holds the
-  reassurance/《how to use》content the merchant controls from the theme editor.
+  reassurance/how-to-usecontent the merchant controls from the theme editor.
   Nothing is pre-filled with claims: every string is an editable setting.
 {%- endcomment -%}
 
@@ -44,18 +44,11 @@
       "type": "step",
       "name": "Passaggio",
       "settings": [
-        { "type": "text", "id": "title", "label": "Titolo" },
-        { "type": "richtext", "id": "text", "label": "Testo" }
+        { "type": "text", "id": "title", "label": "Titolo", "default": "Riempi" },
+        { "type": "richtext", "id": "text", "label": "Testo", "default": "<p>Distribuisci una parte della razione o qualche premietto nel gioco.</p>" }
       ]
     }
   ],
-  "default": {
-    "blocks": [
-      { "type": "step", "settings": { "title": "Riempi", "text": "<p>Distribuisci una parte della razione o qualche premietto nel gioco.</p>" } },
-      { "type": "step", "settings": { "title": "Appoggia a terra", "text": "<p>Scegli una superficie stabile e lascia che il cane si avvicini da solo.</p>" } },
-      { "type": "step", "settings": { "title": "Lascialo cercare", "text": "<p>Resta nei paraggi e supervisiona il gioco, soprattutto le prime volte.</p>" } }
-    ]
-  },
   "presets": [{ "name": "Fiuto · Come si usa" }]
 }
 {% endschema %}
