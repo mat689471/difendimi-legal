@@ -1,0 +1,102 @@
+{%- comment -%}
+  FIUTO — Related products
+  Pulls the rest of the chosen collection, minus the product being viewed, and
+  renders it with the same editorial card as the homepage vetrina.
+{%- endcomment -%}
+
+{%- liquid
+  assign coll = collections[section.settings.collection]
+  if coll == blank or coll.products_count == 0
+    assign coll = product.collections.first
+  endif
+-%}
+
+{%- if coll != blank and coll.products_count > 1 -%}
+  <section class="f-showcase f-section f-related">
+    <div class="f-wrap f-wrap--wide">
+      <header class="f-showcase__head">
+        <div class="f-showcase__head-copy">
+          {%- if section.settings.eyebrow != blank -%}
+            <p class="f-eyebrow" data-f-reveal>{{ section.settings.eyebrow }}</p>
+          {%- endif -%}
+          <h2 class="f-h2 f-reveal-text" data-f-split="45">{{ section.settings.heading }}</h2>
+        </div>
+        <a class="f-btn f-btn--ghost f-showcase__head-link" href="{{ coll.url }}" data-f-reveal data-f-magnet="0.14">
+          {{ section.settings.link_label }} <span class="f-btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </header>
+
+      <ul class="f-showcase__grid" role="list" data-f-stagger="100">
+        {%- assign shown = 0 -%}
+        {%- for item in coll.products limit: 8 -%}
+          {%- if item.id == product.id -%}{%- continue -%}{%- endif -%}
+          {%- if shown >= section.settings.products_to_show -%}{%- break -%}{%- endif -%}
+          {%- assign shown = shown | plus: 1 -%}
+          {%- liquid
+            assign first_img = item.featured_image
+            assign second_img = blank
+            for media in item.media limit: 3
+              if media.id != item.featured_media.id and media.media_type == 'image'
+                assign second_img = media.preview_image
+                break
+              endif
+            endfor
+            assign short_title = item.title | split: '—' | first | strip
+            assign descriptor = item.title | split: '—' | last | strip
+          -%}
+          <li class="f-card" data-f-reveal>
+            <a class="f-card__link" href="{{ item.url }}" aria-label="{{ item.title | escape }}">
+              <div class="f-card__media">
+                <img
+                  class="f-card__img f-card__img--front"
+                  src="{{ first_img | image_url: width: 700 }}"
+                  srcset="{{ first_img | image_url: width: 350 }} 350w, {{ first_img | image_url: width: 700 }} 700w"
+                  sizes="(min-width: 990px) 26vw, 88vw"
+                  alt="{{ first_img.alt | default: item.title | escape }}"
+                  width="{{ first_img.width }}" height="{{ first_img.height }}"
+                  loading="lazy" decoding="async"
+                >
+                {%- if second_img != blank -%}
+                  <img
+                    class="f-card__img f-card__img--back"
+                    src="{{ second_img | image_url: width: 700 }}"
+                    alt="" width="{{ second_img.width }}" height="{{ second_img.height }}"
+                    loading="lazy" decoding="async" aria-hidden="true"
+                  >
+                {%- endif -%}
+                <span class="f-card__cta"><span>{{ section.settings.card_cta }}</span><span class="f-btn__arrow" aria-hidden="true">&rarr;</span></span>
+              </div>
+              <div class="f-card__body">
+                <h3 class="f-card__title">{{ short_title }}</h3>
+                {%- if descriptor != short_title -%}
+                  <p class="f-card__descriptor">{{ descriptor | truncate: 52 }}</p>
+                {%- endif -%}
+                <p class="f-card__price">
+                  {%- if item.compare_at_price > item.price -%}<s>{{ item.compare_at_price | money }}</s>{%- endif -%}
+                  <strong>{{ item.price | money }}</strong>
+                </p>
+              </div>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Fiuto · Prodotti correlati",
+  "tag": "section",
+  "class": "fiuto-section fiuto-section--related",
+  "settings": [
+    { "type": "collection", "id": "collection", "label": "Collezione (vuoto = quella del prodotto)" },
+    { "type": "range", "id": "products_to_show", "label": "Prodotti", "min": 2, "max": 8, "step": 1, "default": 3 },
+    { "type": "text", "id": "eyebrow", "label": "Occhiello", "default": "Continua a esplorare" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Altri giochi per il naso." },
+    { "type": "text", "id": "link_label", "label": "Testo link", "default": "Vedi la collezione" },
+    { "type": "text", "id": "card_cta", "label": "CTA card", "default": "Scopri" }
+  ],
+  "presets": [{ "name": "Fiuto · Prodotti correlati" }]
+}
+{% endschema %}

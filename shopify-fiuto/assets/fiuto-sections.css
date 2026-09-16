@@ -897,3 +897,126 @@
 
 /* Anchor targets clear the sticky header */
 .f-anchor { display: block; position: relative; top: calc((var(--header-height, 64px) + 16px) * -1); visibility: hidden; }
+
+/* ============================ COLLECTION HEADER ========================= */
+.f-collhero {
+  position: relative;
+  background: var(--f-bone);
+  padding-block: clamp(2.5rem, 7vw, 5rem) clamp(1.5rem, 3vw, 2.5rem);
+  overflow: clip;
+  isolation: isolate;
+}
+.f-collhero__bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.f-collhero__glow { position: absolute; border-radius: 50%; filter: blur(80px); }
+.f-collhero__glow--a {
+  width: 44vw; height: 44vw; left: -14vw; top: -22vw;
+  background: radial-gradient(circle, color-mix(in srgb, var(--f-amber) 42%, transparent), transparent 66%);
+}
+.f-collhero__glow--b {
+  width: 40vw; height: 40vw; right: -12vw; top: -18vw;
+  background: radial-gradient(circle, color-mix(in srgb, var(--f-lime) 38%, transparent), transparent 68%);
+}
+.f-collhero__inner { position: relative; z-index: 2; display: grid; gap: clamp(1.25rem, 3vw, 2rem); }
+
+.f-collhero__crumbs {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.75rem; letter-spacing: 0.06em; color: var(--f-ink-mute);
+}
+.f-collhero__crumbs a { color: inherit; text-decoration: none; }
+.f-collhero__crumbs a:hover { color: var(--f-leaf); text-decoration: underline; }
+.f-collhero__crumbs [aria-current] { color: var(--f-ink); }
+
+.f-collhero__head { display: flex; flex-direction: column; gap: 0.8rem; }
+.f-collhero__title { font-size: clamp(2.75rem, 9vw, 6rem); max-width: 14ch; }
+.f-collhero__aside { display: flex; flex-direction: column; gap: 1.5rem; }
+.f-collhero__desc { max-width: 52ch; }
+.f-collhero__desc p { margin: 0 0 0.6em; }
+.f-collhero__desc p:last-child { margin-bottom: 0; }
+
+.f-collhero__meta { display: flex; gap: clamp(1.5rem, 4vw, 3rem); margin: 0; padding-top: 1.1rem; border-top: 1px solid var(--f-line); }
+.f-collhero__meta > div { display: flex; flex-direction: column; gap: 0.15rem; }
+.f-collhero__meta dt { font-size: clamp(1.35rem, 2.6vw, 1.75rem); line-height: 1; letter-spacing: -0.03em; }
+.f-collhero__meta dd { margin: 0; font-size: 0.75rem; color: var(--f-ink-mute); letter-spacing: 0.05em; }
+
+@media (min-width: 900px) {
+  .f-collhero__inner {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    grid-template-areas: "crumbs crumbs" "head aside";
+    column-gap: clamp(2rem, 5vw, 4rem);
+    align-items: end;
+  }
+  .f-collhero__crumbs { grid-area: crumbs; }
+  .f-collhero__head { grid-area: head; }
+  .f-collhero__aside { grid-area: aside; }
+}
+
+/* ============================ PRODUCT PAGE ============================== */
+/* Gallery: soft warm panels instead of raw edge-to-edge photographs. */
+body[data-template^="product"] media-gallery { gap: clamp(0.5rem, 1vw, 0.9rem); }
+body[data-template^="product"] .product-media-container {
+  border-radius: var(--f-radius);
+  overflow: hidden;
+  background:
+    radial-gradient(118% 88% at 50% 6%, color-mix(in srgb, var(--f-amber-soft) 40%, transparent), transparent 62%),
+    var(--f-sand);
+  isolation: isolate;
+}
+body[data-template^="product"] .product-media-container img { mix-blend-mode: multiply; }
+
+body[data-template^="product"] .product-details { padding-inline-start: clamp(0rem, 2vw, 1.5rem); }
+
+/* Native Horizon sticky bar, restyled to the Fiuto system */
+.sticky-add-to-cart__bar {
+  border-radius: var(--f-radius-pill);
+  background: color-mix(in srgb, var(--f-paper) 92%, transparent) !important;
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--f-shadow-lift);
+  border: 1px solid var(--f-line);
+  padding-inline: 0.5rem;
+}
+.sticky-add-to-cart__image-img { border-radius: 50%; background: var(--f-sand); mix-blend-mode: multiply; }
+.sticky-add-to-cart__title { font-family: var(--f-display); font-weight: 600; letter-spacing: -0.02em; }
+.sticky-add-to-cart__button { border-radius: var(--f-radius-pill) !important; font-weight: 700; }
+
+/* ============================ USAGE STRIP =============================== */
+.f-usage {
+  background: var(--f-sand);
+  padding-block: clamp(3rem, 7vw, 5.5rem);
+}
+.f-usage__head { display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: clamp(1.5rem, 3.5vw, 2.5rem); }
+.f-usage__head .f-h2 { max-width: 20ch; }
+.f-usage__grid {
+  display: grid;
+  gap: clamp(0.85rem, 2vw, 1.25rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+.f-usage__item {
+  background: var(--f-paper);
+  border-radius: var(--f-radius);
+  padding: clamp(1.25rem, 2.4vw, 1.85rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: var(--f-shadow-sm);
+  transition: transform 0.5s var(--f-ease), box-shadow 0.5s var(--f-ease);
+}
+.f-usage__item:hover { transform: translateY(-3px); box-shadow: var(--f-shadow-md); }
+.f-usage__step { font-size: 0.6875rem; letter-spacing: 0.18em; color: var(--f-amber); }
+.f-usage__title { margin: 0; font-family: var(--f-display); font-size: 1.25rem; letter-spacing: -0.025em; }
+.f-usage__item .f-body p { margin: 0; }
+
+.f-related { background: var(--f-bone); }
+
+/* ============================ HORIZON CARD REVEAL ======================= */
+product-card.f-reveal-card {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+  transition: opacity 0.7s var(--f-ease) var(--f-delay, 0ms), transform 0.7s var(--f-ease) var(--f-delay, 0ms);
+  will-change: opacity, transform;
+}
+product-card.f-reveal-card.is-in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  product-card.f-reveal-card { opacity: 1 !important; transform: none !important; }
+}

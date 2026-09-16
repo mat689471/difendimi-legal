@@ -1,0 +1,61 @@
+{%- comment -%}
+  FIUTO — Product support strip
+  Rendered under the product information on product pages. Holds the
+  reassurance/《how to use》content the merchant controls from the theme editor.
+  Nothing is pre-filled with claims: every string is an editable setting.
+{%- endcomment -%}
+
+{%- if section.blocks.size > 0 -%}
+  <section class="f-usage f-section">
+    <div class="f-wrap f-wrap--wide">
+      {%- if section.settings.heading != blank -%}
+        <header class="f-usage__head">
+          {%- if section.settings.eyebrow != blank -%}
+            <p class="f-eyebrow" data-f-reveal>{{ section.settings.eyebrow }}</p>
+          {%- endif -%}
+          <h2 class="f-h2 f-reveal-text" data-f-split="45">{{ section.settings.heading }}</h2>
+        </header>
+      {%- endif -%}
+
+      <div class="f-usage__grid" data-f-stagger="90">
+        {%- for block in section.blocks -%}
+          <article class="f-usage__item" data-f-reveal {{ block.shopify_attributes }}>
+            <span class="f-usage__step f-num" aria-hidden="true">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+            <h3 class="f-usage__title">{{ block.settings.title }}</h3>
+            <div class="f-body">{{ block.settings.text }}</div>
+          </article>
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Fiuto · Come si usa",
+  "tag": "section",
+  "class": "fiuto-section fiuto-section--usage",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Occhiello", "default": "Come si usa" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Tre passaggi, poi tocca al naso." }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Passaggio",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Titolo" },
+        { "type": "richtext", "id": "text", "label": "Testo" }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "step", "settings": { "title": "Riempi", "text": "<p>Distribuisci una parte della razione o qualche premietto nel gioco.</p>" } },
+      { "type": "step", "settings": { "title": "Appoggia a terra", "text": "<p>Scegli una superficie stabile e lascia che il cane si avvicini da solo.</p>" } },
+      { "type": "step", "settings": { "title": "Lascialo cercare", "text": "<p>Resta nei paraggi e supervisiona il gioco, soprattutto le prime volte.</p>" } }
+    ]
+  },
+  "presets": [{ "name": "Fiuto · Come si usa" }]
+}
+{% endschema %}

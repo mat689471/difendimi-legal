@@ -1,0 +1,75 @@
+{%- comment -%}
+  FIUTO — Collection header
+  Editorial opening for collection and search pages. Title, description and
+  counts all come from the live collection, so nothing goes stale.
+{%- endcomment -%}
+
+{%- liquid
+  assign coll = collection
+  assign min_price = 0
+  for p in coll.products limit: 50
+    if min_price == 0 or p.price < min_price
+      assign min_price = p.price
+    endif
+  endfor
+-%}
+
+<section class="f-collhero f-section">
+  <div class="f-collhero__bg" aria-hidden="true">
+    <span class="f-collhero__glow f-collhero__glow--a"></span>
+    <span class="f-collhero__glow f-collhero__glow--b"></span>
+  </div>
+
+  <div class="f-wrap f-wrap--wide f-collhero__inner">
+    <nav class="f-collhero__crumbs" aria-label="{{ section.settings.breadcrumb_label | escape }}">
+      <a href="{{ routes.root_url }}">{{ section.settings.home_label }}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{{ coll.title | default: section.settings.fallback_title }}</span>
+    </nav>
+
+    <div class="f-collhero__head">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="f-eyebrow" data-f-reveal>{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h1 class="f-mega f-collhero__title f-reveal-text" data-f-split="48">
+        {{- coll.title | default: section.settings.fallback_title -}}
+      </h1>
+    </div>
+
+    <div class="f-collhero__aside">
+      {%- if coll.description != blank -%}
+        <div class="f-lead f-collhero__desc" data-f-reveal>{{ coll.description }}</div>
+      {%- endif -%}
+
+      <dl class="f-collhero__meta" data-f-stagger="70">
+        <div data-f-reveal>
+          <dt class="f-num">{{ coll.products_count }}</dt>
+          <dd>{{ section.settings.count_label }}</dd>
+        </div>
+        {%- if min_price > 0 -%}
+          <div data-f-reveal>
+            <dt class="f-num">{{ min_price | money_without_trailing_zeros }}</dt>
+            <dd>{{ section.settings.price_label }}</dd>
+          </div>
+        {%- endif -%}
+      </dl>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Fiuto · Testata collezione",
+  "tag": "section",
+  "class": "fiuto-section fiuto-section--collhero",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Occhiello", "default": "Collezione" },
+    { "type": "text", "id": "fallback_title", "label": "Titolo di riserva", "default": "Tutti i giochi" },
+    { "type": "text", "id": "home_label", "label": "Etichetta home", "default": "Home" },
+    { "type": "text", "id": "breadcrumb_label", "label": "Etichetta percorso", "default": "Percorso di navigazione" },
+    { "type": "text", "id": "count_label", "label": "Etichetta conteggio", "default": "prodotti" },
+    { "type": "text", "id": "price_label", "label": "Etichetta prezzo", "default": "prezzo di partenza" }
+  ],
+  "presets": [{ "name": "Fiuto · Testata collezione" }]
+}
+{% endschema %}

@@ -310,6 +310,40 @@
     });
   }
 
+  /* ------------------------------------------------ Horizon product cards */
+  /* Horizon renders its own <product-card> elements on collection, search and
+     recommendation grids. Give them the same staggered entrance as the custom
+     editorial cards without touching Horizon's markup. */
+  function initCardReveal(root) {
+    var cards = (root || document).querySelectorAll('product-card:not([data-f-card-bound])');
+    if (!cards.length) return;
+
+    var groups = new Map();
+    cards.forEach(function (card) {
+      card.setAttribute('data-f-card-bound', '');
+      var parent = card.closest('li, .product-grid__card') || card;
+      var grid = parent.parentElement || document.body;
+      if (!groups.has(grid)) groups.set(grid, 0);
+      var i = groups.get(grid);
+      groups.set(grid, i + 1);
+      card.style.setProperty('--f-delay', Math.min(i, 8) * 80 + 'ms');
+      card.classList.add('f-reveal-card');
+    });
+
+    if (reduce || !('IntersectionObserver' in window)) {
+      cards.forEach(function (c) { c.classList.add('is-in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-in');
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+    cards.forEach(function (c) { io.observe(c); });
+  }
+
   /* ---------------------------------------------------------- cart bubble */
   function initCartFeedback() {
     document.addEventListener('click', function (e) {
@@ -342,6 +376,7 @@
     initStagger(root);
     initReveal(root);
     initSplit(root);
+    initCardReveal(root);
   }
 
   function init() {

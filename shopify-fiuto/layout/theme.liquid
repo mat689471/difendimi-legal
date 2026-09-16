@@ -139,6 +139,16 @@
         data-template="{{ template }}"
       >
         {{ content_for_layout }}
+
+        {%- comment -%}
+          FIUTO product-page extras. Rendered from the layout so Horizon's own
+          product template stays untouched; both sections remain fully editable
+          from the theme editor.
+        {%- endcomment -%}
+        {%- if template.name == 'product' -%}
+          {% section 'fiuto-usage' %}
+          {% section 'fiuto-related' %}
+        {%- endif -%}
       </main>
 
       <footer>
